@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "VCWalletApp"
+rootProject.name = "vc-wallet-android-app"
 include(":app")
