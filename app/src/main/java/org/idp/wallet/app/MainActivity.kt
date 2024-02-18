@@ -9,7 +9,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,7 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
@@ -123,17 +127,19 @@ class MainActivity : ComponentActivity() {
 fun Content(onClick: (pinCode: String) -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(all= Dp(20.0F))
     ) {
         var pinCode by remember { mutableStateOf("") }
-        TextField(value = pinCode, onValueChange = {
+        TextField(label = { Text(text = "pinCode: ")}, value = pinCode, onValueChange = {
             pinCode = it
         })
-        Button(onClick = {
+        Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
             onClick(pinCode)
         }) {
             Text(text = "scan QR")
         }
+        Divider()
         Text(text = "")
     }
 }
