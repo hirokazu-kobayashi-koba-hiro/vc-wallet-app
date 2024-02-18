@@ -13,7 +13,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
@@ -23,11 +28,16 @@ import com.microsoft.walletlibrary.VerifiedIdClientBuilder
 import com.microsoft.walletlibrary.requests.VerifiedIdPresentationRequest
 import com.microsoft.walletlibrary.requests.VerifiedIdRequest
 import com.microsoft.walletlibrary.requests.input.VerifiedIdRequestURL
+import com.microsoft.walletlibrary.requests.requirements.GroupRequirement
+import com.microsoft.walletlibrary.requests.requirements.PinRequirement
+import com.microsoft.walletlibrary.verifiedid.VerifiedId
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 
 class MainActivity : ComponentActivity() {
+
+    var pinCode: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -37,6 +47,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Content(onClick = {
+                        pinCode = it
                         val intentIntegrator = IntentIntegrator(this@MainActivity).apply {
                             setPrompt("Scan a QR code")
                             captureActivity = PortraitCaptureActivity::class.java
@@ -70,9 +81,35 @@ class MainActivity : ComponentActivity() {
 
             if (verifiedIdRequestResult.isSuccess) {
                 val verifiedIdRequest = verifiedIdRequestResult.getOrNull()
-                val presentationRequest = verifiedIdRequest?.let {
-                    verifiedIdRequest as VerifiedIdPresentationRequest
+                verifiedIdRequest?.let {
+                    val requirement = it.requirement
+                    val requirementList =
+                        if (requirement !is GroupRequirement) listOf(requirement) else requirement.requirements
+                    requirementList.forEach {
+                        if (it is PinRequirement) {
+                            it.fulfill(pinCode)
+                        }
+                    }
                 }
+                verifiedIdRequest?.complete()?.fold(
+                    onSuccess = {issuedVerifiedId ->
+                        val verifiedId = issuedVerifiedId as VerifiedId
+                        val encodeResult = verifiedIdClient.encode(verifiedId)
+                        encodeResult.fold(
+                            onSuccess = {
+                                it.let { encodedVerifiedId ->
+                                    Toast.makeText(this@MainActivity, encodedVerifiedId, Toast.LENGTH_LONG).show()
+                                }
+                            },
+                            onFailure = {
+                                Toast.makeText(this@MainActivity, "encodedVerifiedId failed", Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    },
+                    onFailure = {
+                        Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show()
+                    }
+                )
             } else {
                 // If an exception occurs, its value can be accessed here.
                 val exception = verifiedIdRequestResult.exceptionOrNull()
@@ -83,16 +120,21 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(onClick: () -> Unit) {
+fun Content(onClick: (pinCode: String) -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        var pinCode by remember { mutableStateOf("") }
+        TextField(value = pinCode, onValueChange = {
+            pinCode = it
+        })
         Button(onClick = {
-            onClick()
+            onClick(pinCode)
         }) {
             Text(text = "scan QR")
         }
+        Text(text = "")
     }
 }
 
