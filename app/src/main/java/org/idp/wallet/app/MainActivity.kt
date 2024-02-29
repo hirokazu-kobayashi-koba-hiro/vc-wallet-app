@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 
@@ -72,7 +73,10 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Read Error", Toast.LENGTH_LONG).show()
             return
         }
-        lifecycleScope.launch {
+        val errorHandler = CoroutineExceptionHandler { _, error ->
+            Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
+        }
+        lifecycleScope.launch(errorHandler) {
             viewModel.request(this@MainActivity, barcodeValue, pinCode)
         }
     }

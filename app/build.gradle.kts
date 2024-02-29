@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     //verified
-    implementation("com.microsoft.entra.verifiedid:walletlibrary:1.0.0")
+    implementation(project(":verifiable-credentials-library"))
 
     //QR
     implementation("com.google.zxing:core:3.4.0")
