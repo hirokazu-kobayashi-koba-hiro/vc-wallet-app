@@ -8,12 +8,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,7 +39,7 @@ import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 
 class MainActivity : ComponentActivity() {
 
-    var pinCode: String = ""
+    var format: String = ""
 
     private val viewModel: VerifiableCredentialIssuanceViewModel by lazy {
         ViewModelProvider(this).get(VerifiableCredentialIssuanceViewModel::class.java)
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Content(viewModel, onClick = {
-                        pinCode = it
+                        format = it
                         val intentIntegrator = IntentIntegrator(this@MainActivity).apply {
                             setPrompt("Scan a QR code")
                             captureActivity = PortraitCaptureActivity::class.java
@@ -77,7 +79,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
         }
         lifecycleScope.launch(errorHandler) {
-            viewModel.request(this@MainActivity, barcodeValue, pinCode)
+            viewModel.request(this@MainActivity, barcodeValue, format)
         }
     }
 }
@@ -89,14 +91,27 @@ fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode:
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(all= Dp(20.0F))
     ) {
-        var pinCode by remember { mutableStateOf("") }
+        var format by remember { mutableStateOf("") }
         val vciState = viewModel.vciState.collectAsState()
 
-        TextField(label = { Text(text = "pinCode: ")}, value = pinCode, onValueChange = {
-            pinCode = it
-        })
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                RadioButton(selected = format == "vc+sd-jwt", onClick = {
+                    format = "vc+sd-jwt"
+                })
+                Text(text = "vc-sd-jwt")
+            }
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                RadioButton(selected = format == "mso_mdoc", onClick = {
+                    format = "mso_mdoc"
+                })
+                Text(text = "mso_mdoc")
+            }
+        }
         Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
-            onClick(pinCode)
+            onClick(format)
         }) {
             Text(text = "scan QR")
         }

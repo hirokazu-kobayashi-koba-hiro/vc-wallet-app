@@ -7,7 +7,7 @@ import java.util.Base64
 
 class VerifiableCredentialsClient(val clientId: String) {
 
-    suspend fun requestVCI(url: String): JSONObject {
+    suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
         val credentialOfferResponse = getCredentialOfferResponse(url)
         //{"credential_issuer":"https://trial.authlete.net","credential_configuration_ids":["IdentityCredential","org.iso.18013.5.1.mDL"],"grants":{"urn:ietf:params:oauth:grant-type:pre-authorized_code":{"pre-authorized_code":"9EzVDw3GeT5qF0_1m2zaBAEWuPQnuVSJ_wZfw_D2CDY"}}}
         val openidCredentialIssuerEndpoint =
@@ -30,7 +30,7 @@ class VerifiableCredentialsClient(val clientId: String) {
         val vcMetaResponse = HttpClient.get(openidCredentialIssuerEndpoint)
         val credentialEndpoint = vcMetaResponse.getString("credential_endpoint")
         val credentialRequest = hashMapOf(
-            Pair("format", "vc+sd-jwt"),
+            Pair("format", format),
             Pair("vct", "https://credentials.example.com/identity_credential")
         )
         val credentialRequestHeader = hashMapOf(

@@ -11,9 +11,9 @@ class VerifiableCredentialIssuanceViewModel :
 
     var _vcContent = MutableStateFlow("")
     val vciState = _vcContent.asStateFlow()
-    suspend fun request(context: Context, uri: String, pinCode: String) {
+    suspend fun request(context: Context, uri: String, format: String) {
         var verifiableCredentialsClient = VerifiableCredentialsClient("218232426")
-        var requestVCIResponse = verifiableCredentialsClient.requestVCI(uri)
+        var requestVCIResponse = verifiableCredentialsClient.requestVCI(uri, format)
         _vcContent.value = requestVCIResponse.toString()
     }
 
