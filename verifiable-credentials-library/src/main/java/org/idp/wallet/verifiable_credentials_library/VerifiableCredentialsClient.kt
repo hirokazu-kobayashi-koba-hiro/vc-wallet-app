@@ -1,17 +1,19 @@
 package org.idp.wallet.verifiable_credentials_library
 
+import android.content.Context
 import org.idp.wallet.verifiable_credentials_library.http.HttpClient
 import org.json.JSONObject
 import java.net.URLDecoder
-import java.util.Base64
 
-class VerifiableCredentialsClient(val clientId: String) {
+class VerifiableCredentialsClient(context: Context, val clientId: String) {
+
+    val registry = VerifiableCredentialRegistry(context)
 
     suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
         val credentialOfferResponse = getCredentialOfferResponse(url)
-        //{"credential_issuer":"https://trial.authlete.net","credential_configuration_ids":["IdentityCredential","org.iso.18013.5.1.mDL"],"grants":{"urn:ietf:params:oauth:grant-type:pre-authorized_code":{"pre-authorized_code":"9EzVDw3GeT5qF0_1m2zaBAEWuPQnuVSJ_wZfw_D2CDY"}}}
+        val credentialIssuer = credentialOfferResponse.getString("credential_issuer")
         val openidCredentialIssuerEndpoint =
-            credentialOfferResponse.getString("credential_issuer") + "/.well-known/openid-credential-issuer"
+            credentialIssuer + "/.well-known/openid-credential-issuer"
         val oiddEndpoint = credentialOfferResponse.getString("credential_issuer") + "/.well-known/openid-configuration"
         val metaResponse = HttpClient.get(oiddEndpoint)
         val tokenEndpoint = metaResponse.getString("token_endpoint")
@@ -37,7 +39,15 @@ class VerifiableCredentialsClient(val clientId: String) {
             Pair("Authorization", "Bearer $accessToken")
         )
         val credentialResponse = HttpClient.post(credentialEndpoint, credentialRequestHeader, credentialRequest)
+        registry.save(credentialIssuer, credentialResponse.optString("credential"))
         return credentialResponse
+    }
+
+    fun getAllCredentials(): JSONObject {
+        return registry.getAll()
+    }
+    fun decodeSdJwt() {
+
     }
 
     private suspend fun getCredentialOfferResponse(url: String): JSONObject {

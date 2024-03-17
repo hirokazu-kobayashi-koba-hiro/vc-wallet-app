@@ -58,7 +58,11 @@ class MainActivity : ComponentActivity() {
                             setPrompt("Scan a QR code")
                             captureActivity = PortraitCaptureActivity::class.java
                         }.initiateScan()
-                    })
+                    },
+                        onClickShow = {
+                            viewModel.getAllCredentials(this@MainActivity)
+                        }
+                    )
                 }
             }
         }
@@ -85,7 +89,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode: String) -> Unit) {
+fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode: String) -> Unit, onClickShow: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,10 +114,22 @@ fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode:
                 Text(text = "mso_mdoc")
             }
         }
-        Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
-            onClick(format)
-        }) {
-            Text(text = "scan QR")
+        Row {
+            Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
+                onClick(format)
+            }) {
+                Text(text = "scan QR")
+            }
+            Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
+                viewModel.clearVci()
+            }) {
+                Text(text = "clear")
+            }
+            Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
+                onClickShow()
+            }) {
+                Text(text = "show")
+            }
         }
         Divider()
         Text(text = "VerifiableCredentials", modifier = Modifier.padding(top = Dp(16.0F)))
@@ -129,6 +145,6 @@ fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode:
 @Composable
 fun GreetingPreview() {
     VCWalletAppTheme {
-        Content(viewModel = VerifiableCredentialIssuanceViewModel(), onClick = {})
+        Content(viewModel = VerifiableCredentialIssuanceViewModel(), onClick = {}, onClickShow = {})
     }
 }
