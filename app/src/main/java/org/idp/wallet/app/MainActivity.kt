@@ -2,23 +2,28 @@ package org.idp.wallet.app
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +41,20 @@ import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Scaffold
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
 
@@ -44,28 +63,24 @@ class MainActivity : ComponentActivity() {
     private val viewModel: VerifiableCredentialIssuanceViewModel by lazy {
         ViewModelProvider(this).get(VerifiableCredentialIssuanceViewModel::class.java)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VCWalletAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Content(viewModel, onClick = {
-                        format = it
-                        val intentIntegrator = IntentIntegrator(this@MainActivity).apply {
-                            setPrompt("Scan a QR code")
-                            captureActivity = PortraitCaptureActivity::class.java
-                        }.initiateScan()
-                    },
-                        onClickShow = {
-                            viewModel.getAllCredentials(this@MainActivity)
-                        }
-                    )
+
+            HomeView(viewModel, onClick = {
+                format = it
+                val intentIntegrator = IntentIntegrator(this@MainActivity).apply {
+                    setPrompt("Scan a QR code")
+                    captureActivity = PortraitCaptureActivity::class.java
+                }.initiateScan()
+            },
+                onClickShow = {
+                    viewModel.getAllCredentials(this@MainActivity)
                 }
-            }
+            )
         }
+
     }
 
     @SuppressLint("ShowToast")
@@ -88,26 +103,142 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode: String) -> Unit, onClickShow: () -> Unit) {
+fun PreviewMainScreen() {
+    HomeView(viewModel = VerifiableCredentialIssuanceViewModel(), onClick = {}, onClickShow = {})
+}
+
+@Composable
+fun HomeView(
+    viewModel: VerifiableCredentialIssuanceViewModel,
+    onClick: (format: String) -> Unit,
+    onClickShow: () -> Unit
+) {
+    val navController = rememberNavController()
+    VCWalletAppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MainScreen(
+                viewModel = viewModel,
+                onClick = onClick,
+                onClickShow = onClickShow,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+fun MainScreen(
+    viewModel: VerifiableCredentialIssuanceViewModel,
+    onClick: (format: String) -> Unit,
+    onClickShow: () -> Unit,
+    navController: NavHostController
+) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigation {
+                val items = listOf(
+                    Screen.Home,
+                    Screen.Vc,
+                    Screen.Vp
+                )
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                items.forEach { screen ->
+                    BottomNavigationItem(
+                        icon = { Icon(screen.icon, contentDescription = null) },
+                        label = { Text(screen.title) },
+                        selected = currentRoute == screen.route,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    ) { padding ->
+        Log.d("padding", padding.toString())
+        NavHost(navController, startDestination = Screen.Home.route) {
+            composable(Screen.Home.route) {
+                HomeScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
+            }
+            composable(Screen.Vc.route) {
+                VcScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
+            }
+            composable(Screen.Vp.route) {
+                VpScreen(navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeScreen(
+    viewModel: VerifiableCredentialIssuanceViewModel,
+    onClick: (pinCode: String) -> Unit,
+    onClickShow: () -> Unit
+) {
+    val vciState = viewModel.vciState.collectAsState()
     Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(all= Dp(20.0F))
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "")
+            Text(text = "VerifiableCredentials", modifier = Modifier.padding(top = Dp(16.0F)))
+            IconButton(onClick = onClickShow) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+            }
+        }
+        Text(
+            text = vciState.value, modifier = Modifier
+                .padding(top = Dp(16.0F))
+                .verticalScroll(
+                    rememberScrollState()
+                )
+        )
+
+    }
+}
+
+@Composable
+fun VcScreen(
+    viewModel: VerifiableCredentialIssuanceViewModel,
+    onClick: (pinCode: String) -> Unit,
+    onClickShow: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var format by remember { mutableStateOf("") }
         val vciState = viewModel.vciState.collectAsState()
 
         Column {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 RadioButton(selected = format == "vc+sd-jwt", onClick = {
                     format = "vc+sd-jwt"
                 })
                 Text(text = "vc-sd-jwt")
             }
-            Row(verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 RadioButton(selected = format == "mso_mdoc", onClick = {
                     format = "mso_mdoc"
                 })
@@ -120,31 +251,28 @@ fun Content(viewModel: VerifiableCredentialIssuanceViewModel, onClick: (pinCode:
             }) {
                 Text(text = "scan QR")
             }
-            Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
-                viewModel.clearVci()
-            }) {
-                Text(text = "clear")
-            }
-            Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = {
-                onClickShow()
-            }) {
-                Text(text = "show")
-            }
         }
-        Divider()
-        Text(text = "VerifiableCredentials", modifier = Modifier.padding(top = Dp(16.0F)))
-        Text(text = vciState.value, modifier = Modifier
-            .padding(top = Dp(16.0F))
-            .verticalScroll(
-                rememberScrollState()
-            ))
+
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    VCWalletAppTheme {
-        Content(viewModel = VerifiableCredentialIssuanceViewModel(), onClick = {}, onClickShow = {})
+fun VpScreen(navController: NavHostController) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Profile Screen")
     }
+}
+
+sealed class Screen(
+    val route: String,
+    val title: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    object Home : Screen("home", "Home", Icons.Default.Home)
+    object Vc : Screen("vc", "Vc", Icons.Default.Add)
+    object Vp : Screen("vp", "Vp", Icons.Default.Share)
 }
