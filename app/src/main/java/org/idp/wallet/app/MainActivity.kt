@@ -2,7 +2,6 @@ package org.idp.wallet.app
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -13,12 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.magnifier
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -49,6 +47,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -99,6 +98,7 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch(errorHandler) {
             viewModel.request(this@MainActivity, barcodeValue, format)
+            Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
         }
     }
 }
@@ -179,6 +179,24 @@ fun MainScreen(
 }
 
 @Composable
+fun VcCardComponent(title: String, content: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Dp(16.0F))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(Dp(16.0F))
+        ) {
+            Text(text = title, style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(Dp(8.0F)))
+            Text(text = content, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
 fun HomeScreen(
     viewModel: VerifiableCredentialIssuanceViewModel,
     onClick: (pinCode: String) -> Unit,
@@ -195,19 +213,27 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "")
-            Text(text = "VerifiableCredentials", modifier = Modifier.padding(top = Dp(16.0F)))
+            Text(text = "VerifiableCredentials")
             IconButton(onClick = onClickShow) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
             }
         }
-        Text(
-            text = vciState.value, modifier = Modifier
-                .padding(top = Dp(16.0F))
-                .verticalScroll(
-                    rememberScrollState()
-                )
-        )
-
+        val cardList = mutableListOf<Pair<String, String>>()
+        val vc = vciState.value
+        vc.keys().forEach { key ->
+            val jsonArray = vc.getJSONArray(key)
+            for (i in 0 until jsonArray.length()) {
+                jsonArray.getString(i)
+                cardList.add(Pair(key, jsonArray.getString(i)))
+            }
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(cardList) { (issuer, content) ->
+                VcCardComponent(title = issuer, content = content)
+            }
+        }
     }
 }
 
