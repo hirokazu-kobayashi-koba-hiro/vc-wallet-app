@@ -1,9 +1,12 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
+import android.util.Log
+import id.walt.sdjwt.SDJwt
 import org.idp.wallet.verifiable_credentials_library.http.HttpClient
 import org.json.JSONObject
 import java.net.URLDecoder
+
 
 class VerifiableCredentialsClient(context: Context, val clientId: String) {
 
@@ -46,8 +49,15 @@ class VerifiableCredentialsClient(context: Context, val clientId: String) {
     fun getAllCredentials(): JSONObject {
         return registry.getAll()
     }
-    fun decodeSdJwt() {
-
+    companion object {
+        fun parseSdJwt(rawSdJwt: String): SDJwt {
+            try {
+                return SDJwt.parse(rawSdJwt)
+            } catch (e: Exception) {
+                Log.e("Vc library", e.message?: "failed parseSdJwt")
+                throw e
+            }
+        }
     }
 
     private suspend fun getCredentialOfferResponse(url: String): JSONObject {

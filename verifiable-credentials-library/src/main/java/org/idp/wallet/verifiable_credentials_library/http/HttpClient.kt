@@ -94,19 +94,19 @@ object ResponseResolver {
         when (val status = connection.responseCode) {
             in (200..299) -> {
                 val message = connection.inputStream.bufferedReader().use { it.readText() }
-                Log.d("VC Http", message)
+                Log.d("Vc library", message)
                 return JSONObject(message)
             }
 
             in (400..499) -> {
                 val message = connection.errorStream.bufferedReader().use { it.readText() }
-                Log.d("VC Http", message)
+                Log.d("Vc library", message)
                 throw NetworkException("0001", "network client error statusCode: $status, response: $message")
             }
 
             in (500..599) -> {
                 val message = connection.errorStream.bufferedReader().use { it.readText() }
-                Log.d("VC Http", message)
+                Log.d("Vc library", message)
                 throw NetworkException("0002", "network server error statusCode: $status, response: $message")
             }
         }

@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -32,11 +34,26 @@ android {
     }
 }
 
+repositories {
+    google()
+    mavenLocal()
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://maven.walt.id/repository/waltid/")
+    maven("https://maven.walt.id/repository/waltid-ssi-kit/")
+    maven("https://repo.danubetech.com/repository/maven-public/")
+}
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
+    implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
+
+    // JSON
+    implementation("com.beust:klaxon:5.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")

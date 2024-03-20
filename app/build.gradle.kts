@@ -51,6 +51,16 @@ android {
     }
 }
 
+repositories {
+    google()
+    mavenLocal()
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://maven.walt.id/repository/waltid/")
+    maven("https://maven.walt.id/repository/waltid-ssi-kit/")
+    maven("https://repo.danubetech.com/repository/maven-public/")
+}
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -70,6 +80,11 @@ dependencies {
 
     //verified
     implementation(project(":verifiable-credentials-library"))
+    implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
+
+    // JSON
+    implementation("com.beust:klaxon:5.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     //QR
     implementation("com.google.zxing:core:3.4.0")

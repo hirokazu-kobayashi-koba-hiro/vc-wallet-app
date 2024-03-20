@@ -54,6 +54,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import java.util.stream.Collectors
 
 class MainActivity : ComponentActivity() {
 
@@ -163,7 +164,7 @@ fun MainScreen(
             }
         }
     ) { padding ->
-        Log.d("padding", padding.toString())
+        Log.d("Vc library app", padding.toString())
         NavHost(navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
                 HomeScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
@@ -223,8 +224,14 @@ fun HomeScreen(
         vc.keys().forEach { key ->
             val jsonArray = vc.getJSONArray(key)
             for (i in 0 until jsonArray.length()) {
-                jsonArray.getString(i)
-                cardList.add(Pair(key, jsonArray.getString(i)))
+                val value = jsonArray.getString(i)
+                val sdJwt = viewModel.parseSdJwt(value)
+                val stringBuilder = StringBuilder()
+                sdJwt.digestedDisclosures.forEach {
+                    stringBuilder.append(it.value.key + ":" + it.value.value)
+                    stringBuilder.append("\n")
+                }
+                cardList.add(Pair(key, stringBuilder.toString()))
             }
         }
         LazyColumn(
