@@ -34,15 +34,6 @@ android {
     }
 }
 
-repositories {
-    google()
-    mavenLocal()
-    mavenCentral()
-    maven("https://jitpack.io")
-    maven("https://maven.walt.id/repository/waltid/")
-    maven("https://maven.walt.id/repository/waltid-ssi-kit/")
-    maven("https://repo.danubetech.com/repository/maven-public/")
-}
 
 dependencies {
 
