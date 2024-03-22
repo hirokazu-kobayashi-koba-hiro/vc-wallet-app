@@ -20,9 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-
-
-
 rootProject.name = "vc-wallet-android-app"
 include(":app")
 include(":verifiable-credentials-library")

@@ -44,7 +44,10 @@ dependencies {
 
     // JSON
     implementation("com.beust:klaxon:5.6")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    //jose
+    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")

@@ -67,7 +67,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             HomeView(viewModel, onClick = {
                 format = it
                 val intentIntegrator = IntentIntegrator(this@MainActivity).apply {
@@ -80,7 +79,9 @@ class MainActivity : ComponentActivity() {
                 }
             )
         }
-
+        lifecycleScope.launch {
+            viewModel.getAllCredentials(this@MainActivity)
+        }
     }
 
     @SuppressLint("ShowToast")
