@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.jose
+package org.idp.wallet.verifiable_credentials_library.basic.jose
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader

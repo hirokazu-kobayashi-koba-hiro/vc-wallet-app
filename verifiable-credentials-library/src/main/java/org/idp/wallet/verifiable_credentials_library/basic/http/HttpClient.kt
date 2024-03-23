@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.http
+package org.idp.wallet.verifiable_credentials_library.basic.http
 
 import android.net.Uri
 import android.util.Log

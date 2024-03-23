@@ -3,9 +3,9 @@ package org.idp.wallet.verifiable_credentials_library
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import org.idp.wallet.verifiable_credentials_library.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.jose.JwtObject
+import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
+import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import java.net.URLDecoder
 
 
