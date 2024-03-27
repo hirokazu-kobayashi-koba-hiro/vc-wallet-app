@@ -46,6 +46,9 @@ dependencies {
     implementation("com.beust:klaxon:5.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+    implementation("com.nfeld.jsonpathkt:jsonpathkt:2.0.1")
+
+
     //jose
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
 
