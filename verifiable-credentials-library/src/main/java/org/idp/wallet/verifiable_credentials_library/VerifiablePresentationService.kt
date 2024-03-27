@@ -20,10 +20,9 @@ class VerifiablePresentationService(context: Context) {
         val verifiablePresentationRequestCreator = VerifiablePresentationRequestCreator(requestObject)
         val presentationRequest = verifiablePresentationRequestCreator.create()
         presentationRequest.presentationDefinition
-        //get presentation definition
-        //get client meta data
         //verify request
-        //create id_token and vp_token
+        //find vc
+        //create id_token and vp_token and presentation_submission
         //create response
         //return response
     }

@@ -1,6 +1,5 @@
 package org.idp.wallet.verifiable_credentials_library
 
-import com.nimbusds.jose.shaded.gson.annotations.SerializedName
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
@@ -42,37 +41,55 @@ class VerifiablePresentationRequest(
 
 
 class PresentationDefinition(
-    val id: String = "",
-//    @SerializedName("input_descriptors")
-    val inputDescriptors: List<InputDescriptorDetail> = listOfNotNull()
-)
+    val id: String,
+    val inputDescriptors: List<InputDescriptorDetail>
+) {
 
-class InputDescriptorDetail(
-    val id: String = "",
+
+}
+
+data class InputDescriptorDetail(
+    val id: String,
+    val name: String?,
+    val purpose: String?,
     val format: Format?,
     val constraints: Constraints?
 )
 
-class Format(
-    val ldpVc: LdpVc
+data class Format(
+    val jwt: FormatDetail?,
+    val jwtVc: FormatDetail?,
+    val jwtVp: FormatDetail?,
+    val ldpVc: FormatDetail?,
+    val ldpVp: FormatDetail?,
+    val ldp: FormatDetail?
 )
 
-class LdpVc(
-    val proofType: List<String>
+data class FormatDetail(
+    val alg: List<String>?,
+    val proofType: List<String>?
 )
-class Constraints(
-    val limitDisclosure: String,
-    val fields: List<Field>
+
+data class Constraints(
+    val limitDisclosure: String?,
+    val fields: List<Field>?
 )
-class Field(
+
+data class Field(
     val path: List<String>,
-    val filter: Filter? = null
+    val id: String?,
+    val purpose: String?,
+    val name: String?,
+    val filter: Filter?,
+    val optional: Boolean?
 )
-class Filter(
+
+data class Filter(
     val type: String,
     val pattern: String
 )
-class ClientMetadata (
+
+class ClientMetadata(
     val clientId: String = "",
     val clientSecret: String = "",
     val redirectUris: List<String> = ArrayList(),
