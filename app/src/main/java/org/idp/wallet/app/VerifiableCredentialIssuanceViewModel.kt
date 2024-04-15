@@ -14,15 +14,13 @@ class VerifiableCredentialIssuanceViewModel :
 
     var _vcContent = MutableStateFlow(JSONObject())
     val vciState = _vcContent.asStateFlow()
-    suspend fun request(context: Context, uri: String, format: String) {
-        var verifiableCredentialsClient = VerifiableCredentialsClient(context, "218232426")
-        var requestVCIResponse = verifiableCredentialsClient.requestVCI(uri, format)
+    suspend fun request(uri: String, format: String) {
+        val requestVCIResponse = VerifiableCredentialsClient.requestVCI(uri, format)
         Log.d("Vc library app", requestVCIResponse.toString())
     }
 
-    fun getAllCredentials(context: Context) {
-        var verifiableCredentialsClient = VerifiableCredentialsClient(context, "218232426")
-        var allCredentials = verifiableCredentialsClient.getAllCredentials()
+    fun getAllCredentials() {
+        val allCredentials = VerifiableCredentialsClient.getAllCredentials()
         Log.d("Vc library app", allCredentials.toString())
         _vcContent.value = allCredentials
     }

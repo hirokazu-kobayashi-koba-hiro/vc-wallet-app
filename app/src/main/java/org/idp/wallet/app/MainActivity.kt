@@ -54,6 +54,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import java.util.stream.Collectors
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VerifiableCredentialsClient.init(this, "218232426")
         setContent {
             HomeView(viewModel, onClick = {
                 format = it
@@ -75,12 +77,12 @@ class MainActivity : ComponentActivity() {
                 }.initiateScan()
             },
                 onClickShow = {
-                    viewModel.getAllCredentials(this@MainActivity)
+                    viewModel.getAllCredentials()
                 }
             )
         }
         lifecycleScope.launch {
-            viewModel.getAllCredentials(this@MainActivity)
+            viewModel.getAllCredentials()
         }
     }
 
@@ -99,7 +101,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
         }
         lifecycleScope.launch(errorHandler) {
-            viewModel.request(this@MainActivity, barcodeValue, format)
+            viewModel.request(barcodeValue, format)
             Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
         }
     }
@@ -228,8 +230,8 @@ fun HomeScreen(
                 val value = jsonArray.getString(i)
                 val sdJwt = viewModel.parseSdJwt(value)
                 val stringBuilder = StringBuilder()
-                sdJwt.digestedDisclosures.forEach {
-                    stringBuilder.append(it.value.key + ":" + it.value.value)
+                sdJwt.fullPayload.forEach {
+                    stringBuilder.append(it.key + ":" + it.value)
                     stringBuilder.append("\n")
                 }
                 cardList.add(Pair(key, stringBuilder.toString()))

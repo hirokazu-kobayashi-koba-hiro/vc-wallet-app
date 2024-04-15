@@ -39,6 +39,22 @@ class VerifiablePresentationRequest(
     }
 }
 
+enum class VerifiableProperty(val key: String, val typeString: String) {
+    context("@context", "List<String>"),
+    id("id", "String"),
+    type("type", "List<String>"),
+    issuer("issuer", "Map<String,Any>"),
+    credentialSubject("credentialSubject", "Map<String,Any>"),
+    issuanceDate("issuanceDate", "String");
+
+    companion object {
+        fun of(key: String): VerifiableProperty {
+            return entries.first {
+                it.key == key
+            }
+        }
+    }
+}
 
 class PresentationDefinition(
     val id: String,
@@ -81,7 +97,8 @@ data class Field(
     val purpose: String?,
     val name: String?,
     val filter: Filter?,
-    val optional: Boolean?
+    val optional: Boolean?,
+    val pattern: String?
 )
 
 data class Filter(
