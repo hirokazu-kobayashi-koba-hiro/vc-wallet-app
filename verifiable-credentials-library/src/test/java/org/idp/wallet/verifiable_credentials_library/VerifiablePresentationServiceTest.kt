@@ -3,6 +3,7 @@ package org.idp.wallet.verifiable_credentials_library
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
+import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.json.JSONArray
 import org.junit.Assert
 import org.junit.Before
@@ -25,8 +26,154 @@ class VerifiablePresentationServiceTest {
     @Test
     fun testSaveAndFind() {
         runBlocking {
-            val url = "openid4vp://?request=eyJ0eXBlIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJyZXNwb25zZV90eXBlIjoidnBfdG9rZW4iLCJwcmVzZW50YXRpb25fZGVmaW5pdGlvbiI6eyJpZCI6ImV4YW1wbGUgd2l0aCBzZWxlY3RpdmUgZGlzY2xvc3VyZSIsImlucHV0X2Rlc2NyaXB0b3JzIjpbeyJpZCI6IklEIGNhcmQgd2l0aCBjb25zdHJhaW50cyIsImZvcm1hdCI6eyJsZHBfdmMiOnsicHJvb2ZfdHlwZSI6WyJFZDI1NTE5U2lnbmF0dXJlMjAxOCJdfX0sImNvbnN0cmFpbnRzIjp7ImxpbWl0X2Rpc2Nsb3N1cmUiOiJyZXF1aXJlZCIsImZpZWxkcyI6W3sicGF0aCI6WyIkLnR5cGUiXSwiZmlsdGVyIjp7InR5cGUiOiJzdHJpbmciLCJwYXR0ZXJuIjoiSURDYXJkQ3JlZGVudGlhbCJ9fSx7InBhdGgiOlsiJC5jcmVkZW50aWFsU3ViamVjdC5naXZlbl9uYW1lIl19LHsicGF0aCI6WyIkLmNyZWRlbnRpYWxTdWJqZWN0LmZhbWlseV9uYW1lIl19LHsicGF0aCI6WyIkLmNyZWRlbnRpYWxTdWJqZWN0LmJpcnRoZGF0ZSJdfV19fV19LCJyZWRpcmVjdF91cmkiOiJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9jYWxsYmFjayIsImNsaWVudF9tZXRhZGF0YSI6eyJpc3N1ZXIiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvMTIzIiwiY2xpZW50X2lkIjoicHJpdmF0ZUtleUp3dCIsImNsaWVudF9zZWNyZXQiOiJwcml2YXRlS2V5Snd0U2VjcmV0IiwiY2xpZW50X2lkX2lzc3VlZF9hdCI6Mjg5MzI1NjgwMCwiY2xpZW50X3NlY3JldF9leHBpcmVzX2F0IjoyODkzMjc2ODAwLCJyZWRpcmVjdF91cmlzIjpbImh0dHBzOi8vY2xpZW50LmV4YW1wbGUub3JnL2NhbGxiYWNrIiwiaHR0cHM6Ly9jbGllbnQuZXhhbXBsZS5vcmcvY2FsbGJhY2syIiwiaHR0cDovL2xvY2FsaG9zdDo4MDgxL2NhbGxiYWNrIiwiaHR0cHM6Ly93d3cuY2VydGlmaWNhdGlvbi5vcGVuaWQubmV0L3Rlc3QvYS9pZHBfb2lkY19iYXNpYy9jYWxsYmFjayIsImh0dHBzOi8vbG9jYWxob3N0LmVtb2JpeC5jby51azo4NDQzL3Rlc3QvYS9pZHBfb2lkY19iYXNpYy9jYWxsYmFjayIsImh0dHBzOi8vbG9jYWxob3N0LmVtb2JpeC5jby51azo4NDQzL3Rlc3QvYS9pZHBfb2lkY19pbXBsaWNpdC9jYWxsYmFjayIsImh0dHBzOi8vbG9jYWxob3N0LmVtb2JpeC5jby51azo4NDQzL3Rlc3QvYS9pZHBfb2lkY19oeWJyaWQvY2FsbGJhY2siXSwicmVzcG9uc2VfdHlwZXMiOlsiY29kZSIsInRva2VuIiwiaWRfdG9rZW4iLCJjb2RlIHRva2VuIiwiY29kZSB0b2tlbiBpZF90b2tlbiIsInRva2VuIGlkX3Rva2VuIiwiY29kZSBpZF90b2tlbiIsIm5vbmUiLCJ2cF90b2tlbiIsInZwX3Rva2VuIGlkX3Rva2VuIl0sImdyYW50X3R5cGVzIjpbImF1dGhvcml6YXRpb25fY29kZSIsInJlZnJlc2hfdG9rZW4iLCJwYXNzd29yZCIsImNsaWVudF9jcmVkZW50aWFscyJdLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIGFkZHJlc3MgcGhvbmUgb2ZmbGluZV9hY2Nlc3MgYWNjb3VudCB0cmFuc2ZlcnMgcmVhZCB3cml0ZSIsImNsaWVudF9uYW1lIjoiTXkgRXhhbXBsZSBDbGllbnQiLCJjbGllbnRfbmFtZSNqYS1KcGFuLUpQIjoi44Kv44Op44Kk44Ki44Oz44OI5ZCNIiwidG9rZW5fZW5kcG9pbnRfYXV0aF9tZXRob2QiOiJwcml2YXRlX2tleV9qd3QiLCJsb2dvX3VyaSI6Imh0dHBzOi8vY2xpZW50LmV4YW1wbGUub3JnL2xvZ28ucG5nIiwiandrc191cmkiOiJodHRwczovL2NsaWVudC5leGFtcGxlLm9yZy9teV9wdWJsaWNfa2V5cy5qd2tzIiwiYXBwbGljYXRpb25fdHlwZSI6IndlYiIsImp3a3MiOiJ7XG4gICAgXCJrZXlzXCI6IFtcbiAgICAgICAge1xuICAgICAgICAgICAgXCJrdHlcIjogXCJSU0FcIixcbiAgICAgICAgICAgIFwiZVwiOiBcIkFRQUJcIixcbiAgICAgICAgICAgIFwidXNlXCI6IFwic2lnXCIsXG4gICAgICAgICAgICBcImtpZFwiOiBcImNsaWVudF9zZWNyZXRfa2V5XCIsXG4gICAgICAgICAgICBcImFsZ1wiOiBcIlJTMjU2XCIsXG4gICAgICAgICAgICBcIm5cIjogXCJzRlNxc1d1MmtvVTY5b0c2N0w1d3NWR3d6a3llODBCZDlsbU9maVNrU1RYeWM4SUtsNGd3bWo5dGp6eHhBMXBHWWk0U0tFUWFCWU5sOEpyR2h0dEJjYnRyYXF3YVM1UTZqcEcyNEMxejlualV1bUpXSm5lQTNFSjlMcHVuOWQzdUNBM2JfNzFYbks1UHItVnR3enBVNno4VkdOTVpobDhyWjVwMUwwc3lNcFowM3k1dFNXVk1udGNlaXFOYUZ1SkNGWEdNVlNscDZ2clZDcXBjTTRyMDM1dFVSLVB3alN5bnB4ZTdPR2xRcEhWU3ZCQ2JYSkp1ZmkwUXhJSWpkUHgya2E1ODZUbHZGalZ1MFFCRWNFb25fQk1yUERXUEQxYWFBRWNTUE05VTdmV3psSzZidEo4ZDM3VFhaMF9yUlBRX3RWZVpBbERuUmNsZWhIa0tmbGtOandcIlxuICAgICAgICB9LHtcbiAgICBcImt0eVwiOiBcIlJTQVwiLFxuICAgIFwiZVwiOiBcIkFRQUJcIixcbiAgICBcInVzZVwiOiBcInNpZ1wiLFxuICAgIFwia2lkXCI6IFwiY2xpZW50X3NlY3JldF9rZXlfMjA0MFwiLFxuICAgIFwiYWxnXCI6IFwiUlMyNTZcIixcbiAgICBcIm5cIjogXCJ0bmRJUGlZblR3OFVsYnZVNEdTRDc3dFB3ZVBOcHUxVlltVFdtck9BMWV0dk5WN3hlVTEwbEhQc2NtYnI3MDJiYm81YWRFVndXc3F3SGtTMGx2dEJCZXBiM0JLaEZ3bDg0X0ZmcXAtUF9ycWxkdVEzWG5yaTVCZmVzcmVPeTZuWlFjUTk1T1NSME00SFlnZmhyc01YQ3hRc0ExR0NEQ0k3b2lLbTQzaWNUeGFQb0gyMzJxZkpGR19ySW5IQkVva08tQkNLXzBDdC10bzZkeVJMeGxEZ0NvS1I0TG5XSl9FVGZ4emI5TFNkcDZtTzNjY0Q5cjlRaXQ3dGdidi12QnpHdE1XOVlkX2l3YkhNbzJxUlJNbmJRTUhISzNWaXAyeENFSWkxdjNIQy0tVVVYdWVjSl9TWUcyRDY5VUtDM2h2TzU0bGpXS3NJeWVHQWtjVHlEWkVSXCJcbn0gICAgXVxufSIsImF1dGhvcml6YXRpb25fZGV0YWlsc190eXBlcyI6WyJwYXltZW50X2luaXRpYXRpb24iLCJhY2NvdW50X2luZm9ybWF0aW9uIiwib3BlbmlkX2NyZWRlbnRpYWwiXX19.KvGKuN_aQ7bRjgwrJR__EdgVXFw04FMZVL8dQNMdYeP-lcE5popnOwqEoAZJIjwhQBrB7suvETdyfFl5nk2G8A"
-            service.handleVpRequest(url)
+            val registry = service.registry
+            val header = mapOf("type" to "JWT")
+            val payloadValue = """
+            {
+              "vc": {
+                "@context": [
+                  "https://www.w3.org/ns/credentials/v2",
+                  "https://www.w3.org/ns/credentials/examples/v2"
+                ],
+                "id": "http://university.example/credentials/3732",
+                "type": [
+                  "VerifiableCredential",
+                  "ExampleDegreeCredential"
+                ],
+                "issuer": "https://university.example/issuers/565049",
+                "validFrom": "2010-01-01T00:00:00Z",
+                "credentialSubject": {
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "degree": {
+                    "type": "ExampleBachelorDegree",
+                    "name": "Bachelor of Science and Arts"
+                  }
+                }
+              },
+              "iss": "https://university.example/issuers/565049",
+              "jti": "http://university.example/credentials/3732",
+              "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            }
+        """.trimIndent()
+            val jwk = """
+            {
+                "kty": "EC",
+                "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
+                "use": "sig",
+                "crv": "P-256",
+                "kid": "access_token",
+                "x": "iWJINqt0ySv3kVEvlHbvNkPKY2pPSf1cG1PSx3tRfw0",
+                "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
+                "alg": "ES256"
+            }
+        """.trimIndent()
+
+            val signedValue = JoseHandler.sign(header, payloadValue, jwk)
+            val payload = JoseHandler.parse(signedValue).payload()
+            val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload);
+            registry.save("test", record)
+            val vpPayload = """
+            {
+                "redirect_uri": "https://client.example.org/callback",
+                "response_type": "vp_token",
+                "presentation_definition": {
+                    "id": "example with selective disclosure",
+                    "input_descriptors": [
+                        {
+                            "id": "ID card with constraints",
+                            "format": {
+                                "ldp_vc": {
+                                    "proof_type": [
+                                        "Ed25519Signature2018"
+                                    ]
+                                }
+                            },
+                            "constraints": {
+                                "limit_disclosure": "required",
+                                "fields": [
+                                    {
+                                        "path": [
+                                            "${'$'}.vc.type"
+                                        ],
+                                        "filter": {
+                                            "type": "string",
+                                            "pattern": "ExampleDegreeCredential"
+                                        }
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.given_name"
+                                        ]
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.family_name"
+                                        ]
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.birthdate"
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "client_metadata": {
+                    "issuer": "http://localhost:8080/123",
+                    "client_id": "privateKeyJwt",
+                    "client_secret": "privateKeyJwtSecret",
+                    "client_id_issued_at": 2893256800,
+                    "client_secret_expires_at": 2893276800,
+                    "redirect_uris": [
+                        "https://client.example.org/callback",
+                        "https://client.example.org/callback2",
+                        "http://localhost:8081/callback",
+                        "https://www.certification.openid.net/test/a/idp_oidc_basic/callback",
+                        "https://localhost.emobix.co.uk:8443/test/a/idp_oidc_basic/callback",
+                        "https://localhost.emobix.co.uk:8443/test/a/idp_oidc_implicit/callback",
+                        "https://localhost.emobix.co.uk:8443/test/a/idp_oidc_hybrid/callback"
+                    ],
+                    "response_types": [
+                        "code",
+                        "token",
+                        "id_token",
+                        "code token",
+                        "code token id_token",
+                        "token id_token",
+                        "code id_token",
+                        "none",
+                        "vp_token",
+                        "vp_token id_token"
+                    ],
+                    "grant_types": [
+                        "authorization_code",
+                        "refresh_token",
+                        "password",
+                        "client_credentials"
+                    ],
+                    "scope": "openid profile email address phone offline_access account transfers read write",
+                    "client_name": "My Example Client",
+                    "client_name#ja-Jpan-JP": "クライアント名",
+                    "token_endpoint_auth_method": "private_key_jwt",
+                    "logo_uri": "https://client.example.org/logo.png",
+                    "jwks_uri": "https://client.example.org/my_public_keys.jwks",
+                    "application_type": "web",
+                    "jwks": "{\n    \"keys\": [\n        {\n            \"kty\": \"RSA\",\n            \"e\": \"AQAB\",\n            \"use\": \"sig\",\n            \"kid\": \"client_secret_key\",\n            \"alg\": \"RS256\",\n            \"n\": \"sFSqsWu2koU69oG67L5wsVGwzkye80Bd9lmOfiSkSTXyc8IKl4gwmj9tjzxxA1pGYi4SKEQaBYNl8JrGhttBcbtraqwaS5Q6jpG24C1z9njUumJWJneA3EJ9Lpun9d3uCA3b_71XnK5Pr-VtwzpU6z8VGNMZhl8rZ5p1L0syMpZ03y5tSWVMntceiqNaFuJCFXGMVSlp6vrVCqpcM4r035tUR-PwjSynpxe7OGlQpHVSvBCbXJJufi0QxIIjdPx2ka586TlvFjVu0QBEcEon_BMrPDWPD1aaAEcSPM9U7fWzlK6btJ8d37TXZ0_rRPQ_tVeZAlDnRclehHkKflkNjw\"\n        },{\n    \"kty\": \"RSA\",\n    \"e\": \"AQAB\",\n    \"use\": \"sig\",\n    \"kid\": \"client_secret_key_2040\",\n    \"alg\": \"RS256\",\n    \"n\": \"tndIPiYnTw8UlbvU4GSD77tPwePNpu1VYmTWmrOA1etvNV7xeU10lHPscmbr702bbo5adEVwWsqwHkS0lvtBBepb3BKhFwl84_Ffqp-P_rqlduQ3Xnri5BfesreOy6nZQcQ95OSR0M4HYgfhrsMXCxQsA1GCDCI7oiKm43icTxaPoH232qfJFG_rInHBEokO-BCK_0Ct-to6dyRLxlDgCoKR4LnWJ_ETfxzb9LSdp6mO3ccD9r9Qit7tgbv-vBzGtMW9Yd_iwbHMo2qRRMnbQMHHK3Vip2xCEIi1v3HC--UUXuecJ_SYG2D69UKC3hvO54ljWKsIyeGAkcTyDZER\"\n}    ]\n}",
+                    "authorization_details_types": [
+                        "payment_initiation",
+                        "account_information",
+                        "openid_credential"
+                    ]
+                }
+            }
+        """.trimIndent()
+
+            val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
+            val url = "openid4vp://?request=$vpRequestSignedValue"
+            val filteredVcRecords = service.handleVpRequest(url)
+            Assert.assertEquals(1, filteredVcRecords.size())
         }
     }
 }

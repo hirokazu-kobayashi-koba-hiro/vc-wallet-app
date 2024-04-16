@@ -19,13 +19,14 @@ class VerifiablePresentationService(context: Context) {
 
     val registry = VerifiableCredentialRegistry(context)
 
-    suspend fun handleVpRequest(url: String) {
+    suspend fun handleVpRequest(url: String):VerifiableCredentialsRecords {
         Log.d("Vc library", "handleVpRequest")
         //extract RequestObject
         val requestObject = extractRequestObject(url)
         val verifiablePresentationRequestCreator = VerifiablePresentationRequestCreator(requestObject)
         val presentationRequest = verifiablePresentationRequestCreator.create()
-        presentationRequest.presentationDefinition
+        val records = registry.getAllAsCollection()
+        return filterVerifiableCredential(records ,presentationRequest.presentationDefinition)
         //verify request
         //find vc
         //create id_token and vp_token and presentation_submission
@@ -34,17 +35,17 @@ class VerifiablePresentationService(context: Context) {
     }
 
 
-    fun filterVerifiableCredential(verifiableCredentialsRecords: VerifiableCredentialsRecords, presentationDefinition: PresentationDefinition): VerifiableCredentialsRecords {
+    fun filterVerifiableCredential(verifiableCredentialsRecords: VerifiableCredentialsRecords, presentationDefinition: PresentationDefinition?): VerifiableCredentialsRecords {
         val filteredVcList = mutableListOf<VerifiableCredentialsRecord>()
-        val inputDescriptors = presentationDefinition.inputDescriptors
-        inputDescriptors.forEach { inputDescriptorDetail ->
+        val inputDescriptors = presentationDefinition?.inputDescriptors
+        inputDescriptors?.forEach { inputDescriptorDetail ->
             inputDescriptorDetail.constraints?.fields?.forEach { field ->
                 val path = field.path[0]
                 verifiableCredentialsRecords.forEach { vcRecord ->
                     if (path.contains("type")) {
                         val typeList = JsonPath.parse(vcRecord.getPayloadWithJson().toString())?.read<List<String>>(path)
-                        if (typeList != null && field.pattern != null) {
-                            if (typeList.contains(field.pattern)) {
+                        if (typeList != null && field.filter?.pattern != null) {
+                            if (typeList.contains(field.filter.pattern)) {
                                 filteredVcList.add(vcRecord)
                             }
                         }

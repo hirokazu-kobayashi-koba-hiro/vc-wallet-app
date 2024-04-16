@@ -142,4 +142,51 @@ class JoseHandlerTest {
         val signedValue = JoseHandler.sign(header, payload, jwk)
         assertTrue(signedValue.contains("."))
     }
+
+    @Test
+    fun sign3() {
+        val header = mapOf("type" to "JWT")
+        val payload = """
+            {
+              "vc": {
+                "@context": [
+                  "https://www.w3.org/ns/credentials/v2",
+                  "https://www.w3.org/ns/credentials/examples/v2"
+                ],
+                "id": "http://university.example/credentials/3732",
+                "type": [
+                  "VerifiableCredential",
+                  "ExampleDegreeCredential"
+                ],
+                "issuer": "https://university.example/issuers/565049",
+                "validFrom": "2010-01-01T00:00:00Z",
+                "credentialSubject": {
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "degree": {
+                    "type": "ExampleBachelorDegree",
+                    "name": "Bachelor of Science and Arts"
+                  }
+                }
+              },
+              "iss": "https://university.example/issuers/565049",
+              "jti": "http://university.example/credentials/3732",
+              "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            }
+        """.trimIndent()
+        val jwk = """
+            {
+                "kty": "EC",
+                "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
+                "use": "sig",
+                "crv": "P-256",
+                "kid": "access_token",
+                "x": "iWJINqt0ySv3kVEvlHbvNkPKY2pPSf1cG1PSx3tRfw0",
+                "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
+                "alg": "ES256"
+            }
+        """.trimIndent()
+        val signedValue = JoseHandler.sign(header, payload, jwk)
+        println(signedValue)
+        assertTrue(signedValue.contains("."))
+    }
 }

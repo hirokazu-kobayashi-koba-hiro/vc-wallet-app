@@ -20,6 +20,10 @@ class VerifiableCredentialsRecords(private val values: List<VerifiableCredential
         return values.iterator()
     }
 
+    fun size(): Int {
+        return values.size
+    }
+
 
 }
 

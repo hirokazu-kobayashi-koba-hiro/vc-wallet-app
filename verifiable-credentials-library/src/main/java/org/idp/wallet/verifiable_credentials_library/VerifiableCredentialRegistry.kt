@@ -17,6 +17,16 @@ class VerifiableCredentialRegistry(context: Context) {
        return values
     }
 
+    fun getAllAsCollection(): VerifiableCredentialsRecords {
+        val list = mutableListOf<VerifiableCredentialsRecord>()
+        values.forEach {
+            it.value.forEach { record ->
+                list.add(record)
+            }
+        }
+        return VerifiableCredentialsRecords(list)
+    }
+
     fun find(credentialIssuer: String): VerifiableCredentialsRecords? {
         return values[credentialIssuer]
     }
