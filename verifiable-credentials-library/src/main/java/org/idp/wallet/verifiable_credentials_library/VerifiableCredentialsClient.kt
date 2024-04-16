@@ -21,7 +21,7 @@ object VerifiableCredentialsClient {
         return verifiableCredentialsService.requestVCI(url, format)
     }
 
-    fun getAllCredentials(): JSONObject {
+    fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
         return verifiableCredentialsService.getAllCredentials()
     }
 

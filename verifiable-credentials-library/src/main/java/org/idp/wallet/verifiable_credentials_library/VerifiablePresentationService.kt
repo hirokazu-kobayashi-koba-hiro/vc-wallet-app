@@ -33,38 +33,26 @@ class VerifiablePresentationService(context: Context) {
         //return response
     }
 
-    @OptIn(ExperimentalJsExport::class)
-    fun decideVerifiableCredential(presentationDefinition: PresentationDefinition): List<JSONObject> {
-        val allCredentials = registry.getAll()
-        val vcList = mutableListOf<JSONObject>()
-        val filteredVcList = mutableListOf<JSONObject>()
-        allCredentials.keys().forEach { key ->
-            val jsonArray = allCredentials.getJSONArray(key)
-            for (i in 0 until jsonArray.length()) {
-                val value = jsonArray.getString(i)
-                val sdJwt = SDJwt.parse(value)
-                val fullPayload = sdJwt.fullPayload
-                val jsonObject = JSONObject(fullPayload)
-                vcList.add(jsonObject)
-            }
-        }
+
+    fun filterVerifiableCredential(verifiableCredentialsRecords: VerifiableCredentialsRecords, presentationDefinition: PresentationDefinition): VerifiableCredentialsRecords {
+        val filteredVcList = mutableListOf<VerifiableCredentialsRecord>()
         val inputDescriptors = presentationDefinition.inputDescriptors
         inputDescriptors.forEach { inputDescriptorDetail ->
             inputDescriptorDetail.constraints?.fields?.forEach { field ->
                 val path = field.path[0]
-                vcList.forEach {vcJsonObject ->
+                verifiableCredentialsRecords.forEach { vcRecord ->
                     if (path.contains("type")) {
-                        val typeList = JsonPath.parse(vcJsonObject.toString())?.read<List<String>>(path)
+                        val typeList = JsonPath.parse(vcRecord.getPayloadWithJson().toString())?.read<List<String>>(path)
                         if (typeList != null && field.pattern != null) {
                             if (typeList.contains(field.pattern)) {
-                                filteredVcList.add(vcJsonObject)
+                                filteredVcList.add(vcRecord)
                             }
                         }
                     }
                 }
             }
         }
-        return filteredVcList
+        return VerifiableCredentialsRecords(filteredVcList)
     }
 
 

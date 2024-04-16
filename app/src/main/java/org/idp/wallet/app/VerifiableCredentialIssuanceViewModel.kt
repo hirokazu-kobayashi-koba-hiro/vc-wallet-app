@@ -1,18 +1,17 @@
 package org.idp.wallet.app
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import id.walt.sdjwt.SDJwt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
-import org.json.JSONObject
+import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsRecords
 
 class VerifiableCredentialIssuanceViewModel :
     ViewModel() {
 
-    var _vcContent = MutableStateFlow(JSONObject())
+    var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
     val vciState = _vcContent.asStateFlow()
     suspend fun request(uri: String, format: String) {
         val requestVCIResponse = VerifiableCredentialsClient.requestVCI(uri, format)
@@ -21,7 +20,6 @@ class VerifiableCredentialIssuanceViewModel :
 
     fun getAllCredentials() {
         val allCredentials = VerifiableCredentialsClient.getAllCredentials()
-        Log.d("Vc library app", allCredentials.toString())
         _vcContent.value = allCredentials
     }
 

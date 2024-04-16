@@ -1,15 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
-import android.net.Uri
-import android.util.Log
 import id.walt.sdjwt.SDJwt
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import org.json.JSONObject
-import java.net.URI
 import java.net.URLDecoder
+import java.util.UUID
+import kotlin.js.ExperimentalJsExport
 
 
 class VerifiableCredentialsService(context: Context, val clientId: String) {
@@ -54,11 +52,34 @@ class VerifiableCredentialsService(context: Context, val clientId: String) {
         )
         val credentialResponse =
             HttpClient.post(credentialEndpoint, credentialRequestHeader, credentialRequest)
-        registry.save(credentialIssuer, credentialResponse.optString("credential"))
+        val rawVc = credentialResponse.optString("credential")
+        val verifiableCredentialsRecord = transform(format, rawVc)
+        registry.save(credentialIssuer, verifiableCredentialsRecord)
         return credentialResponse
     }
 
-    fun getAllCredentials(): JSONObject {
+    @OptIn(ExperimentalJsExport::class)
+    private fun transform(format: String, rawVc: String): VerifiableCredentialsRecord {
+        return when(format) {
+            "vc+sd-jwt" -> {
+                val sdJwt = SDJwt.parse(rawVc)
+                val fullPayload = sdJwt.fullPayload
+                VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, fullPayload)
+            }
+
+            "jwt_vc_json" -> {
+                val jwt = JoseHandler.parse(rawVc)
+                val payload = jwt.payload()
+                VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, payload)
+            }
+
+            else -> {
+                throw RuntimeException("unsupported format")
+            }
+        }
+    }
+
+    fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
         return registry.getAll()
     }
 

@@ -224,17 +224,17 @@ fun HomeScreen(
         }
         val cardList = mutableListOf<Pair<String, String>>()
         val vc = vciState.value
-        vc.keys().forEach { key ->
-            val jsonArray = vc.getJSONArray(key)
-            for (i in 0 until jsonArray.length()) {
-                val value = jsonArray.getString(i)
-                val sdJwt = viewModel.parseSdJwt(value)
-                val stringBuilder = StringBuilder()
-                sdJwt.fullPayload.forEach {
-                    stringBuilder.append(it.key + ":" + it.value)
-                    stringBuilder.append("\n")
+        vc.keys.forEach { key ->
+            val values = vc.values
+            values.forEach { records ->
+                records.forEach { record ->
+                    val stringBuilder = StringBuilder()
+                    record.payload.forEach {
+                            stringBuilder.append(it.key + ":" + it.value)
+                            stringBuilder.append("\n")
+                        }
+                    cardList.add(Pair(key, stringBuilder.toString()))
                 }
-                cardList.add(Pair(key, stringBuilder.toString()))
             }
         }
         LazyColumn(
