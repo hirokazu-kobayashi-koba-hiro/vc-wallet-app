@@ -2,11 +2,10 @@ package org.idp.wallet.app
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import id.walt.sdjwt.SDJwt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
-import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
 class VerifiableCredentialIssuanceViewModel :
     ViewModel() {
@@ -21,15 +20,6 @@ class VerifiableCredentialIssuanceViewModel :
     fun getAllCredentials() {
         val allCredentials = VerifiableCredentialsClient.getAllCredentials()
         _vcContent.value = allCredentials
-    }
-
-    fun parseSdJwt(value: String): SDJwt {
-        try {
-            return VerifiableCredentialsClient.parseSdJwt(value)
-        } catch (e: Exception) {
-            Log.e("Vc library app", e.message?: "failed parseSdJwt")
-            throw e
-        }
     }
 
 }

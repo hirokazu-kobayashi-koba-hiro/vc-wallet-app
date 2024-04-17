@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library
+package org.idp.wallet.verifiable_credentials_library.verifiable_credentials
 
 import org.json.JSONObject
 

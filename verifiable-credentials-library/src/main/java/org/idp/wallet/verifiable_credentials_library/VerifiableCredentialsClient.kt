@@ -3,6 +3,9 @@ package org.idp.wallet.verifiable_credentials_library
 import android.content.Context
 import android.util.Log
 import id.walt.sdjwt.SDJwt
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsService
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationService
 import org.json.JSONObject
 import kotlin.js.ExperimentalJsExport
 
@@ -23,16 +26,6 @@ object VerifiableCredentialsClient {
 
     fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
         return verifiableCredentialsService.getAllCredentials()
-    }
-
-    @OptIn(ExperimentalJsExport::class)
-    fun parseSdJwt(rawSdJwt: String): SDJwt {
-        try {
-            return SDJwt.parse(rawSdJwt)
-        } catch (e: Exception) {
-            Log.e("Vc library", e.message?: "failed parseSdJwt")
-            throw e
-        }
     }
 
     suspend fun handleVpRequest(url: String) {

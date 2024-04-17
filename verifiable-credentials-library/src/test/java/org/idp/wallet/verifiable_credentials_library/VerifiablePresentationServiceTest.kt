@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
-import org.json.JSONArray
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationService
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
