@@ -22,4 +22,7 @@ class VerifiableCredentialIssuanceViewModel :
         _vcContent.value = allCredentials
     }
 
+    suspend fun handleVpRequest(url: String) {
+        VerifiableCredentialsClient.handleVpRequest(url)
+    }
 }

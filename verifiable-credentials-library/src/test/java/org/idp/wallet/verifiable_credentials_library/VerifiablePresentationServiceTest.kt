@@ -2,8 +2,13 @@ package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.basic.resource.AssetsReader
+import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationService
 import org.junit.Assert
@@ -20,8 +25,10 @@ class VerifiablePresentationServiceTest {
 
     @Before
     fun setup() {
-        context = ApplicationProvider.getApplicationContext()
-        service = VerifiablePresentationService(context)
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+        val registry = VerifiableCredentialRegistry(context)
+        val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
+        service = VerifiablePresentationService(registry, walletConfigurationReader)
     }
 
     @Test

@@ -51,7 +51,7 @@ class JoseHandlerTest {
                                 "fields": [
                                     {
                                         "path": [
-                                            "${'$'}.type"
+                                            "${'$'}.vc.type"
                                         ],
                                         "filter": {
                                             "type": "string",
@@ -140,6 +140,7 @@ class JoseHandlerTest {
             }
         """.trimIndent()
         val signedValue = JoseHandler.sign(header, payload, jwk)
+        println(signedValue)
         assertTrue(signedValue.contains("."))
     }
 

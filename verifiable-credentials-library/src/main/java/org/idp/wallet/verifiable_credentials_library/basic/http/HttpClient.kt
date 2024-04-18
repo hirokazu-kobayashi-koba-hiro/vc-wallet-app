@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.idp.wallet.verifiable_credentials_library.NetworkException
+import org.idp.wallet.verifiable_credentials_library.error.NetworkException
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL

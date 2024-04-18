@@ -10,9 +10,8 @@ import java.util.UUID
 import kotlin.js.ExperimentalJsExport
 
 
-class VerifiableCredentialsService(context: Context, val clientId: String) {
+class VerifiableCredentialsService(val registry: VerifiableCredentialRegistry, val clientId: String) {
 
-    val registry = VerifiableCredentialRegistry(context)
 
     suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
         val credentialOfferResponse = getCredentialOfferResponse(url)
