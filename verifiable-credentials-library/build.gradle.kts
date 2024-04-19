@@ -3,6 +3,7 @@ import java.net.URI
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("com.diffplug.spotless")
 }
 
 android {
@@ -37,7 +38,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
@@ -57,4 +58,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+}
+
+spotless { // if you are using build.gradle.kts, instead of 'spotless {' use:
+    // configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    kotlin {
+        target("/src/**/*.kt")
+        ktfmt()
+    }
 }

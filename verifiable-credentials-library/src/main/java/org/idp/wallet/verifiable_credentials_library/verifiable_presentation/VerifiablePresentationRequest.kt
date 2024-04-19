@@ -9,31 +9,34 @@ class VerifiablePresentationRequest(
     val clientMeta: ClientMetadata?
 ) {
 
-    fun responseType(): String {
-        return jwtObject.valueAsStringFromPayload("response_type")
-    }
+  fun responseType(): String {
+    return jwtObject.valueAsStringFromPayload("response_type")
+  }
 
-    fun responseMode(): String {
-        return jwtObject.valueAsStringFromPayload("response_mode")
-    }
+  fun responseMode(): String {
+    return jwtObject.valueAsStringFromPayload("response_mode")
+  }
 
-    fun scope(): String {
-        return jwtObject.valueAsStringFromPayload("scope")
-    }
+  fun scope(): String {
+    return jwtObject.valueAsStringFromPayload("scope")
+  }
 
-    fun nonce(): String {
-        return jwtObject.valueAsStringFromPayload("nonce")
-    }
+  fun nonce(): String {
+    return jwtObject.valueAsStringFromPayload("nonce")
+  }
 
-    fun redirectUri(): String {
-        return jwtObject.valueAsStringFromPayload("redirect_uri")
-    }
+  fun redirectUri(): String {
+    return jwtObject.valueAsStringFromPayload("redirect_uri")
+  }
 
-    fun state(): String {
-        return jwtObject.valueAsStringFromPayload("state")
-    }
+  fun state(): String {
+    return jwtObject.valueAsStringFromPayload("state")
+  }
 
-    fun filterVerifiableCredential(records: VerifiableCredentialsRecords): VerifiableCredentialsRecords {
-        return presentationDefinition?.filterVerifiableCredential(records)?: VerifiableCredentialsRecords()
-    }
+  fun filterVerifiableCredential(
+      records: VerifiableCredentialsRecords
+  ): VerifiableCredentialsRecords {
+    return presentationDefinition?.filterVerifiableCredential(records)
+        ?: VerifiableCredentialsRecords()
+  }
 }

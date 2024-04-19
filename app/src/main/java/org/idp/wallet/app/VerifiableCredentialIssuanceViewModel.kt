@@ -7,22 +7,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
-class VerifiableCredentialIssuanceViewModel :
-    ViewModel() {
+class VerifiableCredentialIssuanceViewModel : ViewModel() {
 
-    var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
-    val vciState = _vcContent.asStateFlow()
-    suspend fun request(uri: String, format: String) {
-        val requestVCIResponse = VerifiableCredentialsClient.requestVCI(uri, format)
-        Log.d("Vc library app", requestVCIResponse.toString())
-    }
+  var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
+  val vciState = _vcContent.asStateFlow()
 
-    fun getAllCredentials() {
-        val allCredentials = VerifiableCredentialsClient.getAllCredentials()
-        _vcContent.value = allCredentials
-    }
+  suspend fun request(uri: String, format: String) {
+    val requestVCIResponse = VerifiableCredentialsClient.requestVCI(uri, format)
+    Log.d("Vc library app", requestVCIResponse.toString())
+  }
 
-    suspend fun handleVpRequest(url: String) {
-        VerifiableCredentialsClient.handleVpRequest(url)
-    }
+  fun getAllCredentials() {
+    val allCredentials = VerifiableCredentialsClient.getAllCredentials()
+    _vcContent.value = allCredentials
+  }
+
+  suspend fun handleVpRequest(url: String) {
+    VerifiableCredentialsClient.handleVpRequest(url)
+  }
 }

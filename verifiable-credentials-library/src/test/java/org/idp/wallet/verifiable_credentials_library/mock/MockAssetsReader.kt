@@ -2,9 +2,9 @@ package org.idp.wallet.verifiable_credentials_library.mock
 
 import org.idp.wallet.verifiable_credentials_library.basic.resource.ResourceReader
 
-class MockAssetsReader: ResourceReader {
-    override fun read(fileName: String): String {
-        return """
+class MockAssetsReader : ResourceReader {
+  override fun read(fileName: String): String {
+    return """
             {
               "issuer": "http://localhost:8080/123",
               "authorization_endpoint": "openid4vp:",
@@ -197,6 +197,7 @@ class MockAssetsReader: ResourceReader {
                 "write"
               ]
             }
-        """.trimIndent()
-    }
+        """
+        .trimIndent()
+  }
 }

@@ -9,32 +9,30 @@ import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.Veri
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationService
 import org.json.JSONObject
 
-
 object VerifiableCredentialsClient {
 
-    private lateinit var verifiableCredentialsService: VerifiableCredentialsService
-    private lateinit var verifiablePresentationService: VerifiablePresentationService
-    private lateinit var walletConfigurationReader: WalletConfigurationReader
+  private lateinit var verifiableCredentialsService: VerifiableCredentialsService
+  private lateinit var verifiablePresentationService: VerifiablePresentationService
+  private lateinit var walletConfigurationReader: WalletConfigurationReader
 
-    fun init(context: Context, clientId: String) {
-        val assetsReader = AssetsReader(context)
-        val registry = VerifiableCredentialRegistry(context)
-        walletConfigurationReader = WalletConfigurationReader(assetsReader)
-        verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
-        verifiablePresentationService = VerifiablePresentationService(registry, walletConfigurationReader)
+  fun init(context: Context, clientId: String) {
+    val assetsReader = AssetsReader(context)
+    val registry = VerifiableCredentialRegistry(context)
+    walletConfigurationReader = WalletConfigurationReader(assetsReader)
+    verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
+    verifiablePresentationService =
+        VerifiablePresentationService(registry, walletConfigurationReader)
+  }
 
-    }
+  suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
+    return verifiableCredentialsService.requestVCI(url, format)
+  }
 
-    suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
-        return verifiableCredentialsService.requestVCI(url, format)
-    }
+  fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
+    return verifiableCredentialsService.getAllCredentials()
+  }
 
-    fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-        return verifiableCredentialsService.getAllCredentials()
-    }
-
-    suspend fun handleVpRequest(url: String) {
-        verifiablePresentationService.handleVpRequest(url)
-    }
-
+  suspend fun handleVpRequest(url: String) {
+    verifiablePresentationService.handleVpRequest(url)
+  }
 }

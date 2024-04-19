@@ -1,17 +1,17 @@
 package org.idp.wallet.verifiable_credentials_library.jose
 
-import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.junit.Test
 
 class JoseHandlerTest {
 
-    @Test
-    fun sign() {
-        val header = mapOf("type" to "JWT")
-        val payload = mapOf("iss" to "iss", "client_id" to "client_id")
-        val jwk = """
+  @Test
+  fun sign() {
+    val header = mapOf("type" to "JWT")
+    val payload = mapOf("iss" to "iss", "client_id" to "client_id")
+    val jwk =
+        """
             {
                 "kty": "EC",
                 "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
@@ -22,15 +22,17 @@ class JoseHandlerTest {
                 "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
                 "alg": "ES256"
             }
-        """.trimIndent()
-        val signedValue = JoseHandler.sign(header, payload, jwk)
-        assertTrue(signedValue.contains("."))
-    }
+        """
+            .trimIndent()
+    val signedValue = JoseHandler.sign(header, payload, jwk)
+    assertTrue(signedValue.contains("."))
+  }
 
-    @Test
-    fun sign2() {
-        val header = mapOf("type" to "JWT")
-        val payload = """
+  @Test
+  fun sign2() {
+    val header = mapOf("type" to "JWT")
+    val payload =
+        """
             {
                 "redirect_uri": "https://client.example.org/callback",
                 "response_type": "vp_token",
@@ -126,8 +128,10 @@ class JoseHandlerTest {
                     ]
                 }
             }
-        """.trimIndent()
-        val jwk = """
+        """
+            .trimIndent()
+    val jwk =
+        """
             {
                 "kty": "EC",
                 "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
@@ -138,16 +142,18 @@ class JoseHandlerTest {
                 "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
                 "alg": "ES256"
             }
-        """.trimIndent()
-        val signedValue = JoseHandler.sign(header, payload, jwk)
-        println(signedValue)
-        assertTrue(signedValue.contains("."))
-    }
+        """
+            .trimIndent()
+    val signedValue = JoseHandler.sign(header, payload, jwk)
+    println(signedValue)
+    assertTrue(signedValue.contains("."))
+  }
 
-    @Test
-    fun sign3() {
-        val header = mapOf("type" to "JWT")
-        val payload = """
+  @Test
+  fun sign3() {
+    val header = mapOf("type" to "JWT")
+    val payload =
+        """
             {
               "vc": {
                 "@context": [
@@ -173,8 +179,10 @@ class JoseHandlerTest {
               "jti": "http://university.example/credentials/3732",
               "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21"
             }
-        """.trimIndent()
-        val jwk = """
+        """
+            .trimIndent()
+    val jwk =
+        """
             {
                 "kty": "EC",
                 "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
@@ -185,9 +193,10 @@ class JoseHandlerTest {
                 "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
                 "alg": "ES256"
             }
-        """.trimIndent()
-        val signedValue = JoseHandler.sign(header, payload, jwk)
-        println(signedValue)
-        assertTrue(signedValue.contains("."))
-    }
+        """
+            .trimIndent()
+    val signedValue = JoseHandler.sign(header, payload, jwk)
+    println(signedValue)
+    assertTrue(signedValue.contains("."))
+  }
 }

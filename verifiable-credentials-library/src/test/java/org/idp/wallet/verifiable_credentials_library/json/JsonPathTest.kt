@@ -7,19 +7,21 @@ import org.junit.Test
 
 class JsonPathTest {
 
-    @Test
-    fun success_extract_value() {
-        val json = """{"hello": "world"}"""
-        val read = JsonPath.parse(json)?.read<String>("$.hello") // returns "world"
-        val somethingelse = JsonPath.parse(json)
+  @Test
+  fun success_extract_value() {
+    val json = """{"hello": "world"}"""
+    val read = JsonPath.parse(json)?.read<String>("$.hello") // returns "world"
+    val somethingelse =
+        JsonPath.parse(json)
             ?.read<String>("$.somethingelse") // returns null since "somethingelse" key not found
-        Assert.assertEquals("world", read)
-        Assert.assertNull(somethingelse)
-    }
+    Assert.assertEquals("world", read)
+    Assert.assertNull(somethingelse)
+  }
 
-    @Test
-    fun success_extract_value_from_vc() {
-        val vcJsonString = """
+  @Test
+  fun success_extract_value_from_vc() {
+    val vcJsonString =
+        """
             {
                 "@context": [
                     "https://www.w3.org/2018/credentials/v1",
@@ -47,9 +49,10 @@ class JsonPathTest {
                     "verificationMethod": "did:example:issuer#keys-1"
                 }
             }
-        """.trimIndent()
-        val type = JsonPath.parse(vcJsonString)?.read<List<String>>("$.type")
-        println(type)
-        Assert.assertEquals(listOf("VerifiableCredential", "IDCardCredential"), type);
-    }
+        """
+            .trimIndent()
+    val type = JsonPath.parse(vcJsonString)?.read<List<String>>("$.type")
+    println(type)
+    Assert.assertEquals(listOf("VerifiableCredential", "IDCardCredential"), type)
+  }
 }

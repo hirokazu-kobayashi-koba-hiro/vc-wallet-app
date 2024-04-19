@@ -1,11 +1,9 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.basic.resource.AssetsReader
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
@@ -20,23 +18,24 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class VerifiablePresentationServiceTest {
 
-    private lateinit var context: Context
-    private lateinit var service: VerifiablePresentationService
+  private lateinit var context: Context
+  private lateinit var service: VerifiablePresentationService
 
-    @Before
-    fun setup() {
-        context = InstrumentationRegistry.getInstrumentation().getContext();
-        val registry = VerifiableCredentialRegistry(context)
-        val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
-        service = VerifiablePresentationService(registry, walletConfigurationReader)
-    }
+  @Before
+  fun setup() {
+    context = InstrumentationRegistry.getInstrumentation().getContext()
+    val registry = VerifiableCredentialRegistry(context)
+    val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
+    service = VerifiablePresentationService(registry, walletConfigurationReader)
+  }
 
-    @Test
-    fun testSaveAndFind() {
-        runBlocking {
-            val registry = service.registry
-            val header = mapOf("type" to "JWT")
-            val payloadValue = """
+  @Test
+  fun testSaveAndFind() {
+    runBlocking {
+      val registry = service.registry
+      val header = mapOf("type" to "JWT")
+      val payloadValue =
+          """
             {
               "vc": {
                 "@context": [
@@ -62,8 +61,10 @@ class VerifiablePresentationServiceTest {
               "jti": "http://university.example/credentials/3732",
               "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21"
             }
-        """.trimIndent()
-            val jwk = """
+        """
+              .trimIndent()
+      val jwk =
+          """
             {
                 "kty": "EC",
                 "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
@@ -74,13 +75,15 @@ class VerifiablePresentationServiceTest {
                 "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
                 "alg": "ES256"
             }
-        """.trimIndent()
+        """
+              .trimIndent()
 
-            val signedValue = JoseHandler.sign(header, payloadValue, jwk)
-            val payload = JoseHandler.parse(signedValue).payload()
-            val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload);
-            registry.save("test", record)
-            val vpPayload = """
+      val signedValue = JoseHandler.sign(header, payloadValue, jwk)
+      val payload = JoseHandler.parse(signedValue).payload()
+      val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
+      registry.save("test", record)
+      val vpPayload =
+          """
             {
                 "redirect_uri": "https://client.example.org/callback",
                 "response_type": "vp_token",
@@ -176,12 +179,13 @@ class VerifiablePresentationServiceTest {
                     ]
                 }
             }
-        """.trimIndent()
+        """
+              .trimIndent()
 
-            val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
-            val url = "openid4vp://?request=$vpRequestSignedValue"
-            val filteredVcRecords = service.handleVpRequest(url)
-            Assert.assertEquals(1, filteredVcRecords.size())
-        }
+      val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
+      val url = "openid4vp://?request=$vpRequestSignedValue"
+      val filteredVcRecords = service.handleVpRequest(url)
+      Assert.assertEquals(1, filteredVcRecords.size())
     }
+  }
 }

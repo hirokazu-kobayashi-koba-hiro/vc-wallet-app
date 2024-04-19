@@ -13,73 +13,71 @@ import java.util.stream.Collectors
  * does not use this Response Type, since no ID Token would be returned.
  *
  * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#Authentication">3.
- *     Authentication</a>
+ *   Authentication</a>
  */
-enum class ResponseType(private val values: Set<String>,
-                        val value: String) {
-    code(setOf("code"), "code"),
-    token(setOf("token"), "token"),
-    id_token(setOf("id_token"), "id_token"),
-    code_token(setOf("code", "token"), "code token"),
-    code_token_id_token(setOf("code", "token", "id_token"), "code token id_token"),
-    code_id_token(setOf("code", "id_token"), "code id_token"),
-    token_id_token(setOf("token", "id_token"), "token id_token"),
-    none(setOf("none"), "none"),
-    vp_token(setOf("vp_token"), "vp_token"),
-    vp_token_id_token(setOf("vp_token", "id_token"), "vp_token id_token"),
-    undefined(setOf(), ""),
-    unknown(setOf(), "");
+enum class ResponseType(private val values: Set<String>, val value: String) {
+  code(setOf("code"), "code"),
+  token(setOf("token"), "token"),
+  id_token(setOf("id_token"), "id_token"),
+  code_token(setOf("code", "token"), "code token"),
+  code_token_id_token(setOf("code", "token", "id_token"), "code token id_token"),
+  code_id_token(setOf("code", "id_token"), "code id_token"),
+  token_id_token(setOf("token", "id_token"), "token id_token"),
+  none(setOf("none"), "none"),
+  vp_token(setOf("vp_token"), "vp_token"),
+  vp_token_id_token(setOf("vp_token", "id_token"), "vp_token id_token"),
+  undefined(setOf(), ""),
+  unknown(setOf(), "");
 
-
-    fun of(input: String): ResponseType? {
-        if (Objects.isNull(input) || input.isEmpty()) {
-            return undefined
-        }
-        val inputValues = Arrays.stream(input.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-            .toTypedArray()).collect(Collectors.toSet())
-        for (responseType in entries) {
-            if (responseType.values.size == inputValues.size
-                && responseType.values.containsAll(inputValues)
-            ) {
-                return responseType
-            }
-        }
-        return unknown
+  fun of(input: String): ResponseType? {
+    if (Objects.isNull(input) || input.isEmpty()) {
+      return undefined
     }
-
-    fun isAuthorizationCodeFlow(): Boolean {
-        return this === code
+    val inputValues =
+        Arrays.stream(input.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+            .collect(Collectors.toSet())
+    for (responseType in entries) {
+      if (responseType.values.size == inputValues.size &&
+          responseType.values.containsAll(inputValues)) {
+        return responseType
+      }
     }
+    return unknown
+  }
 
-    fun isOAuthImplicitFlow(): Boolean {
-        return this === token
-    }
+  fun isAuthorizationCodeFlow(): Boolean {
+    return this === code
+  }
 
-    fun isOidcImplicitFlow(): Boolean {
-        return this === id_token || this === token_id_token
-    }
+  fun isOAuthImplicitFlow(): Boolean {
+    return this === token
+  }
 
-    fun isHybridFlow(): Boolean {
-        return this === code_token || this === code_id_token || this === code_token_id_token
-    }
+  fun isOidcImplicitFlow(): Boolean {
+    return this === id_token || this === token_id_token
+  }
 
-    fun isOidcHybridFlow(): Boolean {
-        return this === code_id_token || this === code_token_id_token
-    }
+  fun isHybridFlow(): Boolean {
+    return this === code_token || this === code_id_token || this === code_token_id_token
+  }
 
-    fun isUndefined(): Boolean {
-        return this === undefined
-    }
+  fun isOidcHybridFlow(): Boolean {
+    return this === code_id_token || this === code_token_id_token
+  }
 
-    fun isUnknown(): Boolean {
-        return this === unknown
-    }
+  fun isUndefined(): Boolean {
+    return this === undefined
+  }
 
-    fun isCodeIdToken(): Boolean {
-        return this === code_id_token
-    }
+  fun isUnknown(): Boolean {
+    return this === unknown
+  }
 
-    fun isCode(): Boolean {
-        return this === code
-    }
+  fun isCodeIdToken(): Boolean {
+    return this === code_id_token
+  }
+
+  fun isCode(): Boolean {
+    return this === code
+  }
 }

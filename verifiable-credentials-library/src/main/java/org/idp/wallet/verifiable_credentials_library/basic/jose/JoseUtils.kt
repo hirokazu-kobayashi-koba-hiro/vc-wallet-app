@@ -11,51 +11,49 @@ import com.nimbusds.jwt.SignedJWT
 
 object JoseHandler {
 
-    fun parse(jose: String): JwtObject {
-        val parsedJwt = JWTParser.parse(jose)
-        return JwtObject(parsedJwt)
-    }
+  fun parse(jose: String): JwtObject {
+    val parsedJwt = JWTParser.parse(jose)
+    return JwtObject(parsedJwt)
+  }
 
-    fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwkValue: String): String {
-        val jwk = JWK.parse(jwkValue)
-        val headers = JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name))
-            .customParams(header)
-            .build()
-        val claimSet = JWTClaimsSet.parse(payload)
-        val jws = SignedJWT(headers, claimSet)
-        val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
-        jws.sign(jwsSigner)
-        return jws.serialize()
-    }
+  fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwkValue: String): String {
+    val jwk = JWK.parse(jwkValue)
+    val headers =
+        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+    val claimSet = JWTClaimsSet.parse(payload)
+    val jws = SignedJWT(headers, claimSet)
+    val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
+    jws.sign(jwsSigner)
+    return jws.serialize()
+  }
 
-    fun sign(header: Map<String, Any>, payload: String, jwkValue: String): String {
-        val jwk = JWK.parse(jwkValue)
-        val headers = JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name))
-            .customParams(header)
-            .build()
-        val claimSet = JWTClaimsSet.parse(payload)
-        val jws = SignedJWT(headers, claimSet)
-        val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
-        jws.sign(jwsSigner)
-        return jws.serialize()
-    }
+  fun sign(header: Map<String, Any>, payload: String, jwkValue: String): String {
+    val jwk = JWK.parse(jwkValue)
+    val headers =
+        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+    val claimSet = JWTClaimsSet.parse(payload)
+    val jws = SignedJWT(headers, claimSet)
+    val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
+    jws.sign(jwsSigner)
+    return jws.serialize()
+  }
 }
 
 class JwtObject(private val jwt: JWT) {
 
-    fun kid(): String {
-        return jwt.header.customParams.getOrDefault("kid", "") as String
-    }
+  fun kid(): String {
+    return jwt.header.customParams.getOrDefault("kid", "") as String
+  }
 
-    fun algorithm(): String {
-        return jwt.header.algorithm.name
-    }
+  fun algorithm(): String {
+    return jwt.header.algorithm.name
+  }
 
-    fun payload(): Map<String, Any> {
-        return jwt.jwtClaimsSet.claims
-    }
+  fun payload(): Map<String, Any> {
+    return jwt.jwtClaimsSet.claims
+  }
 
-    fun valueAsStringFromPayload(key: String): String {
-        return jwt.jwtClaimsSet.getStringClaim(key)
-    }
+  fun valueAsStringFromPayload(key: String): String {
+    return jwt.jwtClaimsSet.getStringClaim(key)
+  }
 }
