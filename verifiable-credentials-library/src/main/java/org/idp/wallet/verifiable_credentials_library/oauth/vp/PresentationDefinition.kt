@@ -1,7 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.oauth.vp
 
-import com.nfeld.jsonpathkt.JsonPath
-import com.nfeld.jsonpathkt.extension.read
+import org.idp.wallet.verifiable_credentials_library.basic.json.JsonPathUtils
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
@@ -13,24 +12,25 @@ class PresentationDefinition(
   fun filterVerifiableCredential(
       verifiableCredentialsRecords: VerifiableCredentialsRecords
   ): VerifiableCredentialsRecords {
-    val filteredVcList = mutableListOf<VerifiableCredentialsRecord>()
+    val filteredVcList = mutableSetOf<VerifiableCredentialsRecord>()
     inputDescriptors.forEach { inputDescriptorDetail ->
       inputDescriptorDetail.constraints?.fields?.forEach { field ->
-        val path = field.path[0]
-        verifiableCredentialsRecords.forEach { vcRecord ->
-          if (path.contains("type")) {
-            val typeList =
-                JsonPath.parse(vcRecord.getPayloadWithJson().toString())?.read<List<String>>(path)
-            if (typeList != null && field.filter?.pattern != null) {
-              if (typeList.contains(field.filter.pattern)) {
-                filteredVcList.add(vcRecord)
+        field.path.forEach { path ->
+          verifiableCredentialsRecords.forEach { vcRecord ->
+            if (path.contains("type")) {
+              val typeList =
+                  JsonPathUtils.readAsListString(vcRecord.getPayloadWithJson().toString(), path)
+              if (typeList != null && field.filter?.pattern != null) {
+                if (typeList.contains(field.filter.pattern)) {
+                  filteredVcList.add(vcRecord)
+                }
               }
             }
           }
         }
       }
     }
-    return VerifiableCredentialsRecords(filteredVcList)
+    return VerifiableCredentialsRecords(filteredVcList.toList())
   }
 }
 

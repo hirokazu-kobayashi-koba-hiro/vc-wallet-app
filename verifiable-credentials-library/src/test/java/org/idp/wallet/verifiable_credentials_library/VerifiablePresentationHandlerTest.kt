@@ -248,7 +248,7 @@ class VerifiablePresentationHandlerTest {
                                 "fields": [
                                     {
                                         "path": [
-                                            "${'$'}.vc.type"
+                                            "$.vc.type"
                                         ],
                                         "filter": {
                                             "type": "string",
@@ -257,17 +257,17 @@ class VerifiablePresentationHandlerTest {
                                     },
                                     {
                                         "path": [
-                                            "${'$'}.credentialSubject.given_name"
+                                            "$.credentialSubject.given_name"
                                         ]
                                     },
                                     {
                                         "path": [
-                                            "${'$'}.credentialSubject.family_name"
+                                            "$.credentialSubject.family_name"
                                         ]
                                     },
                                     {
                                         "path": [
-                                            "${'$'}.credentialSubject.birthdate"
+                                            "$.credentialSubject.birthdate"
                                         ]
                                     }
                                 ]
