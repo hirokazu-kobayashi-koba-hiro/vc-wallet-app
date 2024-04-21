@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
+package org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation
 
 import android.net.Uri
 import android.util.Log
@@ -6,19 +6,20 @@ import java.net.URLDecoder
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
-import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationRequestCreator
 
-class VerifiablePresentationService(
+class VerifiablePresentationHandler(
     val registry: VerifiableCredentialRegistry,
-    val walletConfigurationReader: WalletConfigurationReader
+    private val oAuthRequestHandler: OAuthRequestHandler
 ) {
 
   suspend fun handleVpRequest(url: String): VerifiableCredentialsRecords {
     Log.d("Vc library", "handleVpRequest")
     // extract RequestObject
-    val walletConfiguration = walletConfigurationReader.get()
+    val oAuthRequestContext = oAuthRequestHandler.handleRequest(url)
     val requestObject = extractRequestObject(url)
     val verifiablePresentationRequestCreator = VerifiablePresentationRequestCreator(requestObject)
     val presentationRequest = verifiablePresentationRequestCreator.create()

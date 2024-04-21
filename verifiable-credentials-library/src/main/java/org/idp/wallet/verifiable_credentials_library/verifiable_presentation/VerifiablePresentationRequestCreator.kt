@@ -3,6 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
+import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 
 class VerifiablePresentationRequestCreator(private val jwtObject: JwtObject) {
 
@@ -14,11 +15,11 @@ class VerifiablePresentationRequestCreator(private val jwtObject: JwtObject) {
     return VerifiablePresentationRequest(jwtObject, presentationDefinition, clientMeta)
   }
 
-  private suspend fun getClientMeta(): ClientMetadata? {
+  private suspend fun getClientMeta(): ClientConfiguration? {
     val clientMeta = payload.get("client_metadata")
     if (clientMeta != null) {
       val clientMetaValue = JsonUtils.write(clientMeta)
-      return JsonUtils.read(clientMetaValue, ClientMetadata::class.java)
+      return JsonUtils.read(clientMetaValue, ClientConfiguration::class.java)
     }
     val clientMetadataUri = payload.get("client_metadata_uri")
     if (clientMetadataUri != null) {
@@ -27,9 +28,9 @@ class VerifiablePresentationRequestCreator(private val jwtObject: JwtObject) {
     return null
   }
 
-  private suspend fun fetchClientMetadata(uri: String): ClientMetadata {
+  private suspend fun fetchClientMetadata(uri: String): ClientConfiguration {
     val jsonObject = HttpClient.get(uri)
-    return JsonUtils.read(jsonObject.toString(), ClientMetadata::class.java)
+    return JsonUtils.read(jsonObject.toString(), ClientConfiguration::class.java)
   }
 
   private suspend fun getPresentationDefinition(): PresentationDefinition? {

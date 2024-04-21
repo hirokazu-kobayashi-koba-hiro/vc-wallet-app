@@ -1,7 +1,6 @@
-package org.idp.wallet.verifiable_credentials_library.jose
+package org.idp.wallet.verifiable_credentials_library.basic.jose
 
 import junit.framework.TestCase.assertTrue
-import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.junit.Test
 
 class JoseHandlerTest {

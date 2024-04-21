@@ -29,20 +29,22 @@ enum class ResponseType(private val values: Set<String>, val value: String) {
   undefined(setOf(), ""),
   unknown(setOf(), "");
 
-  fun of(input: String): ResponseType? {
-    if (Objects.isNull(input) || input.isEmpty()) {
-      return undefined
-    }
-    val inputValues =
-        Arrays.stream(input.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
-            .collect(Collectors.toSet())
-    for (responseType in entries) {
-      if (responseType.values.size == inputValues.size &&
-          responseType.values.containsAll(inputValues)) {
-        return responseType
+  companion object {
+    fun of(input: String): ResponseType {
+      if (Objects.isNull(input) || input.isEmpty()) {
+        return undefined
       }
+      val inputValues =
+          Arrays.stream(input.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+              .collect(Collectors.toSet())
+      for (responseType in entries) {
+        if (responseType.values.size == inputValues.size &&
+            responseType.values.containsAll(inputValues)) {
+          return responseType
+        }
+      }
+      return unknown
     }
-    return unknown
   }
 
   fun isAuthorizationCodeFlow(): Boolean {

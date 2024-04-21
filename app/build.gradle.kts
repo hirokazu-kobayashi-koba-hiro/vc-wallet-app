@@ -90,8 +90,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
-spotless { // if you are using build.gradle.kts, instead of 'spotless {' use:
-    // configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+spotless {
     kotlin {
         target("/src/**/*.kt")
         ktfmt()

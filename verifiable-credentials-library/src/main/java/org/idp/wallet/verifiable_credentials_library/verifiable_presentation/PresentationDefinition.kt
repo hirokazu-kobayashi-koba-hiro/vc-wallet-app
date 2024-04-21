@@ -5,7 +5,10 @@ import com.nfeld.jsonpathkt.extension.read
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
-class PresentationDefinition(val id: String, val inputDescriptors: List<InputDescriptorDetail>) {
+class PresentationDefinition(
+    val id: String = "",
+    val inputDescriptors: List<InputDescriptorDetail> = listOf()
+) {
 
   fun filterVerifiableCredential(
       verifiableCredentialsRecords: VerifiableCredentialsRecords

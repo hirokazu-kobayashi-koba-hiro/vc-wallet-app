@@ -1,12 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
+import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
 class VerifiablePresentationRequest(
     val jwtObject: JwtObject,
     val presentationDefinition: PresentationDefinition?,
-    val clientMeta: ClientMetadata?
+    val clientMeta: ClientConfiguration?
 ) {
 
   fun responseType(): String {

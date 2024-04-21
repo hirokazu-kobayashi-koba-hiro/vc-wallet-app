@@ -5,10 +5,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationService
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -16,17 +16,17 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class VerifiablePresentationServiceTest {
+class VerifiablePresentationHandlerTest {
 
   private lateinit var context: Context
-  private lateinit var service: VerifiablePresentationService
+  private lateinit var service: VerifiablePresentationHandler
 
   @Before
   fun setup() {
     context = InstrumentationRegistry.getInstrumentation().getContext()
     val registry = VerifiableCredentialRegistry(context)
     val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
-    service = VerifiablePresentationService(registry, walletConfigurationReader)
+    service = VerifiablePresentationHandler(registry, walletConfigurationReader)
   }
 
   @Test

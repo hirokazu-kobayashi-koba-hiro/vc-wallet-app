@@ -1,10 +1,10 @@
-package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
+package org.idp.wallet.verifiable_credentials_library.configuration
 
 import java.util.Arrays
 import java.util.Objects
 import java.util.stream.Collectors
 
-class ClientMetadata(
+class ClientConfiguration(
     val clientId: String = "",
     val clientSecret: String = "",
     val redirectUris: List<String> = ArrayList(),

@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.sdjwt
+package org.idp.wallet.verifiable_credentials_library.basic.sdjwt
 
 import id.walt.sdjwt.SDJwt
 import org.junit.Assert

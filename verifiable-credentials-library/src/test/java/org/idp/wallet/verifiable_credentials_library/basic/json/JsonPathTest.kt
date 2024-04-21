@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.json
+package org.idp.wallet.verifiable_credentials_library.basic.json
 
 import com.nfeld.jsonpathkt.JsonPath
 import com.nfeld.jsonpathkt.extension.read
