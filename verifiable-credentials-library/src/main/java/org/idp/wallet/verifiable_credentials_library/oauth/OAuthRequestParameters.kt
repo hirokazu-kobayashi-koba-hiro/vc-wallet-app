@@ -7,21 +7,19 @@ import org.idp.wallet.verifiable_credentials_library.type.vp.ClientIdScheme
 
 class OAuthRequestParameters(val params: Map<String, List<String>>) {
 
-  fun getScope(): Set<String> {
-    val scopesValue = getFirstOrEmptyAsString("scope")
-    return scopesValue.split(" ").stream().collect(Collectors.toSet())
+  fun getScope(): Set<String>? {
+    if (params.containsKey("scope")) {
+      val scopesValue = getFirstOrEmptyAsString("scope")
+      return scopesValue.split(" ").stream().collect(Collectors.toSet())
+    }
+    return null
   }
 
-  fun hasScope(): Boolean {
-    return params.containsKey("scope")
-  }
-
-  fun getResponseType(): ResponseType {
-    return ResponseType.of(getFirstOrEmptyAsString("response_type"))
-  }
-
-  fun hasResponseType(): Boolean {
-    return params.containsKey("response_type")
+  fun getResponseType(): ResponseType? {
+    if (params.containsKey("response_type")) {
+      return ResponseType.of(getFirstOrEmptyAsString("response_type"))
+    }
+    return null
   }
 
   fun getClientId(): String {
@@ -32,68 +30,60 @@ class OAuthRequestParameters(val params: Map<String, List<String>>) {
     return params.containsKey("client_id")
   }
 
-  fun getRedirectUri(): String {
-    return getFirstOrEmptyAsString("redirect_uri")
+  fun getRedirectUri(): String? {
+    if (params.containsKey("redirect_uri")) {
+      return getFirstOrEmptyAsString("redirect_uri")
+    }
+    return null
   }
 
-  fun hasRedirectUri(): Boolean {
-    return params.containsKey("redirect_uri")
+  fun getState(): String? {
+    if (params.containsKey("state")) {
+      return getFirstOrEmptyAsString("state")
+    }
+    return null
   }
 
-  fun getState(): String {
-    return getFirstOrEmptyAsString("state")
+  fun getResponseMode(): ResponseMode? {
+    if (params.containsKey("response_mode")) {
+      return ResponseMode.of(getFirstOrEmptyAsString("response_mode"))
+    }
+    return null
   }
 
-  fun hasState(): Boolean {
-    return params.containsKey("state")
+  fun getNonce(): String? {
+    if (params.containsKey("nonce")) {
+      return getFirstOrEmptyAsString("nonce")
+    }
+    return null
   }
 
-  fun getResponseMode(): ResponseMode {
-    return ResponseMode.of(getFirstOrEmptyAsString("response_mode"))
+  fun getRequestObject(): String? {
+    if (params.containsKey("request")) {
+      return getFirstOrEmptyAsString("request")
+    }
+    return null
   }
 
-  fun hasResponseMode(): Boolean {
-    return params.containsKey("response_mode")
+  fun getRequestUri(): String? {
+    if (params.containsKey("request_uri")) {
+      return getFirstOrEmptyAsString("request_uri")
+    }
+    return null
   }
 
-  fun getNonce(): String {
-    return getFirstOrEmptyAsString("nonce")
+  fun getPresentationDefinitionObject(): String? {
+    if (params.containsKey("presentation_definition")) {
+      return getFirstOrEmptyAsString("presentation_definition")
+    }
+    return null
   }
 
-  fun hasNonce(): Boolean {
-    return params.containsKey("nonce")
-  }
-
-  fun getRequestObject(): String {
-    return getFirstOrEmptyAsString("request")
-  }
-
-  fun hasRequestObject(): Boolean {
-    return params.containsKey("request")
-  }
-
-  fun getRequestUri(): String {
-    return getFirstOrEmptyAsString("request_uri")
-  }
-
-  fun hasRequestUri(): Boolean {
-    return params.containsKey("request_uri")
-  }
-
-  fun getPresentationDefinitionObject(): String {
-    return getFirstOrEmptyAsString("presentation_definition")
-  }
-
-  fun hasPresentationDefinitionObject(): Boolean {
-    return params.containsKey("presentation_definition")
-  }
-
-  fun getPresentationDefinitionUri(): String {
-    return getFirstOrEmptyAsString("presentation_definition_uri")
-  }
-
-  fun hasPresentationDefinitionUri(): Boolean {
-    return params.containsKey("presentation_definition_uri")
+  fun getPresentationDefinitionUri(): String? {
+    if (params.containsKey("presentation_definition_uri")) {
+      return getFirstOrEmptyAsString("presentation_definition_uri")
+    }
+    return null
   }
 
   fun clientMetadata(): String {
@@ -127,6 +117,9 @@ class OAuthRequestParameters(val params: Map<String, List<String>>) {
   }
 
   private fun getFirstOrEmptyAsString(key: String): String {
+    if (!params.containsKey(key)) {
+      return ""
+    }
     return params.getOrDefault(key, listOf("")).first()
   }
 }

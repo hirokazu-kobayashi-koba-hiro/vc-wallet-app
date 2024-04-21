@@ -1,7 +1,5 @@
 package org.idp.wallet.verifiable_credentials_library.type
 
-import java.util.Objects
-
 enum class ResponseMode(val value: String, val responseModeValue: String) {
   query("query", "?"),
   fragment("fragment", "#"),
@@ -15,8 +13,8 @@ enum class ResponseMode(val value: String, val responseModeValue: String) {
   unknown("", "");
 
   companion object {
-    fun of(value: String): ResponseMode {
-      if (Objects.isNull(value) || value.isEmpty()) {
+    fun of(value: String?): ResponseMode {
+      if (value.isNullOrEmpty()) {
         return undefined
       }
       for (responseMode in entries) {

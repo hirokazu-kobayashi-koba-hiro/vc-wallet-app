@@ -1,7 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.type
 
 import java.util.Arrays
-import java.util.Objects
 import java.util.stream.Collectors
 
 /**
@@ -30,8 +29,8 @@ enum class ResponseType(private val values: Set<String>, val value: String) {
   unknown(setOf(), "");
 
   companion object {
-    fun of(input: String): ResponseType {
-      if (Objects.isNull(input) || input.isEmpty()) {
+    fun of(input: String?): ResponseType {
+      if (input == null || input.isEmpty()) {
         return undefined
       }
       val inputValues =

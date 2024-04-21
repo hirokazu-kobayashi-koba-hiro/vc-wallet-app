@@ -1,8 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
+import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import java.net.URLEncoder
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
@@ -90,9 +90,34 @@ class VerifiablePresentationHandlerTest {
                 }
           """
               .trimIndent()
-      val encodedPresentationDefinition = URLEncoder.encode(presentationDefinition)
-      val url =
-          "https://client.example.org/universal-link?response_type=vp_token&client_id=https%3A%2F%2Fclient.example.org%2Fcb&client_id_scheme=redirect_uri&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&presentation_definition=$encodedPresentationDefinition&nonce=n-0S6_WzA2Mj&client_metadata=%7B%22vp_formats%22:%7B%22jwt_vp_json%22:%7B%22alg%22:%5B%22EdDSA%22,%22ES256K%22%5D%7D,%22ldp_vp%22:%7B%22proof_type%22:%5B%22Ed25519Signature2018%22%5D%7D%7D%7D"
+      val clientMetadata =
+          """
+          {
+              "vp_formats": {
+                  "jwt_vp": {
+                      "alg": [
+                          "EdDSA",
+                          "ES256K"
+                      ]
+                  },
+                  "ldp_vp": {
+                      "proof_type": [
+                          "Ed25519Signature2018"
+                      ]
+                  }
+              }
+          }
+      """
+              .trimIndent()
+      val uri =
+          Uri.parse("https://client.example.org/universal-link")
+              .buildUpon()
+              .appendQueryParameter("response_type", "vp_token")
+              .appendQueryParameter("client_id", "https://client.example.org/callback")
+              .appendQueryParameter("redirect_uri", "https://client.example.org/callback")
+              .appendQueryParameter("presentation_definition", presentationDefinition)
+              .appendQueryParameter("client_metadata", clientMetadata)
+              .build()
       val registry = service.registry
       val header = mapOf("type" to "JWT")
       val payloadValue =
@@ -142,14 +167,14 @@ class VerifiablePresentationHandlerTest {
       val payload = JoseHandler.parse(signedValue).payload()
       val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
       registry.save("test", record)
-
-      val filteredVcRecords = service.handleVpRequest(url)
-      Assert.assertEquals(1, filteredVcRecords?.size())
+      println(uri.toString())
+      val response = service.handleVpRequest(uri.toString())
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
     }
   }
 
   @Test
-  fun testSaveAndFind() {
+  fun to_handle_vp_request_with_request_object() {
     runBlocking {
       val registry = service.registry
       val header = mapOf("type" to "JWT")
@@ -302,8 +327,8 @@ class VerifiablePresentationHandlerTest {
               .trimIndent()
       val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
       val url = "openid4vp://?request=$vpRequestSignedValue&client_id=123"
-      val filteredVcRecords = service.handleVpRequest(url)
-      Assert.assertEquals(1, filteredVcRecords?.size())
+      val response = service.handleVpRequest(url)
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
     }
   }
 }

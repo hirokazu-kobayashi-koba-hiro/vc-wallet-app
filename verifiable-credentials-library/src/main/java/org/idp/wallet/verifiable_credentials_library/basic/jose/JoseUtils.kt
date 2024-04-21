@@ -53,12 +53,18 @@ class JwtObject(private val jwt: JWT) {
     return jwt.jwtClaimsSet.claims
   }
 
-  fun valueAsStringFromPayload(key: String): String {
-    return jwt.jwtClaimsSet.getStringClaim(key)
+  fun valueAsStringFromPayload(key: String): String? {
+    if (containsKey(key)) {
+      return jwt.jwtClaimsSet.getStringClaim(key)
+    }
+    return null
   }
 
-  fun valueAsObjectFromPayload(key: String): Map<String, Any> {
-    return jwt.jwtClaimsSet.getJSONObjectClaim(key)
+  fun valueAsObjectFromPayload(key: String): Map<String, Any>? {
+    if (containsKey(key)) {
+      return jwt.jwtClaimsSet.getJSONObjectClaim(key)
+    }
+    return null
   }
 
   fun containsKey(key: String): Boolean {
