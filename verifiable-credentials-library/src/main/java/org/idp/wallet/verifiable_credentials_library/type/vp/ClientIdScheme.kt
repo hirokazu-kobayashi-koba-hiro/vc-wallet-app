@@ -16,7 +16,7 @@ enum class ClientIdScheme(val value: String) {
           return client
         }
       }
-      return undefined
+      return unknown
     }
   }
 }

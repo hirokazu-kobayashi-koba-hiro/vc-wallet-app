@@ -1,20 +1,20 @@
 package org.idp.wallet.verifiable_credentials_library.oauth
 
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.ResponseType
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.PresentationDefinition
 
 class OAuthRequest(
     val identifier: String = "",
-    val scopes: Set<String> = setOf(),
-    val responseType: ResponseType = ResponseType.undefined,
+    val scopes: Set<String>? = null,
+    val responseType: ResponseType? = null,
     val clientId: String = "",
-    val redirectUri: String = "",
-    val state: String = "",
-    val responseMode: ResponseMode = ResponseMode.undefined,
-    val nonce: String = "",
-    val requestObject: String = "",
-    val requestUri: String = "",
-    val presentationDefinition: PresentationDefinition = PresentationDefinition(),
-    val presentationDefinitionUri: String = ""
+    val redirectUri: String? = null,
+    val state: String? = null,
+    val responseMode: ResponseMode? = null,
+    val nonce: String? = null,
+    val requestObject: String? = null,
+    val requestUri: String? = null,
+    val presentationDefinition: PresentationDefinition? = null,
+    val presentationDefinitionUri: String? = null
 ) {}

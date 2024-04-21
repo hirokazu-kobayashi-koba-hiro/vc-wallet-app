@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
+package org.idp.wallet.verifiable_credentials_library.oauth.vp
 
 import com.nfeld.jsonpathkt.JsonPath
 import com.nfeld.jsonpathkt.extension.read
@@ -7,7 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.Veri
 
 class PresentationDefinition(
     val id: String = "",
-    val inputDescriptors: List<InputDescriptorDetail> = listOf()
+    private val inputDescriptors: List<InputDescriptorDetail> = listOf()
 ) {
 
   fun filterVerifiableCredential(

@@ -113,7 +113,7 @@ class OAuthRequestParameters(val params: Map<String, List<String>>) {
   }
 
   fun getClientIdScheme(): ClientIdScheme {
-    return ClientIdScheme.of("client_id_scheme")
+    return ClientIdScheme.of(getFirstOrEmptyAsString("client_id_scheme"))
   }
 
   fun getMultiValuedKeys(): List<String> {
@@ -127,6 +127,6 @@ class OAuthRequestParameters(val params: Map<String, List<String>>) {
   }
 
   private fun getFirstOrEmptyAsString(key: String): String {
-    return params.getOrDefault(key, listOf()).first()
+    return params.getOrDefault(key, listOf("")).first()
   }
 }

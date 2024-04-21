@@ -2,9 +2,13 @@ package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import java.net.URLEncoder
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
+import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
@@ -26,7 +30,122 @@ class VerifiablePresentationHandlerTest {
     context = InstrumentationRegistry.getInstrumentation().getContext()
     val registry = VerifiableCredentialRegistry(context)
     val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
-    service = VerifiablePresentationHandler(registry, walletConfigurationReader)
+    val oauthRequestHandler =
+        OAuthRequestHandler(
+            walletConfigurationReader,
+            ClientConfigurationRepository { it ->
+              return@ClientConfigurationRepository ClientConfiguration()
+            })
+    service = VerifiablePresentationHandler(registry, oauthRequestHandler)
+  }
+
+  @Test
+  fun to_handle_vp_request() {
+    runBlocking {
+      val presentationDefinition =
+          """
+                              {
+                    "id": "example with selective disclosure",
+                    "input_descriptors": [
+                        {
+                            "id": "ID card with constraints",
+                            "format": {
+                                "ldp_vc": {
+                                    "proof_type": [
+                                        "Ed25519Signature2018"
+                                    ]
+                                }
+                            },
+                            "constraints": {
+                                "limit_disclosure": "required",
+                                "fields": [
+                                    {
+                                        "path": [
+                                            "${'$'}.vc.type"
+                                        ],
+                                        "filter": {
+                                            "type": "string",
+                                            "pattern": "ExampleDegreeCredential"
+                                        }
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.given_name"
+                                        ]
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.family_name"
+                                        ]
+                                    },
+                                    {
+                                        "path": [
+                                            "${'$'}.credentialSubject.birthdate"
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+          """
+              .trimIndent()
+      val encodedPresentationDefinition = URLEncoder.encode(presentationDefinition)
+      val url =
+          "https://client.example.org/universal-link?response_type=vp_token&client_id=https%3A%2F%2Fclient.example.org%2Fcb&client_id_scheme=redirect_uri&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&presentation_definition=$encodedPresentationDefinition&nonce=n-0S6_WzA2Mj&client_metadata=%7B%22vp_formats%22:%7B%22jwt_vp_json%22:%7B%22alg%22:%5B%22EdDSA%22,%22ES256K%22%5D%7D,%22ldp_vp%22:%7B%22proof_type%22:%5B%22Ed25519Signature2018%22%5D%7D%7D%7D"
+      val registry = service.registry
+      val header = mapOf("type" to "JWT")
+      val payloadValue =
+          """
+            {
+              "vc": {
+                "@context": [
+                  "https://www.w3.org/ns/credentials/v2",
+                  "https://www.w3.org/ns/credentials/examples/v2"
+                ],
+                "id": "http://university.example/credentials/3732",
+                "type": [
+                  "VerifiableCredential",
+                  "ExampleDegreeCredential"
+                ],
+                "issuer": "https://university.example/issuers/565049",
+                "validFrom": "2010-01-01T00:00:00Z",
+                "credentialSubject": {
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "degree": {
+                    "type": "ExampleBachelorDegree",
+                    "name": "Bachelor of Science and Arts"
+                  }
+                }
+              },
+              "iss": "https://university.example/issuers/565049",
+              "jti": "http://university.example/credentials/3732",
+              "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            }
+        """
+              .trimIndent()
+      val jwk =
+          """
+            {
+                "kty": "EC",
+                "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
+                "use": "sig",
+                "crv": "P-256",
+                "kid": "access_token",
+                "x": "iWJINqt0ySv3kVEvlHbvNkPKY2pPSf1cG1PSx3tRfw0",
+                "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
+                "alg": "ES256"
+            }
+        """
+              .trimIndent()
+      val signedValue = JoseHandler.sign(header, payloadValue, jwk)
+      val payload = JoseHandler.parse(signedValue).payload()
+      val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
+      registry.save("test", record)
+
+      val filteredVcRecords = service.handleVpRequest(url)
+      Assert.assertEquals(1, filteredVcRecords?.size())
+    }
   }
 
   @Test
@@ -181,11 +300,10 @@ class VerifiablePresentationHandlerTest {
             }
         """
               .trimIndent()
-
       val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
-      val url = "openid4vp://?request=$vpRequestSignedValue"
+      val url = "openid4vp://?request=$vpRequestSignedValue&client_id=123"
       val filteredVcRecords = service.handleVpRequest(url)
-      Assert.assertEquals(1, filteredVcRecords.size())
+      Assert.assertEquals(1, filteredVcRecords?.size())
     }
   }
 }

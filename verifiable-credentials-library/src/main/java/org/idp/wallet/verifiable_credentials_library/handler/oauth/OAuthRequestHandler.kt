@@ -7,10 +7,11 @@ import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigu
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestContext
+import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestCreationService
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestParameters
+import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestVerifier
 import org.idp.wallet.verifiable_credentials_library.oauth.OauthRequestValidator
 import org.idp.wallet.verifiable_credentials_library.type.vp.ClientIdScheme
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.PresentationDefinition
 
 class OAuthRequestHandler(
     private val walletConfigurationReader: WalletConfigurationReader,
@@ -23,26 +24,13 @@ class OAuthRequestHandler(
     validator.validate()
     val walletConfiguration = walletConfigurationReader.get()
     val clientConfiguration = getClientConfiguration(parameters)
-    return OAuthRequestContext(parameters, walletConfiguration, clientConfiguration)
-  }
-
-  private suspend fun getPresentationDefinition(
-      parameters: OAuthRequestParameters
-  ): PresentationDefinition? {
-    if (parameters.hasPresentationDefinitionObject()) {
-      val definition = parameters.getPresentationDefinitionObject()
-      return JsonUtils.read(definition, PresentationDefinition::class.java)
-    }
-    if (parameters.hasPresentationDefinitionUri()) {
-      val definitionUri = parameters.getPresentationDefinitionUri()
-      return fetchPresentationDefinition(definitionUri)
-    }
-    return null
-  }
-
-  private suspend fun fetchPresentationDefinition(definitionUri: String): PresentationDefinition {
-    val jsonObject = HttpClient.get(definitionUri)
-    return JsonUtils.read(jsonObject.toString(), PresentationDefinition::class.java)
+    val oauthRequestCreationService = OAuthRequestCreationService(parameters)
+    val oauthRequest = oauthRequestCreationService.create()
+    val oAuthRequestContext =
+        OAuthRequestContext(parameters, oauthRequest, walletConfiguration, clientConfiguration)
+    val verifier = OAuthRequestVerifier(oAuthRequestContext)
+    verifier.verify()
+    return oAuthRequestContext
   }
 
   private suspend fun getClientConfiguration(
@@ -53,11 +41,9 @@ class OAuthRequestHandler(
         val clientMetadata = getClientMetadata(parameters)
         JsonUtils.read(clientMetadata, ClientConfiguration::class.java)
       }
-      ClientIdScheme.pre_registered -> {
-        clientConfigurationRepository.get(parameters.getClientId())
-      }
+      // pre-registered
       else -> {
-        throw RuntimeException()
+        clientConfigurationRepository.get(parameters.getClientId())
       }
     }
   }
