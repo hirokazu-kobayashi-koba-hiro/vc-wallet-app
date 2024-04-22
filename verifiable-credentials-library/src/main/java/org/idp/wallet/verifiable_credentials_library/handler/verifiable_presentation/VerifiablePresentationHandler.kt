@@ -16,7 +16,10 @@ class VerifiablePresentationHandler(
     // find vc
     val records = registry.getAllAsCollection()
     val presentationDefinition = oAuthRequestContext.getPresentationDefinition()
-    val filterVerifiableCredential = presentationDefinition?.filterVerifiableCredential(records)
+    val filterVerifiableCredential =
+        records
+            .filter { presentationDefinition?.evaluate(it.getPayloadWithJson()) ?: false }
+            .toList()
     // create viewData
     return VerifiablePresentationRequestResponse(filterVerifiableCredential)
   }

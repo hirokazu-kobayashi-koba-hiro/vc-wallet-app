@@ -61,27 +61,12 @@ class VerifiablePresentationHandlerTest {
                                 "fields": [
                                     {
                                         "path": [
-                                            "${'$'}.vc.type"
+                                            "$.vc.type"
                                         ],
                                         "filter": {
                                             "type": "string",
                                             "pattern": "ExampleDegreeCredential"
                                         }
-                                    },
-                                    {
-                                        "path": [
-                                            "${'$'}.credentialSubject.given_name"
-                                        ]
-                                    },
-                                    {
-                                        "path": [
-                                            "${'$'}.credentialSubject.family_name"
-                                        ]
-                                    },
-                                    {
-                                        "path": [
-                                            "${'$'}.credentialSubject.birthdate"
-                                        ]
                                     }
                                 ]
                             }
@@ -169,7 +154,7 @@ class VerifiablePresentationHandlerTest {
       registry.save("test", record)
       println(uri.toString())
       val response = service.handleVpRequest(uri.toString())
-      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size)
     }
   }
 
@@ -195,6 +180,9 @@ class VerifiablePresentationHandlerTest {
                 "validFrom": "2010-01-01T00:00:00Z",
                 "credentialSubject": {
                   "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "given_name": "john",
+                  "family_name": "alex",
+                  "birthdate": "2001-02-03",
                   "degree": {
                     "type": "ExampleBachelorDegree",
                     "name": "Bachelor of Science and Arts"
@@ -248,6 +236,7 @@ class VerifiablePresentationHandlerTest {
                                 "fields": [
                                     {
                                         "path": [
+                                            "$.type",
                                             "$.vc.type"
                                         ],
                                         "filter": {
@@ -257,19 +246,22 @@ class VerifiablePresentationHandlerTest {
                                     },
                                     {
                                         "path": [
-                                            "$.credentialSubject.given_name"
+                                            "$.credentialSubject.given_name",
+                                            "$.vc.credentialSubject.given_name"
                                         ]
                                     },
                                     {
                                         "path": [
-                                            "$.credentialSubject.family_name"
+                                            "$.credentialSubject.family_name",
+                                            "$.vc.credentialSubject.family_name"
                                         ]
                                     },
                                     {
                                         "path": [
-                                            "$.credentialSubject.birthdate"
+                                            "$.credentialSubject.birthdate",
+                                            "$.vc.credentialSubject.birthdate"
                                         ]
-                                    }
+                                    }                                 
                                 ]
                             }
                         }
@@ -328,7 +320,7 @@ class VerifiablePresentationHandlerTest {
       val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
       val url = "openid4vp://?request=$vpRequestSignedValue&client_id=123"
       val response = service.handleVpRequest(url)
-      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size)
     }
   }
 }

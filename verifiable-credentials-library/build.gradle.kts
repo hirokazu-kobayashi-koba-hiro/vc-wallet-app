@@ -43,10 +43,11 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
 
-    // JSON
+    //JSON
     implementation("com.beust:klaxon:5.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+    //JSONPath refer to https://identity.foundation/presentation-exchange/spec/v2.0.0/#jsonpath-implementations
     implementation("com.nfeld.jsonpathkt:jsonpathkt:2.0.1")
 
 

@@ -1,36 +1,45 @@
 package org.idp.wallet.verifiable_credentials_library.oauth.vp
 
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonPathUtils
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.json.JSONObject
 
 class PresentationDefinition(
     val id: String = "",
     private val inputDescriptors: List<InputDescriptorDetail> = listOf()
 ) {
 
-  fun filterVerifiableCredential(
-      verifiableCredentialsRecords: VerifiableCredentialsRecords
-  ): VerifiableCredentialsRecords {
-    val filteredVcList = mutableSetOf<VerifiableCredentialsRecord>()
+  fun evaluate(jsonObject: JSONObject): Boolean {
     inputDescriptors.forEach { inputDescriptorDetail ->
-      inputDescriptorDetail.constraints?.fields?.forEach { field ->
-        field.path.forEach { path ->
-          verifiableCredentialsRecords.forEach { vcRecord ->
-            if (path.contains("type")) {
-              val typeList =
-                  JsonPathUtils.readAsListString(vcRecord.getPayloadWithJson().toString(), path)
-              if (typeList != null && field.filter?.pattern != null) {
-                if (typeList.contains(field.filter.pattern)) {
-                  filteredVcList.add(vcRecord)
-                }
-              }
-            }
-          }
+      inputDescriptorDetail.constraints.fields?.forEach { field ->
+        if (field.path.stream().noneMatch { path -> match(path, field, jsonObject) }) {
+          return false
         }
       }
     }
-    return VerifiableCredentialsRecords(filteredVcList.toList())
+    return true
+  }
+
+  private fun match(path: String, field: Field, jsonObject: JSONObject): Boolean {
+    if (path.contains("type")) {
+      val typeList = JsonPathUtils.readAsListString(jsonObject.toString(), path)
+      if (typeList == null && field.isRequired()) {
+        return false
+      }
+      if (typeList != null &&
+          field.filter?.pattern != null &&
+          !typeList.contains(field.filter.pattern)) {
+        return false
+      }
+    } else {
+      val value = JsonPathUtils.readAsString(jsonObject.toString(), path)
+      if (value == null && field.isRequired()) {
+        return false
+      }
+      if (value != null && field.filter?.pattern != null && value != field.filter.pattern) {
+        return false
+      }
+    }
+    return true
   }
 }
 
@@ -39,7 +48,7 @@ data class InputDescriptorDetail(
     val name: String?,
     val purpose: String?,
     val format: Format?,
-    val constraints: Constraints?
+    val constraints: Constraints
 )
 
 data class Format(
@@ -63,6 +72,10 @@ data class Field(
     val filter: Filter?,
     val optional: Boolean?,
     val pattern: String?
-)
+) {
+  fun isRequired(): Boolean {
+    return optional == false || optional == null
+  }
+}
 
 data class Filter(val type: String, val pattern: String)
