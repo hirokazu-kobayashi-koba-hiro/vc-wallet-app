@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity(), VerifiablePresentationInteractor {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    VerifiableCredentialsClient.init(this, "218232426")
+    VerifiableCredentialsClient.initialize(this, "218232426")
     setContent {
       HomeView(
           viewModel,

@@ -5,7 +5,7 @@ import org.idp.wallet.verifiable_credentials_library.basic.http.extractQueries
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
-import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestContext
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestCreationService
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthRequestParameters
@@ -14,7 +14,7 @@ import org.idp.wallet.verifiable_credentials_library.oauth.OauthRequestValidator
 import org.idp.wallet.verifiable_credentials_library.type.vp.ClientIdScheme
 
 class OAuthRequestHandler(
-    private val walletConfigurationReader: WalletConfigurationReader,
+    private val walletConfigurationService: WalletConfigurationService,
     private val clientConfigurationRepository: ClientConfigurationRepository
 ) {
 
@@ -22,7 +22,7 @@ class OAuthRequestHandler(
     val parameters = OAuthRequestParameters(extractQueries(url))
     val validator = OauthRequestValidator(parameters)
     validator.validate()
-    val walletConfiguration = walletConfigurationReader.get()
+    val walletConfiguration = walletConfigurationService.getConfiguration()
     val clientConfiguration = getClientConfiguration(parameters)
     val oauthRequestCreationService = OAuthRequestCreationService(parameters)
     val oauthRequest = oauthRequestCreationService.create()

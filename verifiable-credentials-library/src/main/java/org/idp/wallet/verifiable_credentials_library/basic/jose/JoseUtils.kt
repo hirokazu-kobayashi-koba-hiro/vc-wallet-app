@@ -6,6 +6,7 @@ import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory
 import com.nimbusds.jose.jwk.Curve
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
@@ -44,6 +45,12 @@ object JoseHandler {
   fun generateECKey(keyId: String): String {
     val ecJWK: ECKey = ECKeyGenerator(Curve.P_256).keyID(keyId).generate()
     return ecJWK.toJSONString()
+  }
+
+  fun transformJwksAsString(jwk: String): String {
+    val parsedJwk = JWK.parse(jwk)
+    val jwkSet = JWKSet(parsedJwk)
+    return jwkSet.toString(false)
   }
 }
 

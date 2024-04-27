@@ -10,7 +10,7 @@ class WalletConfiguration(
     val authorizationEndpoint: String? = null,
     val tokenEndpoint: String = "",
     val userinfoEndpoint: String = "",
-    val jwks: String? = null,
+    var jwks: String? = null,
     val jwksUri: String? = null,
     val registrationEndpoint: String = "",
     val scopesSupported: List<String> = ArrayList(),
@@ -68,8 +68,6 @@ class WalletConfiguration(
     val defaultMaxAge: Long = 86400,
     val authorizationResponseDuration: Long = 60
 ) {
-
-  fun ServerConfiguration() {}
 
   fun issuer(): String {
     return issuer

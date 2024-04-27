@@ -42,6 +42,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     //JSON
     implementation("com.beust:klaxon:5.6")

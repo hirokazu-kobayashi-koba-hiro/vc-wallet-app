@@ -2,9 +2,10 @@ package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import org.idp.wallet.verifiable_credentials_library.basic.resource.AssetsReader
+import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
-import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
@@ -17,19 +18,21 @@ object VerifiableCredentialsClient {
 
   private lateinit var verifiableCredentialsService: VerifiableCredentialsService
   private lateinit var verifiablePresentationHandler: VerifiablePresentationHandler
-  private lateinit var walletConfigurationReader: WalletConfigurationReader
+  private lateinit var walletConfigurationService: WalletConfigurationService
 
-  fun init(context: Context, clientId: String) {
+  fun initialize(context: Context, clientId: String) {
+    val keyStore = KeyStore(context)
     val assetsReader = AssetsReader(context)
     val registry = VerifiableCredentialRegistry(context)
-    walletConfigurationReader = WalletConfigurationReader(assetsReader)
+    walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
+    walletConfigurationService.initialize()
     verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()
     }
     verifiablePresentationHandler =
         VerifiablePresentationHandler(
-            registry, OAuthRequestHandler(walletConfigurationReader, mock))
+            registry, OAuthRequestHandler(walletConfigurationService, mock))
   }
 
   suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {

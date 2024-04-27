@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
-import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
+import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
@@ -33,10 +33,10 @@ class VerifiablePresentationHandlerTest {
   fun setup() {
     context = InstrumentationRegistry.getInstrumentation().getContext()
     val registry = VerifiableCredentialRegistry(context)
-    val walletConfigurationReader = WalletConfigurationReader(MockAssetsReader())
+    val walletConfigurationService = WalletConfigurationService(MockAssetsReader())
     val oauthRequestHandler =
         OAuthRequestHandler(
-            walletConfigurationReader,
+            walletConfigurationService,
             ClientConfigurationRepository { it ->
               return@ClientConfigurationRepository ClientConfiguration()
             })

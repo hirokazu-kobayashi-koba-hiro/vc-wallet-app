@@ -24,6 +24,10 @@ class AuthorizationResponseCreator(
   private fun createVpToken(): String {
     val selectedVerifiableCredentialsRecords =
         verifiableCredentialsRecords.find(selectedVerifiableCredentialIds)
+    val jwks = oAuthRequestContext.walletConfiguration.jwks
+    // FIXME
+    val keyId = "vc_wallet_jwt_key"
+
     return ""
   }
 }
