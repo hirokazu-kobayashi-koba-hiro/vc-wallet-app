@@ -3,7 +3,10 @@ package org.idp.wallet.verifiable_credentials_library.basic.jose
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory
+import com.nimbusds.jose.jwk.Curve
+import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.JWTParser
@@ -36,6 +39,11 @@ object JoseHandler {
     val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
     jws.sign(jwsSigner)
     return jws.serialize()
+  }
+
+  fun generateECKey(keyId: String): String {
+    val ecJWK: ECKey = ECKeyGenerator(Curve.P_256).keyID(keyId).generate()
+    return ecJWK.toJSONString()
   }
 }
 

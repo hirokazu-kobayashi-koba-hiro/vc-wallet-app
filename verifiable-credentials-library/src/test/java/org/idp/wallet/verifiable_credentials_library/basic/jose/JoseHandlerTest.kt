@@ -1,9 +1,22 @@
 package org.idp.wallet.verifiable_credentials_library.basic.jose
 
 import junit.framework.TestCase.assertTrue
+import org.junit.Assert
 import org.junit.Test
 
 class JoseHandlerTest {
+
+  @Test
+  fun to_generate_ec_key() {
+    val ecKey = JoseHandler.generateECKey("123")
+    println(ecKey)
+    Assert.assertTrue(
+        ecKey.contains(
+            """
+            "kid":"123"
+        """
+                .trimIndent()))
+  }
 
   @Test
   fun sign() {
