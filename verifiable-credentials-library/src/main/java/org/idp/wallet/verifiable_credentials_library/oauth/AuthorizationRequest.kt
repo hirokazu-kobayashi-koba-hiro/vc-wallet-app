@@ -4,7 +4,7 @@ import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefini
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.ResponseType
 
-class OAuthRequest(
+class AuthorizationRequest(
     val identifier: String = "",
     val scopes: Set<String>? = null,
     val responseType: ResponseType? = null,

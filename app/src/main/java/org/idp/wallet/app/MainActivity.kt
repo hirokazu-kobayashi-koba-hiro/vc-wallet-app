@@ -1,6 +1,7 @@
 package org.idp.wallet.app
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -55,8 +56,12 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractorCallback
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), VerifiablePresentationInteractor {
 
   var format: String = ""
 
@@ -103,6 +108,13 @@ class MainActivity : ComponentActivity() {
       Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
     }
   }
+
+  override fun confirm(
+      context: Context,
+      viewData: VerifiablePresentationViewData,
+      verifiableCredentialsRecords: VerifiableCredentialsRecords,
+      callback: VerifiablePresentationInteractorCallback
+  ): Boolean {}
 }
 
 @Preview(showBackground = true)

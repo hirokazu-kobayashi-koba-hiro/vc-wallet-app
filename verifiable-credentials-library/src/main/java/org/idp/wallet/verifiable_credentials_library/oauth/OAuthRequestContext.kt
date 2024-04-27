@@ -6,11 +6,22 @@ import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefini
 
 class OAuthRequestContext(
     val parameters: OAuthRequestParameters,
-    val oAuthRequest: OAuthRequest,
+    val authorizationRequest: AuthorizationRequest,
     val walletConfiguration: WalletConfiguration,
     val clientConfiguration: ClientConfiguration
 ) {
   fun getPresentationDefinition(): PresentationDefinition? {
-    return oAuthRequest.presentationDefinition
+    return authorizationRequest.presentationDefinition
+  }
+
+  fun getIssuer(): String {
+    return walletConfiguration.issuer
+  }
+
+  fun getRedirectUri(): String {
+    authorizationRequest.redirectUri?.let {
+      return it
+    }
+    return clientConfiguration.redirectUris[0]
   }
 }

@@ -7,6 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigu
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsService
@@ -39,7 +40,11 @@ object VerifiableCredentialsClient {
     return verifiableCredentialsService.getAllCredentials()
   }
 
-  suspend fun handleVpRequest(url: String) {
-    verifiablePresentationHandler.handleVpRequest(url)
+  suspend fun handleVpRequest(
+      context: Context,
+      url: String,
+      interactor: VerifiablePresentationInteractor
+  ) {
+    verifiablePresentationHandler.handleVpRequest(context, url, interactor)
   }
 }

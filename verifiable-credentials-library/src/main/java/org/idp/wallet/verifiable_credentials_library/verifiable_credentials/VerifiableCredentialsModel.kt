@@ -1,5 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.verifiable_credentials
 
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinition
 import org.json.JSONObject
 
 class VerifiableCredentialsRecords(private val values: List<VerifiableCredentialsRecord>) :
@@ -10,6 +11,17 @@ class VerifiableCredentialsRecords(private val values: List<VerifiableCredential
     val arrayList = ArrayList(values)
     arrayList.add(record)
     return VerifiableCredentialsRecords(arrayList)
+  }
+
+  fun filter(presentationDefinition: PresentationDefinition): VerifiableCredentialsRecords {
+    val filtered =
+        values.filter { presentationDefinition.evaluate(it.getPayloadWithJson()) }.toList()
+    return VerifiableCredentialsRecords(filtered)
+  }
+
+  fun find(ids: List<String>): VerifiableCredentialsRecords {
+    val filtered = values.filter { ids.contains(it.id) }
+    return VerifiableCredentialsRecords(filtered)
   }
 
   fun find(id: String): VerifiableCredentialsRecord? {

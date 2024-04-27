@@ -12,7 +12,7 @@ import org.idp.wallet.verifiable_credentials_library.type.ResponseType
 
 class OAuthRequestCreationService(private val parameters: OAuthRequestParameters) {
 
-  suspend fun create(): OAuthRequest {
+  suspend fun create(): AuthorizationRequest {
     val identifier = UUID.randomUUID().toString()
     val jwtObject = getRequestObject()
     val scopes =
@@ -77,7 +77,7 @@ class OAuthRequestCreationService(private val parameters: OAuthRequestParameters
           }
           return@let null
         } ?: parameters.getPresentationDefinitionUri()
-    return OAuthRequest(
+    return AuthorizationRequest(
         identifier = identifier,
         scopes = scopes,
         responseType = responseType,

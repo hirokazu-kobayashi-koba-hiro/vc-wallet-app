@@ -1,10 +1,12 @@
 package org.idp.wallet.app
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 
 class VerifiableCredentialIssuanceViewModel : ViewModel() {
@@ -22,7 +24,11 @@ class VerifiableCredentialIssuanceViewModel : ViewModel() {
     _vcContent.value = allCredentials
   }
 
-  suspend fun handleVpRequest(url: String) {
-    VerifiableCredentialsClient.handleVpRequest(url)
+  suspend fun handleVpRequest(
+      context: Context,
+      url: String,
+      interactor: VerifiablePresentationInteractor
+  ) {
+    VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
   }
 }

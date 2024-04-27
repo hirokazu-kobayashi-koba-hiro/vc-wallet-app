@@ -10,9 +10,13 @@ import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigu
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationReader
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -153,8 +157,19 @@ class VerifiablePresentationHandlerTest {
       val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
       registry.save("test", record)
       println(uri.toString())
-      val response = service.handleVpRequest(uri.toString())
-      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size)
+      val interactor =
+          object : VerifiablePresentationInteractor {
+            override fun confirm(
+                context: Context,
+                viewData: VerifiablePresentationViewData,
+                verifiableCredentialsRecords: VerifiableCredentialsRecords,
+                callback: VerifiablePresentationInteractorCallback
+            ) {
+              callback.accept(listOf("1"))
+            }
+          }
+      val response = service.handleVpRequest(context, uri.toString(), interactor = interactor)
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
     }
   }
 
@@ -319,8 +334,19 @@ class VerifiablePresentationHandlerTest {
               .trimIndent()
       val vpRequestSignedValue = JoseHandler.sign(header, vpPayload, jwk)
       val url = "openid4vp://?request=$vpRequestSignedValue&client_id=123"
-      val response = service.handleVpRequest(url)
-      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size)
+      val interactor =
+          object : VerifiablePresentationInteractor {
+            override fun confirm(
+                context: Context,
+                viewData: VerifiablePresentationViewData,
+                verifiableCredentialsRecords: VerifiableCredentialsRecords,
+                callback: VerifiablePresentationInteractorCallback
+            ) {
+              callback.accept(listOf("1"))
+            }
+          }
+      val response = service.handleVpRequest(context, url, interactor = interactor)
+      Assert.assertEquals(1, response.verifiableCredentialsRecords?.size())
     }
   }
 }
