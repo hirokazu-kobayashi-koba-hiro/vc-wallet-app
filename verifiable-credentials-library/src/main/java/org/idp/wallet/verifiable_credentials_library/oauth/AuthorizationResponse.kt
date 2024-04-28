@@ -16,20 +16,14 @@ class AuthorizationResponse(
     val nonce: String? = null
 ) {
 
-    fun redirectUriValue(): String {
-        val buildUpon = Uri.parse(redirectUri + responseModeValue).buildUpon()
-        buildUpon.appendQueryParameter("iss", issuer)
-        buildUpon.appendQueryParameter("vp_token", vpToken)
-        buildUpon.appendQueryParameter("presentation_submission", presentationSubmission.toJsonString())
-        idToken?.let {
-            buildUpon.appendQueryParameter("id_token", it)
-        }
-        state?.let {
-            buildUpon.appendQueryParameter("state", it)
-        }
-        nonce?.let {
-            buildUpon.appendQueryParameter(nonce, it)
-        }
-        return buildUpon.toString()
-    }
+  fun redirectUriValue(): String {
+    val buildUpon = Uri.parse(redirectUri + responseModeValue).buildUpon()
+    buildUpon.appendQueryParameter("iss", issuer)
+    buildUpon.appendQueryParameter("vp_token", vpToken)
+    buildUpon.appendQueryParameter("presentation_submission", presentationSubmission.toJsonString())
+    idToken?.let { buildUpon.appendQueryParameter("id_token", it) }
+    state?.let { buildUpon.appendQueryParameter("state", it) }
+    nonce?.let { buildUpon.appendQueryParameter(nonce, it) }
+    return buildUpon.toString()
+  }
 }

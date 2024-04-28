@@ -26,6 +26,6 @@ class OAuthRequestContext(
   }
 
   fun isDirectPost(): Boolean {
-      return authorizationRequest.isDirectPost()
+    return authorizationRequest.isDirectPost()
   }
 }

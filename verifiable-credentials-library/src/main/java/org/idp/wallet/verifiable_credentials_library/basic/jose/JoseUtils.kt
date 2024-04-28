@@ -7,7 +7,6 @@ import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory
 import com.nimbusds.jose.jwk.Curve
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
-import com.nimbusds.jose.jwk.JWKMatcher
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWT
@@ -22,11 +21,16 @@ object JoseHandler {
     return JwtObject(parsedJwt)
   }
 
-  fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwks: String, keyId: String): String {
+  fun sign(
+      header: Map<String, Any>,
+      payload: Map<String, Any>,
+      jwks: String,
+      keyId: String
+  ): String {
     val jwkSet = JWKSet.parse(jwks)
     val jwk = jwkSet.getKeyByKeyId(keyId)
     val headers =
-      JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
     val claimSet = JWTClaimsSet.parse(payload)
     val jws = SignedJWT(headers, claimSet)
     val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
@@ -57,10 +61,8 @@ object JoseHandler {
   }
 
   fun generateECKey(keyId: String): String {
-    val ecJWK: ECKey = ECKeyGenerator(Curve.P_256)
-      .keyID(keyId)
-      .algorithm(Algorithm.parse("ES256"))
-      .generate()
+    val ecJWK: ECKey =
+        ECKeyGenerator(Curve.P_256).keyID(keyId).algorithm(Algorithm.parse("ES256")).generate()
     return ecJWK.toJSONString()
   }
 

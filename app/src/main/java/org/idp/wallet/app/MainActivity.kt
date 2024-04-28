@@ -1,7 +1,6 @@
 package org.idp.wallet.app
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -56,12 +55,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
-import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractor
-import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationInteractorCallback
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.DefaultVerifiablePresentationInteractorExexution
 
-class MainActivity : ComponentActivity(), VerifiablePresentationInteractor {
+class MainActivity : ComponentActivity() {
 
   var format: String = ""
 
@@ -104,17 +100,18 @@ class MainActivity : ComponentActivity(), VerifiablePresentationInteractor {
       Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
     }
     lifecycleScope.launch(errorHandler) {
+      if (format == "vp") {
+        viewModel.handleVpRequest(
+            this@MainActivity,
+            barcodeValue,
+            interactor = DefaultVerifiablePresentationInteractorExexution())
+        Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+        return@launch
+      }
       viewModel.request(barcodeValue, format)
       Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
     }
   }
-
-  override fun confirm(
-      context: Context,
-      viewData: VerifiablePresentationViewData,
-      verifiableCredentialsRecords: VerifiableCredentialsRecords,
-      callback: VerifiablePresentationInteractorCallback
-  ): Boolean {}
 }
 
 @Preview(showBackground = true)
@@ -172,7 +169,12 @@ fun MainScreen(
           composable(Screen.Vc.route) {
             VcScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
           }
-          composable(Screen.Vp.route) { VpScreen(navController) }
+          composable(Screen.Vp.route) {
+            VpScreen(
+                navController,
+                onClick = onClick,
+            )
+          }
         }
       }
 }
@@ -234,7 +236,7 @@ fun HomeScreen(
 @Composable
 fun VcScreen(
     viewModel: VerifiableCredentialIssuanceViewModel,
-    onClick: (pinCode: String) -> Unit,
+    onClick: (format: String) -> Unit,
     onClickShow: () -> Unit
 ) {
   Column(
@@ -267,12 +269,20 @@ fun VcScreen(
 }
 
 @Composable
-fun VpScreen(navController: NavHostController) {
+fun VpScreen(
+    navController: NavHostController,
+    onClick: (format: String) -> Unit,
+) {
   Column(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Profile Screen")
+        Text(text = "Vp Screen")
+        Row {
+          Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = { onClick("vp") }) {
+            Text(text = "scan QR")
+          }
+        }
       }
 }
 

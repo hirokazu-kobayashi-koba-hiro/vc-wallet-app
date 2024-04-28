@@ -2,13 +2,15 @@ package org.idp.wallet.verifiable_credentials_library.handler.verifiable_present
 
 import android.content.Context
 import android.util.Log
-import org.idp.wallet.verifiable_credentials_library.basic.activity.move
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.idp.wallet.verifiable_credentials_library.basic.activity.move
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCreator
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
 
 class VerifiablePresentationHandler(
@@ -34,18 +36,19 @@ class VerifiablePresentationHandler(
     // create viewData
     val viewData = VerifiablePresentationViewData()
     val confirmationResult = confirm(context, viewData = viewData, filtered, interactor)
-      val authorizationResponseCreator = AuthorizationResponseCreator(
-          oAuthRequestContext = oAuthRequestContext,
-          selectedVerifiableCredentialIds = listOf("1"),
-          verifiableCredentialsRecords = filtered,
-      )
-      val authorizationResponse = authorizationResponseCreator.create()
-      if (oAuthRequestContext.isDirectPost()) {
-          //TODO
-          println("isDirectPost")
-      }
+    val authorizationResponseCreator =
+        AuthorizationResponseCreator(
+            oAuthRequestContext = oAuthRequestContext,
+            selectedVerifiableCredentialIds = listOf("1"),
+            verifiableCredentialsRecords = filtered,
+        )
+    val authorizationResponse = authorizationResponseCreator.create()
+    if (oAuthRequestContext.isDirectPost()) {
+      // TODO
+      println("isDirectPost")
+    }
 
-      move(context, authorizationResponse.redirectUriValue())
+    move(context, authorizationResponse.redirectUriValue())
 
     return VerifiablePresentationRequestResponse(
         parameters = oAuthRequestContext.parameters,
@@ -73,19 +76,4 @@ class VerifiablePresentationHandler(
         }
     interactor.confirm(context = context, viewData = viewData, filtered, callback = callbackHandler)
   }
-}
-
-interface VerifiablePresentationInteractor {
-  fun confirm(
-      context: Context,
-      viewData: VerifiablePresentationViewData,
-      verifiableCredentialsRecords: VerifiableCredentialsRecords,
-      callback: VerifiablePresentationInteractorCallback
-  )
-}
-
-interface VerifiablePresentationInteractorCallback {
-  fun accept(verifiableCredentialIds: List<String>)
-
-  fun reject()
 }
