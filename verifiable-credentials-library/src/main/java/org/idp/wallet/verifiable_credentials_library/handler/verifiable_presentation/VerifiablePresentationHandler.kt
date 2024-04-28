@@ -2,9 +2,11 @@ package org.idp.wallet.verifiable_credentials_library.handler.verifiable_present
 
 import android.content.Context
 import android.util.Log
+import org.idp.wallet.verifiable_credentials_library.basic.activity.move
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
+import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCreator
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
@@ -32,7 +34,18 @@ class VerifiablePresentationHandler(
     // create viewData
     val viewData = VerifiablePresentationViewData()
     val confirmationResult = confirm(context, viewData = viewData, filtered, interactor)
-    if (!confirmationResult) {}
+      val authorizationResponseCreator = AuthorizationResponseCreator(
+          oAuthRequestContext = oAuthRequestContext,
+          selectedVerifiableCredentialIds = listOf("1"),
+          verifiableCredentialsRecords = filtered,
+      )
+      val authorizationResponse = authorizationResponseCreator.create()
+      if (oAuthRequestContext.isDirectPost()) {
+          //TODO
+          println("isDirectPost")
+      }
+
+      move(context, authorizationResponse.redirectUriValue())
 
     return VerifiablePresentationRequestResponse(
         parameters = oAuthRequestContext.parameters,
@@ -47,15 +60,15 @@ class VerifiablePresentationHandler(
       viewData: VerifiablePresentationViewData,
       filtered: VerifiableCredentialsRecords,
       interactor: VerifiablePresentationInteractor
-  ): Boolean = suspendCoroutine { continuation ->
+  ): Map<String, Any> = suspendCoroutine { continuation ->
     val callbackHandler =
         object : VerifiablePresentationInteractorCallback {
           override fun accept(verifiableCredentialIds: List<String>) {
-            continuation.resume(true)
+            continuation.resume(mapOf("result" to true, "selectedIds" to verifiableCredentialIds))
           }
 
           override fun reject() {
-            continuation.resume(false)
+            continuation.resume(mapOf("result" to false))
           }
         }
     interactor.confirm(context = context, viewData = viewData, filtered, callback = callbackHandler)

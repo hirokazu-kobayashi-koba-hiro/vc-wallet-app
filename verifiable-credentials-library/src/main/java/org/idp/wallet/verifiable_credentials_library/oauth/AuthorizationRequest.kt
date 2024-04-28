@@ -17,4 +17,12 @@ class AuthorizationRequest(
     val requestUri: String? = null,
     val presentationDefinition: PresentationDefinition? = null,
     val presentationDefinitionUri: String? = null
-) {}
+) {
+
+    fun isDirectPost(): Boolean {
+        responseMode?.let {
+            return it == ResponseMode.direct_post
+        }
+        return false
+    }
+}

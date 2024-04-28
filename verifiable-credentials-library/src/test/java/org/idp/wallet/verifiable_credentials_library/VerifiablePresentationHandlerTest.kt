@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
@@ -33,7 +34,9 @@ class VerifiablePresentationHandlerTest {
   fun setup() {
     context = InstrumentationRegistry.getInstrumentation().getContext()
     val registry = VerifiableCredentialRegistry(context)
-    val walletConfigurationService = WalletConfigurationService(MockAssetsReader())
+    val keyStore = KeyStore(context)
+    val walletConfigurationService = WalletConfigurationService(keyStore, MockAssetsReader())
+    walletConfigurationService.initialize()
     val oauthRequestHandler =
         OAuthRequestHandler(
             walletConfigurationService,

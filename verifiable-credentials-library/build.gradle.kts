@@ -54,6 +54,7 @@ dependencies {
 
     //jose
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")

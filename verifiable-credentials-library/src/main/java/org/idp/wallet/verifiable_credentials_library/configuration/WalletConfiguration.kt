@@ -10,7 +10,7 @@ class WalletConfiguration(
     val authorizationEndpoint: String? = null,
     val tokenEndpoint: String = "",
     val userinfoEndpoint: String = "",
-    var jwks: String? = null,
+    var jwks: String = "",
     val jwksUri: String? = null,
     val registrationEndpoint: String = "",
     val scopesSupported: List<String> = ArrayList(),

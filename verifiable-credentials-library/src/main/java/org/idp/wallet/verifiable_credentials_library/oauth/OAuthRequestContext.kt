@@ -24,4 +24,8 @@ class OAuthRequestContext(
     }
     return clientConfiguration.redirectUris[0]
   }
+
+  fun isDirectPost(): Boolean {
+      return authorizationRequest.isDirectPost()
+  }
 }

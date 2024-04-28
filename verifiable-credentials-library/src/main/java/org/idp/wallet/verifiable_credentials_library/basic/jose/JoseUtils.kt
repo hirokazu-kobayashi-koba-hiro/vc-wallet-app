@@ -1,11 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library.basic.jose
 
+import com.nimbusds.jose.Algorithm
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory
 import com.nimbusds.jose.jwk.Curve
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.JWKMatcher
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWT
@@ -18,6 +20,18 @@ object JoseHandler {
   fun parse(jose: String): JwtObject {
     val parsedJwt = JWTParser.parse(jose)
     return JwtObject(parsedJwt)
+  }
+
+  fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwks: String, keyId: String): String {
+    val jwkSet = JWKSet.parse(jwks)
+    val jwk = jwkSet.getKeyByKeyId(keyId)
+    val headers =
+      JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+    val claimSet = JWTClaimsSet.parse(payload)
+    val jws = SignedJWT(headers, claimSet)
+    val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
+    jws.sign(jwsSigner)
+    return jws.serialize()
   }
 
   fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwkValue: String): String {
@@ -43,7 +57,10 @@ object JoseHandler {
   }
 
   fun generateECKey(keyId: String): String {
-    val ecJWK: ECKey = ECKeyGenerator(Curve.P_256).keyID(keyId).generate()
+    val ecJWK: ECKey = ECKeyGenerator(Curve.P_256)
+      .keyID(keyId)
+      .algorithm(Algorithm.parse("ES256"))
+      .generate()
     return ecJWK.toJSONString()
   }
 

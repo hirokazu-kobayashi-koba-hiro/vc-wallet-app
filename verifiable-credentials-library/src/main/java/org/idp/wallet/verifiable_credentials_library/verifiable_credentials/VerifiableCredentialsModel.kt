@@ -28,6 +28,10 @@ class VerifiableCredentialsRecords(private val values: List<VerifiableCredential
     return values.find { it.id == id }
   }
 
+  fun rawVcList(): List<String> {
+    return values.map { it.rawVc }
+  }
+
   override fun iterator(): Iterator<VerifiableCredentialsRecord> {
     return values.iterator()
   }
