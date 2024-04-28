@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +26,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import coil.compose.rememberAsyncImagePainter
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.ui.theme.VcWalletTheme
 
 class DefaultVpConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +69,25 @@ class DefaultVpConsentActivity : ComponentActivity() {
   }
 }
 
+@Preview
+@Composable
+fun DefaultVpConsentPreView() {
+  DefaultVpConsentView(
+      viewData = VerifiablePresentationViewData(),
+      records =
+          VerifiableCredentialsRecords(
+              listOf(
+                  VerifiableCredentialsRecord("1", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("2", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("3", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("4", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("5", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("6", "jwt", "", mapOf("key" to "test")),
+                  VerifiableCredentialsRecord("7", "jwt", "", mapOf("key" to "test")))),
+      onAccept = { _ -> },
+      onReject = {})
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultVpConsentView(
@@ -69,37 +96,74 @@ fun DefaultVpConsentView(
     onAccept: (List<String>) -> Unit,
     onReject: () -> Unit
 ) {
-  Scaffold(
-      topBar = {
-        Column(modifier = Modifier.padding(top = Dp(16.0F))) {
-          TopAppBar(
-              title = { Text(text = "Verifiable Presentation Consent") },
-          )
-        }
-      },
-      content = { paddingValue ->
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = paddingValue.calculateTopPadding())) {
-              VerifierView(viewData)
-              VerifiableCredentialsView(records)
-            }
-      },
-      bottomBar = {
-        Row(
-            modifier = Modifier.padding(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Button(onClick = { onReject() }) { Text(text = "reject") }
-          Button(onClick = { onAccept(listOf("1")) }) { Text(text = "accept") }
-        }
-      },
-  )
+  VcWalletTheme {
+    Scaffold(
+        modifier = Modifier.fillMaxWidth().padding(),
+        topBar = {
+          Column(modifier = Modifier.padding(Dp(16.0F))) {
+            TopAppBar(
+                title = { Text(text = "Verifiable Presentation Consent") },
+            )
+          }
+        },
+        content = { paddingValue ->
+          Column(
+              verticalArrangement = Arrangement.SpaceBetween,
+              horizontalAlignment = Alignment.CenterHorizontally,
+              modifier = Modifier.padding(paddingValue)) {
+                VerifierView(viewData)
+                VerifiableCredentialsView(records)
+              }
+        },
+        bottomBar = {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                onClick = { onReject() }) {
+                  Text(text = "Reject")
+                }
+            Button(
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color.White, contentColor = Color.Black),
+                border = BorderStroke(Dp(1.0F), Color.Black),
+                onClick = { onAccept(listOf("1")) }) {
+                  Text(text = "Accept")
+                }
+          }
+        },
+    )
+  }
 }
 
-@Composable fun VerifierView(viewData: VerifiablePresentationViewData) {}
+@Composable
+fun VerifierView(viewData: VerifiablePresentationViewData) {
+  Column(modifier = Modifier.fillMaxWidth().padding(Dp(16.0F))) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+          Image(
+              painter = rememberAsyncImagePainter(viewData.verifierLogoUri),
+              contentDescription = null)
+          Text(text = viewData.verifierName)
+        }
+    Row {
+      Text(text = "credential")
+      Spacer(modifier = Modifier.padding(Dp(8.0F)))
+      Text(text = viewData.credentialType)
+    }
+    Row {
+      Text(text = "purpose")
+      Spacer(modifier = Modifier.padding(Dp(8.0F)))
+      Text(text = viewData.purpose)
+    }
+  }
+}
 
 @Composable
 fun VerifiableCredentialsView(verifiableCredentialsRecords: VerifiableCredentialsRecords) {
