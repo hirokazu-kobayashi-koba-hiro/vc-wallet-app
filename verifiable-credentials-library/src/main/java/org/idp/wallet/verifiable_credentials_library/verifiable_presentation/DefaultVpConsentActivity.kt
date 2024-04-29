@@ -31,9 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import coil.compose.rememberAsyncImagePainter
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
+import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.ui.theme.VcWalletTheme
 
 class DefaultVpConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,7 +4,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-
+        <activity
+            android:name=".oauth.OAuthErrorActivity"
+            android:exported="false"
+            android:label="@string/title_activity_oauth_error"
+            android:theme="@style/Theme.Vcwalletandroidapp" />
         <activity
             android:name=".verifiable_presentation.DefaultVpConsentActivity"
             android:exported="false"

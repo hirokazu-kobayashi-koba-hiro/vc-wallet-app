@@ -57,6 +57,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.activity:activity-ktx:1.9.0")
 
     //compose
     implementation("androidx.activity:activity-compose:1.9.0")
@@ -82,6 +83,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")
@@ -90,6 +92,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

@@ -10,7 +10,7 @@ import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefini
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.ResponseType
 
-class OAuthRequestCreationService(private val parameters: OAuthRequestParameters) {
+class AuthorizationRequestCreationService(private val parameters: OAuthRequestParameters) {
 
   suspend fun create(): AuthorizationRequest {
     val identifier = UUID.randomUUID().toString()

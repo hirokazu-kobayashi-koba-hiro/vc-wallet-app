@@ -29,6 +29,7 @@ class VerifiableCredentialIssuanceViewModel : ViewModel() {
       url: String,
       interactor: VerifiablePresentationInteractor
   ) {
-    VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
+    val result = VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
+    println(result)
   }
 }

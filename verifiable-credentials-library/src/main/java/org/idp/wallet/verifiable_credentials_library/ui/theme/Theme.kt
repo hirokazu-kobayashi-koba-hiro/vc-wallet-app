@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.verifiable_presentation.ui.theme
+package org.idp.wallet.verifiable_credentials_library.ui.theme
 
 import android.app.Activity
 import android.os.Build

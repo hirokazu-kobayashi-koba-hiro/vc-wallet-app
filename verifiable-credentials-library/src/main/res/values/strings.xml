@@ -1,3 +1,4 @@
 <resources>
     <string name="title_activity_default_vp_consent">DefaultVpConsentActivity</string>
+    <string name="title_activity_oauth_error">OAuthErrorActivity</string>
 </resources>
