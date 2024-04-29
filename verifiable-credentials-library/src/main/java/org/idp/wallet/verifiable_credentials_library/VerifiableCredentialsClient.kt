@@ -73,6 +73,9 @@ object VerifiableCredentialsClient {
                 "validFrom": "2010-01-01T00:00:00Z",
                 "credentialSubject": {
                   "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "given_name": "john",
+                  "family_name": "alex",
+                  "birthdate": "2001-02-03",
                   "degree": {
                     "type": "ExampleBachelorDegree",
                     "name": "Bachelor of Science and Arts"

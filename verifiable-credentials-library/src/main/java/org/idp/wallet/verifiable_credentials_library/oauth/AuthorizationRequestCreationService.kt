@@ -94,8 +94,8 @@ class AuthorizationRequestCreationService(private val parameters: OAuthRequestPa
 
   private suspend fun getRequestObject(): JwtObject? {
     parameters.getRequestUri()?.let {
-      val requestObjectResponse = HttpClient.get(it)
-      return JoseHandler.parse(requestObjectResponse.toString())
+      val requestObjectResponse = HttpClient.getForJwt(it)
+      return JoseHandler.parse(requestObjectResponse)
     }
     return parameters.getRequestObject()?.let {
       return JoseHandler.parse(it)

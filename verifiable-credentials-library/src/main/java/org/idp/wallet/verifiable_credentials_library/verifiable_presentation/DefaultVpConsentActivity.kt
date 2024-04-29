@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import coil.compose.rememberAsyncImagePainter
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
@@ -147,9 +145,9 @@ fun VerifierView(viewData: VerifiablePresentationViewData) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
-          Image(
-              painter = rememberAsyncImagePainter(viewData.verifierLogoUri),
-              contentDescription = null)
+          //          Image(
+          //              painter = rememberAsyncImagePainter(viewData.verifierLogoUri),
+          //              contentDescription = null)
           Text(text = viewData.verifierName)
         }
     Row {

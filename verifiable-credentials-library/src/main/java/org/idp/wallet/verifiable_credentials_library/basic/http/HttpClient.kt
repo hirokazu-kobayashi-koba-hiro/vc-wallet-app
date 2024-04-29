@@ -19,7 +19,8 @@ object HttpClient {
     return withContext(Dispatchers.IO) {
       try {
         val connection = HttpURLConnectionCreator.create(url, "POST", headers, requestBody)
-        return@withContext ResponseResolver.resolve(connection)
+        val response = ResponseResolver.resolve(connection)
+        return@withContext JSONObject(response)
       } catch (e: Exception) {
         when (e) {
           is NetworkException -> throw e
@@ -33,6 +34,24 @@ object HttpClient {
       url: String,
       headers: Map<String, String> = mapOf(),
   ): JSONObject {
+    return withContext(Dispatchers.IO) {
+      try {
+        val connection = HttpURLConnectionCreator.create(url, "GET", headers)
+        val response = ResponseResolver.resolve(connection)
+        return@withContext JSONObject(response)
+      } catch (e: Exception) {
+        when (e) {
+          is NetworkException -> throw e
+        }
+        throw NetworkException("0003", "unknown network error", e)
+      }
+    }
+  }
+
+  suspend fun getForJwt(
+      url: String,
+      headers: Map<String, String> = mapOf(),
+  ): String {
     return withContext(Dispatchers.IO) {
       try {
         val connection = HttpURLConnectionCreator.create(url, "GET", headers)
@@ -84,12 +103,12 @@ object HttpURLConnectionCreator {
 }
 
 object ResponseResolver {
-  fun resolve(connection: HttpURLConnection): JSONObject {
+  fun resolve(connection: HttpURLConnection): String {
     when (val status = connection.responseCode) {
       in (200..299) -> {
         val message = connection.inputStream.bufferedReader().use { it.readText() }
         Log.d("Vc library", message)
-        return JSONObject(message)
+        return message
       }
       in (400..499) -> {
         val message = connection.errorStream.bufferedReader().use { it.readText() }
