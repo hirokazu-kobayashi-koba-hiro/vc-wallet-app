@@ -2,7 +2,7 @@ package org.idp.wallet.verifiable_credentials_library.oauth
 
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfiguration
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinition
+import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
 class OAuthRequestContext(
     val parameters: OAuthRequestParameters,
@@ -10,7 +10,7 @@ class OAuthRequestContext(
     val walletConfiguration: WalletConfiguration,
     val clientConfiguration: ClientConfiguration
 ) {
-  fun getPresentationDefinition(): PresentationDefinition? {
+  fun getPresentationDefinition(): PresentationDefinition {
     return authorizationRequest.presentationDefinition
   }
 

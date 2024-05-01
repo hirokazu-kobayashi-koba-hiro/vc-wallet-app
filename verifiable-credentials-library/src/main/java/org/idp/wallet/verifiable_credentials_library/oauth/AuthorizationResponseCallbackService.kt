@@ -2,6 +2,7 @@ package org.idp.wallet.verifiable_credentials_library.oauth
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import org.idp.wallet.verifiable_credentials_library.basic.activity.move
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.json.JSONObject
@@ -14,15 +15,17 @@ class AuthorizationResponseCallbackService(
 
   suspend fun callback() {
     if (authorizationContext.isDirectPost()) {
+      Log.d("Vc library", "response mode is direct post")
       val response = post()
-      val redirectUri = response["redirect_uri"] as String
-      val responseCode = response["response_code"] as String
-      val url =
-          Uri.parse(redirectUri)
-              .buildUpon()
-              .appendQueryParameter("response_code", responseCode)
-              .toString()
-      moveToVerifier(url)
+      val redirectUri = response.optString("redirect_uri", "")
+      val responseCode = response.optString("response_code", "")
+      if (redirectUri.isNotEmpty()) {
+        val uriBuilder = Uri.parse(redirectUri).buildUpon()
+        if (responseCode.isNotEmpty()) {
+          uriBuilder.appendQueryParameter("response_code", responseCode)
+        }
+        moveToVerifier(uriBuilder.toString())
+      }
     } else {
       moveToVerifier(authorizationResponse.redirectUriValue())
     }

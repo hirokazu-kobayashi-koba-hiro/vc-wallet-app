@@ -8,8 +8,9 @@ import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestH
 import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCallbackService
 import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCreator
 import org.idp.wallet.verifiable_credentials_library.oauth.OAuthErrorActivityWrapper
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluator
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
@@ -30,19 +31,14 @@ class VerifiablePresentationHandler(
       // verify request
       val records = registry.getAllAsCollection()
       val presentationDefinition = oAuthRequestContext.getPresentationDefinition()
-      val filtered =
-          presentationDefinition?.let {
-            return@let records.filter(it)
-          } ?: records
       // create viewData
       val viewData = VerifiablePresentationViewData()
-      val confirmationResult = confirm(context, viewData = viewData, filtered, interactor)
+      val evaluator = PresentationDefinitionEvaluator(presentationDefinition, records)
+      val evaluation = evaluator.evaluate()
+      val confirmationResult = confirm(context, viewData = viewData, evaluation, interactor)
       val authorizationResponseCreator =
           AuthorizationResponseCreator(
-              oAuthRequestContext = oAuthRequestContext,
-              selectedVerifiableCredentialIds = listOf("1"),
-              verifiableCredentialsRecords = filtered,
-          )
+              oAuthRequestContext = oAuthRequestContext, evaluation = evaluation)
       val authorizationResponse = authorizationResponseCreator.create()
       val authorizationResponseCallbackService =
           AuthorizationResponseCallbackService(context, oAuthRequestContext, authorizationResponse)
@@ -54,7 +50,7 @@ class VerifiablePresentationHandler(
               authorizationRequest = oAuthRequestContext.authorizationRequest,
               walletConfiguration = oAuthRequestContext.walletConfiguration,
               clientConfiguration = oAuthRequestContext.clientConfiguration,
-              verifiableCredentialsRecords = filtered))
+              verifiableCredentialsRecords = records))
     } catch (e: Exception) {
       OAuthErrorActivityWrapper.launch(context)
       return Result.failure(e)
@@ -64,19 +60,20 @@ class VerifiablePresentationHandler(
   private suspend fun confirm(
       context: Context,
       viewData: VerifiablePresentationViewData,
-      filtered: VerifiableCredentialsRecords,
+      evaluation: PresentationDefinitionEvaluation,
       interactor: VerifiablePresentationInteractor
-  ): Map<String, Any> = suspendCoroutine { continuation ->
+  ): Boolean = suspendCoroutine { continuation ->
     val callbackHandler =
         object : VerifiablePresentationInteractorCallback {
-          override fun accept(verifiableCredentialIds: List<String>) {
-            continuation.resume(mapOf("result" to true, "selectedIds" to verifiableCredentialIds))
+          override fun accept() {
+            continuation.resume(true)
           }
 
           override fun reject() {
-            continuation.resume(mapOf("result" to false))
+            continuation.resume(false)
           }
         }
-    interactor.confirm(context = context, viewData = viewData, filtered, callback = callbackHandler)
+    interactor.confirm(
+        context = context, viewData = viewData, evaluation, callback = callbackHandler)
   }
 }

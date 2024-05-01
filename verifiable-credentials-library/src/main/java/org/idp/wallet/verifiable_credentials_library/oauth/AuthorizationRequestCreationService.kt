@@ -6,9 +6,9 @@ import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.ResponseType
+import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
 class AuthorizationRequestCreationService(private val parameters: OAuthRequestParameters) {
 
@@ -88,6 +88,7 @@ class AuthorizationRequestCreationService(private val parameters: OAuthRequestPa
         nonce = nonce,
         requestObject = requestObject,
         requestUri = requestUri,
+        // FIXME
         presentationDefinition = presentationDefinition,
         presentationDefinitionUri = presentationDefinitionUri)
   }
@@ -102,7 +103,7 @@ class AuthorizationRequestCreationService(private val parameters: OAuthRequestPa
     }
   }
 
-  private suspend fun getPresentationDefinition(jwtObject: JwtObject?): PresentationDefinition? {
+  private suspend fun getPresentationDefinition(jwtObject: JwtObject?): PresentationDefinition {
     jwtObject?.let {
       it.valueAsObjectFromPayload("presentation_definition")?.let {
         val jsonString = JsonUtils.write(it)
@@ -116,9 +117,10 @@ class AuthorizationRequestCreationService(private val parameters: OAuthRequestPa
     parameters.getPresentationDefinitionObject()?.let {
       return JsonUtils.read(it, PresentationDefinition::class.java)
     }
-    return parameters.getPresentationDefinitionUri()?.let {
+    parameters.getPresentationDefinitionUri()?.let {
       val response = HttpClient.get(it)
       return JsonUtils.read(response.toString(), PresentationDefinition::class.java)
     }
+    throw RuntimeException("invalid request, presentation_definition is not found")
   }
 }

@@ -1,8 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.oauth
 
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.ResponseType
+import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
 class AuthorizationRequest(
     val identifier: String = "",
@@ -15,7 +15,7 @@ class AuthorizationRequest(
     val nonce: String? = null,
     val requestObject: String? = null,
     val requestUri: String? = null,
-    val presentationDefinition: PresentationDefinition? = null,
+    val presentationDefinition: PresentationDefinition,
     val presentationDefinitionUri: String? = null
 ) {
 

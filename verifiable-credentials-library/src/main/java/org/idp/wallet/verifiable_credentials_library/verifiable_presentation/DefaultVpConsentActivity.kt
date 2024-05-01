@@ -29,6 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.type.vp.Constraints
+import org.idp.wallet.verifiable_credentials_library.type.vp.InputDescriptorDetail
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
@@ -41,18 +44,18 @@ class DefaultVpConsentActivity : ComponentActivity() {
         viewDataString?.let {
           return@let JsonUtils.read(it, VerifiablePresentationViewData::class.java)
         } ?: VerifiablePresentationViewData()
-    val recordsString = intent.getStringExtra("verifiableCredentialsRecords")
-    val records =
-        recordsString?.let {
-          return@let JsonUtils.read(it, VerifiableCredentialsRecords::class.java)
-        } ?: VerifiableCredentialsRecords()
+    val evaluationString = intent.getStringExtra("evaluation")
+    val evaluation =
+        evaluationString?.let {
+          return@let JsonUtils.read(it, PresentationDefinitionEvaluation::class.java)
+        } ?: PresentationDefinitionEvaluation()
     val callback = VerifiablePresentationInteractorCallbackProvider.callback
     setContent {
       DefaultVpConsentView(
           viewData = viewData,
-          records = records,
-          onAccept = { selected ->
-            callback.accept(selected)
+          evaluation = evaluation,
+          onAccept = {
+            callback.accept()
             finish()
           },
           onReject = {
@@ -72,17 +75,22 @@ class DefaultVpConsentActivity : ComponentActivity() {
 fun DefaultVpConsentPreView() {
   DefaultVpConsentView(
       viewData = VerifiablePresentationViewData(),
-      records =
-          VerifiableCredentialsRecords(
-              listOf(
-                  VerifiableCredentialsRecord("1", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("2", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("3", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("4", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("5", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("6", "jwt", "", mapOf("key" to "test")),
-                  VerifiableCredentialsRecord("7", "jwt", "", mapOf("key" to "test")))),
-      onAccept = { _ -> },
+      evaluation =
+          PresentationDefinitionEvaluation(
+              "",
+              mapOf(
+                  InputDescriptorDetail("", "", null, null, Constraints(null, null)) to
+                      VerifiableCredentialsRecords(
+                          listOf(
+                              VerifiableCredentialsRecord("1", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("2", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("3", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("4", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("5", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("6", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord("7", "jwt", "", mapOf("key" to "test")))),
+              )),
+      onAccept = {},
       onReject = {})
 }
 
@@ -90,8 +98,8 @@ fun DefaultVpConsentPreView() {
 @Composable
 fun DefaultVpConsentView(
     viewData: VerifiablePresentationViewData,
-    records: VerifiableCredentialsRecords,
-    onAccept: (List<String>) -> Unit,
+    evaluation: PresentationDefinitionEvaluation,
+    onAccept: () -> Unit,
     onReject: () -> Unit
 ) {
   VcWalletTheme {
@@ -110,7 +118,7 @@ fun DefaultVpConsentView(
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.padding(paddingValue)) {
                 VerifierView(viewData)
-                VerifiableCredentialsView(records)
+                VerifiableCredentialsView(evaluation)
               }
         },
         bottomBar = {
@@ -129,7 +137,7 @@ fun DefaultVpConsentView(
                     ButtonDefaults.buttonColors(
                         containerColor = Color.White, contentColor = Color.Black),
                 border = BorderStroke(Dp(1.0F), Color.Black),
-                onClick = { onAccept(listOf("1")) }) {
+                onClick = { onAccept() }) {
                   Text(text = "Accept")
                 }
           }
@@ -164,9 +172,11 @@ fun VerifierView(viewData: VerifiablePresentationViewData) {
 }
 
 @Composable
-fun VerifiableCredentialsView(verifiableCredentialsRecords: VerifiableCredentialsRecords) {
+fun VerifiableCredentialsView(evaluation: PresentationDefinitionEvaluation) {
   val cardList = mutableListOf<Pair<String, String>>()
-  verifiableCredentialsRecords.forEach { cardList.add(it.id to JsonUtils.write(it.payload)) }
+  evaluation.results.forEach { inputDescriptorDetail, records ->
+    records.forEach { cardList.add(inputDescriptorDetail.id to JsonUtils.write(it.payload)) }
+  }
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
     items(cardList) { (issuer, content) -> VcCardComponent(title = issuer, content = content) }
   }

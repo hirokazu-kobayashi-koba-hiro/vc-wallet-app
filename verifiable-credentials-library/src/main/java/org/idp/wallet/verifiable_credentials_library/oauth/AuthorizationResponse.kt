@@ -1,8 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.oauth
 
 import android.net.Uri
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationSubmission
 import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
+import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationSubmission
 
 class AuthorizationResponse(
     val issuer: String,

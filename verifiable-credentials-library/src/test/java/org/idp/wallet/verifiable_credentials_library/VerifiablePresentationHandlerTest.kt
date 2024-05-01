@@ -12,9 +12,9 @@ import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigu
 import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
@@ -164,10 +164,10 @@ class VerifiablePresentationHandlerTest {
             override fun confirm(
                 context: Context,
                 viewData: VerifiablePresentationViewData,
-                verifiableCredentialsRecords: VerifiableCredentialsRecords,
+                evaluation: PresentationDefinitionEvaluation,
                 callback: VerifiablePresentationInteractorCallback
             ) {
-              callback.accept(listOf("1"))
+              callback.accept()
             }
           }
       val result = service.handleRequest(context, uri.toString(), interactor = interactor)
@@ -344,10 +344,10 @@ class VerifiablePresentationHandlerTest {
             override fun confirm(
                 context: Context,
                 viewData: VerifiablePresentationViewData,
-                verifiableCredentialsRecords: VerifiableCredentialsRecords,
+                evaluation: PresentationDefinitionEvaluation,
                 callback: VerifiablePresentationInteractorCallback
             ) {
-              callback.accept(listOf("1"))
+              callback.accept()
             }
           }
       val response = service.handleRequest(context, url, interactor = interactor)

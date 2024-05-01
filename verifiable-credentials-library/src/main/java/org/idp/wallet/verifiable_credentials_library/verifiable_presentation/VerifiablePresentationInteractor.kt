@@ -3,22 +3,22 @@ package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 import android.content.Context
 import android.content.Intent
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
 
 class DefaultVerifiablePresentationInteractorExexution : VerifiablePresentationInteractor {
 
   override fun confirm(
       context: Context,
       viewData: VerifiablePresentationViewData,
-      verifiableCredentialsRecords: VerifiableCredentialsRecords,
+      evaluation: PresentationDefinitionEvaluation,
       callback: VerifiablePresentationInteractorCallback
   ) {
     VerifiablePresentationInteractorCallbackProvider.callback = callback
     val intent = Intent(context, DefaultVpConsentActivity::class.java)
     val viewDataString = JsonUtils.write(viewData)
-    val verifiableCredentialsRecordsString = JsonUtils.write(verifiableCredentialsRecords)
+    val evaluationString = JsonUtils.write(evaluation)
     intent.putExtra("viewData", viewDataString)
-    intent.putExtra("verifiableCredentialsRecords", verifiableCredentialsRecordsString)
+    intent.putExtra("evaluation", evaluationString)
     context.startActivity(intent)
   }
 }
@@ -31,13 +31,13 @@ interface VerifiablePresentationInteractor {
   fun confirm(
       context: Context,
       viewData: VerifiablePresentationViewData,
-      verifiableCredentialsRecords: VerifiableCredentialsRecords,
+      evaluation: PresentationDefinitionEvaluation,
       callback: VerifiablePresentationInteractorCallback
   )
 }
 
 interface VerifiablePresentationInteractorCallback {
-  fun accept(verifiableCredentialIds: List<String>)
+  fun accept()
 
   fun reject()
 }
