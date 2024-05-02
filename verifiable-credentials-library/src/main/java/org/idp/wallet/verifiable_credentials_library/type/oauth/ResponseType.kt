@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.type
+package org.idp.wallet.verifiable_credentials_library.type.oauth
 
 import java.util.Arrays
 import java.util.stream.Collectors

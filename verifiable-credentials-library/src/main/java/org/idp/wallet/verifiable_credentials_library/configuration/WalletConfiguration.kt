@@ -3,7 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.configuration
 import java.util.Arrays
 import java.util.Objects
 import java.util.stream.Collectors
-import org.idp.wallet.verifiable_credentials_library.type.ResponseType
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseType
 
 class WalletConfiguration(
     val issuer: String = "",

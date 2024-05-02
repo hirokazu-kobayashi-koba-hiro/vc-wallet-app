@@ -9,15 +9,15 @@ import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
-import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
 import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractorCallback
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationRequestContextService
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +37,7 @@ class VerifiablePresentationHandlerTest {
     val walletConfigurationService = WalletConfigurationService(keyStore, MockAssetsReader())
     walletConfigurationService.initialize()
     val oauthRequestHandler =
-        OAuthRequestHandler(
+        VerifiablePresentationRequestContextService(
             walletConfigurationService,
             ClientConfigurationRepository { it ->
               return@ClientConfigurationRepository ClientConfiguration()

@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import android.content.Context
 import android.content.Intent

@@ -3,7 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 import android.content.Context
 import android.content.Intent
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
 
 class DefaultVerifiablePresentationInteractorExexution : VerifiablePresentationInteractor {
 

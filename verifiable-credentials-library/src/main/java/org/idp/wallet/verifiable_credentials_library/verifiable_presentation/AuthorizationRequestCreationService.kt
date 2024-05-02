@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import java.util.UUID
 import java.util.stream.Collectors
@@ -6,11 +6,13 @@ import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
-import org.idp.wallet.verifiable_credentials_library.type.ResponseType
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseMode
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseType
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
-class AuthorizationRequestCreationService(private val parameters: OAuthRequestParameters) {
+class AuthorizationRequestCreationService(
+    private val parameters: VerifiablePresentationRequestParameters
+) {
 
   suspend fun create(): AuthorizationRequest {
     val identifier = UUID.randomUUID().toString()

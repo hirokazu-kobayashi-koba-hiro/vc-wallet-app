@@ -1,11 +1,11 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
-class OAuthRequestContext(
-    val parameters: OAuthRequestParameters,
+class VerifiablePresentationRequestContext(
+    val parameters: VerifiablePresentationRequestParameters,
     val authorizationRequest: AuthorizationRequest,
     val walletConfiguration: WalletConfiguration,
     val clientConfiguration: ClientConfiguration

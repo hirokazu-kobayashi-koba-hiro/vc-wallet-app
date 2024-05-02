@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import android.content.Context
 import android.net.Uri
@@ -9,7 +9,7 @@ import org.json.JSONObject
 
 class AuthorizationResponseCallbackService(
     private val context: Context,
-    private val authorizationContext: OAuthRequestContext,
+    private val authorizationContext: VerifiablePresentationRequestContext,
     private val authorizationResponse: AuthorizationResponse
 ) {
 

@@ -1,7 +1,7 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
-import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
-import org.idp.wallet.verifiable_credentials_library.type.ResponseType
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseMode
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseType
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationDefinition
 
 class AuthorizationRequest(

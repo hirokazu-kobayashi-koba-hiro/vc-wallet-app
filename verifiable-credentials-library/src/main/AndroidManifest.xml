@@ -5,7 +5,7 @@
 
     <application>
         <activity
-            android:name=".oauth.OAuthErrorActivity"
+            android:name=".verifiable_presentation.OAuthErrorActivity"
             android:exported="false"
             android:label="@string/title_activity_oauth_error"
             android:theme="@style/Theme.Vcwalletandroidapp" />

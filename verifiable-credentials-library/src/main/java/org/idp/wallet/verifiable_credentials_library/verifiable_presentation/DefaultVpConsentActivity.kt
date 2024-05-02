@@ -29,12 +29,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.type.vp.Constraints
 import org.idp.wallet.verifiable_credentials_library.type.vp.InputDescriptorDetail
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
 
 class DefaultVpConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,19 +1,19 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import java.util.UUID
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationSubmission
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationSubmissionDescriptor
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
 
 class AuthorizationResponseCreator(
-    private val oAuthRequestContext: OAuthRequestContext,
+    private val verifiablePresentationRequestContext: VerifiablePresentationRequestContext,
     private val evaluation: PresentationDefinitionEvaluation
 ) {
 
   fun create(): AuthorizationResponse {
-    val issuer = oAuthRequestContext.getIssuer()
-    val redirectUri = oAuthRequestContext.getRedirectUri()
+    val issuer = verifiablePresentationRequestContext.getIssuer()
+    val redirectUri = verifiablePresentationRequestContext.getRedirectUri()
     val vpToken = createVpToken()
     val presentationSubmission = createPresentationSubmission()
     return AuthorizationResponse(
@@ -48,7 +48,7 @@ class AuthorizationResponseCreator(
 
   private fun createVpToken(): String {
     val records = evaluation.verifiableCredentialRecords()
-    val jwks = oAuthRequestContext.walletConfiguration.jwks
+    val jwks = verifiablePresentationRequestContext.walletConfiguration.jwks
     // FIXME
     val keyId = "vc_wallet_jwt_key"
     val header = mapOf<String, Any>("kid" to keyId, "type" to "JWT")

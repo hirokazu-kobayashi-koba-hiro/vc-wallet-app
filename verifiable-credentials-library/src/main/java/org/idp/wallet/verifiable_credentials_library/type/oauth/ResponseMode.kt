@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.type
+package org.idp.wallet.verifiable_credentials_library.type.oauth
 
 enum class ResponseMode(val value: String, val responseModeValue: String) {
   query("query", "?"),

@@ -1,9 +1,11 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import org.idp.wallet.verifiable_credentials_library.error.OAuthBadRequestException
 import org.idp.wallet.verifiable_credentials_library.error.OAuthError
 
-class OauthRequestValidator(private val parameters: OAuthRequestParameters) {
+class VerifiablePresentationRequestValidator(
+    private val parameters: VerifiablePresentationRequestParameters
+) {
 
   fun validate() {
     throwExceptionIfNotFoundRequiredParams()

@@ -1,7 +1,7 @@
-package org.idp.wallet.verifiable_credentials_library.oauth
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation
 
 import android.net.Uri
-import org.idp.wallet.verifiable_credentials_library.type.ResponseMode
+import org.idp.wallet.verifiable_credentials_library.type.oauth.ResponseMode
 import org.idp.wallet.verifiable_credentials_library.type.vp.PresentationSubmission
 
 class AuthorizationResponse(

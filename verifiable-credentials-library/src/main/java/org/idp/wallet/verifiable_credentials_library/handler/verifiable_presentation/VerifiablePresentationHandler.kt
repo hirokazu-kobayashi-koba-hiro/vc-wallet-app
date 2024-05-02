@@ -4,33 +4,34 @@ import android.content.Context
 import android.util.Log
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import org.idp.wallet.verifiable_credentials_library.handler.oauth.OAuthRequestHandler
-import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCallbackService
-import org.idp.wallet.verifiable_credentials_library.oauth.AuthorizationResponseCreator
-import org.idp.wallet.verifiable_credentials_library.oauth.OAuthErrorActivityWrapper
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluation
-import org.idp.wallet.verifiable_credentials_library.oauth.vp.PresentationDefinitionEvaluator
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.AuthorizationResponseCallbackService
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.AuthorizationResponseCreator
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.OAuthErrorActivityWrapper
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractorCallback
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationRequestContextService
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationViewData
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluator
 
 class VerifiablePresentationHandler(
     val registry: VerifiableCredentialRegistry,
-    private val oAuthRequestHandler: OAuthRequestHandler
+    private val verifiablePresentationRequestContextService:
+        VerifiablePresentationRequestContextService
 ) {
 
   suspend fun handleRequest(
       context: Context,
       url: String,
       interactor: VerifiablePresentationInteractor
-  ): Result<Any> {
+  ): Result<Unit> {
     try {
       Log.d("Vc library", "handleVpRequest")
-      val oAuthRequestContext = oAuthRequestHandler.handleRequest(url)
-      // verify request
+      val verifiablePresentationRequestContext =
+          verifiablePresentationRequestContextService.create(url)
       val records = registry.getAllAsCollection()
-      val presentationDefinition = oAuthRequestContext.getPresentationDefinition()
+      val presentationDefinition = verifiablePresentationRequestContext.getPresentationDefinition()
       // create viewData
       val viewData = VerifiablePresentationViewData()
       val evaluator = PresentationDefinitionEvaluator(presentationDefinition, records)
@@ -38,19 +39,15 @@ class VerifiablePresentationHandler(
       val confirmationResult = confirm(context, viewData = viewData, evaluation, interactor)
       val authorizationResponseCreator =
           AuthorizationResponseCreator(
-              oAuthRequestContext = oAuthRequestContext, evaluation = evaluation)
+              verifiablePresentationRequestContext = verifiablePresentationRequestContext,
+              evaluation = evaluation)
       val authorizationResponse = authorizationResponseCreator.create()
       val authorizationResponseCallbackService =
-          AuthorizationResponseCallbackService(context, oAuthRequestContext, authorizationResponse)
+          AuthorizationResponseCallbackService(
+              context, verifiablePresentationRequestContext, authorizationResponse)
       authorizationResponseCallbackService.callback()
 
-      return Result.success(
-          VerifiablePresentationRequestResponse(
-              parameters = oAuthRequestContext.parameters,
-              authorizationRequest = oAuthRequestContext.authorizationRequest,
-              walletConfiguration = oAuthRequestContext.walletConfiguration,
-              clientConfiguration = oAuthRequestContext.clientConfiguration,
-              verifiableCredentialsRecords = records))
+      return Result.success(Unit)
     } catch (e: Exception) {
       OAuthErrorActivityWrapper.launch(context)
       return Result.failure(e)

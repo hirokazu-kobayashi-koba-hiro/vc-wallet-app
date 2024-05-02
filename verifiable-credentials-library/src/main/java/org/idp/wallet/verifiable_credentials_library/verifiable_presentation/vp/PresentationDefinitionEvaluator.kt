@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.oauth.vp
+package org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp
 
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonPathUtils
 import org.idp.wallet.verifiable_credentials_library.type.vp.Constraints
