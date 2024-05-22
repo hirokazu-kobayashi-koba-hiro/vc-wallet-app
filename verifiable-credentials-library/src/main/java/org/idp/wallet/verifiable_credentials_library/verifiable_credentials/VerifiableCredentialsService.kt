@@ -5,6 +5,7 @@ import java.net.URLDecoder
 import java.util.UUID
 import kotlin.js.ExperimentalJsExport
 import org.idp.wallet.verifiable_credentials_library.basic.http.HttpClient
+import org.idp.wallet.verifiable_credentials_library.basic.http.extractQueries
 import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
 import org.json.JSONObject
 
@@ -14,6 +15,8 @@ class VerifiableCredentialsService(
 ) {
 
   suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
+    val queries = extractQueries(url)
+
     val credentialOfferResponse = getCredentialOfferResponse(url)
     val credentialIssuer = credentialOfferResponse.getString("credential_issuer")
     val openidCredentialIssuerEndpoint = credentialIssuer + "/.well-known/openid-credential-issuer"

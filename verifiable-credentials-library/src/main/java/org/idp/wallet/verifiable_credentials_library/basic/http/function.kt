@@ -3,6 +3,10 @@ package org.idp.wallet.verifiable_credentials_library.basic.http
 import android.net.Uri
 import java.net.URLDecoder
 
+fun extractScheme(url: String): String? {
+  return Uri.parse(url).scheme
+}
+
 fun extractQueries(url: String): Map<String, List<String>> {
   val uri = Uri.parse(url)
   val query = uri.query
