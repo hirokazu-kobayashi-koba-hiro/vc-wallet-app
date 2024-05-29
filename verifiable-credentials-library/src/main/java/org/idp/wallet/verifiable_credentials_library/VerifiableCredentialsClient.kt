@@ -7,18 +7,16 @@ import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
-import org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation.VerifiablePresentationHandler
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsService
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationRequestContextService
-import org.json.JSONObject
 
 object VerifiableCredentialsClient {
 
-  private lateinit var verifiableCredentialsService: VerifiableCredentialsService
+  private lateinit var verifiableCredentialsHandler: VerifiableCredentialsHandler
   private lateinit var verifiablePresentationHandler: VerifiablePresentationHandler
   private lateinit var walletConfigurationService: WalletConfigurationService
 
@@ -29,7 +27,8 @@ object VerifiableCredentialsClient {
     registerTestData(registry)
     walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
     walletConfigurationService.initialize()
-    verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
+    val verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
+    verifiableCredentialsHandler = VerifiableCredentialsHandler(verifiableCredentialsService)
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()
     }
@@ -38,12 +37,12 @@ object VerifiableCredentialsClient {
             registry, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
   }
 
-  suspend fun requestVCI(url: String, format: String = "vc+sd-jwt"): JSONObject {
-    return verifiableCredentialsService.requestVCI(url, format)
+  suspend fun requestVCI(url: String, format: String = "vc+sd-jwt") {
+    verifiableCredentialsHandler.handlePreAuthorization(url, format)
   }
 
   fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return verifiableCredentialsService.getAllCredentials()
+    return verifiableCredentialsHandler.getAllCredentials()
   }
 
   suspend fun handleVpRequest(

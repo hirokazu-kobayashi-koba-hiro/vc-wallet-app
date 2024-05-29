@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.handler.verifiable_presentation
+package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import android.util.Log
