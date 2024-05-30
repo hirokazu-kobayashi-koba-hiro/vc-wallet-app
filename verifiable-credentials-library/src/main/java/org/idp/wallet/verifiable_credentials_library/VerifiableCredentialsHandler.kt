@@ -32,9 +32,10 @@ class VerifiableCredentialsHandler(private val service: VerifiableCredentialsSer
             tokenResponse.accessToken,
             format,
             "https://credentials.example.com/identity_credential")
-    val verifiableCredentialsRecord = service.transform(format, credentialResponse.credential)
-    //        registry.save(credentialIssuer, verifiableCredentialsRecord)
-
+    credentialResponse.credential?.let {
+      val verifiableCredentialsRecord = service.transform(format, it)
+      //        registry.save(credentialIssuer, it)
+    }
   }
 
   fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {

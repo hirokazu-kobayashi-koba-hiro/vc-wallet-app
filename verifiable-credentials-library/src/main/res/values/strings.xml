@@ -1,4 +1,7 @@
 <resources>
     <string name="title_activity_default_vp_consent">DefaultVpConsentActivity</string>
     <string name="title_activity_oauth_error">OAuthErrorActivity</string>
+    <string name="title_activity_default_verifiable_credential_cocent">
+        DefaultVerifiableCredentialCocentActivity
+    </string>
 </resources>
