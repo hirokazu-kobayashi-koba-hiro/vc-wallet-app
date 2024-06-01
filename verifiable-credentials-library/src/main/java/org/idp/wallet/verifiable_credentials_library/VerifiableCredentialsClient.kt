@@ -7,6 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
@@ -37,8 +38,13 @@ object VerifiableCredentialsClient {
             registry, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
   }
 
-  suspend fun requestVCI(url: String, format: String = "vc+sd-jwt") {
-    verifiableCredentialsHandler.handlePreAuthorization(url, format)
+  suspend fun handlePreAuthorization(
+      context: Context,
+      url: String,
+      format: String = "vc+sd-jwt",
+      interactor: VerifiableCredentialInteractor
+  ) {
+    verifiableCredentialsHandler.handlePreAuthorization(context, url, format, interactor)
   }
 
   fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {

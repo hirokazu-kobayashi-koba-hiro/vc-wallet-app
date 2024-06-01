@@ -5,7 +5,7 @@ import android.content.Intent
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.vp.PresentationDefinitionEvaluation
 
-class DefaultVerifiablePresentationInteractorExexution : VerifiablePresentationInteractor {
+class DefaultVerifiablePresentationInteractor : VerifiablePresentationInteractor {
 
   override fun confirm(
       context: Context,

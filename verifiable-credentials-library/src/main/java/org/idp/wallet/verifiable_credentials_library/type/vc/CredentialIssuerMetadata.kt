@@ -14,6 +14,10 @@ data class CredentialIssuerMetadata(
     val credentialConfigurationsSupported: Map<String, CredentialConfiguration>
 ) {
 
+  fun findCredentialConfiguration(credential: String): CredentialConfiguration? {
+    return credentialConfigurationsSupported[credential]
+  }
+
   fun getOpenIdConfigurationEndpoint(): String {
     authorizationServers?.let {
       if (it.isNotEmpty()) {
@@ -50,6 +54,18 @@ data class CredentialConfiguration(
     val cryptographicBindingMethodsSupported: List<String>?,
     val proofTypesSupported: ProofTypesSupported?,
     val display: List<Display>?,
-)
+) {
+  fun getFirstDisplay(): Display? {
+    return display?.get(0)
+  }
+
+  fun getFirstLogo(): Logo? {
+    return display?.get(0)?.logo
+  }
+
+  fun findLogo(name: String): Logo? {
+    return display?.find { it.name == name }?.logo
+  }
+}
 
 data class ProofTypesSupported(val proofSigningAlgValuesSupported: List<String>) {}

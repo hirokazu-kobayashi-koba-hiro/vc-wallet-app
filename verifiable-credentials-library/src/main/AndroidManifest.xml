@@ -5,7 +5,7 @@
 
     <application>
         <activity
-            android:name=".verifiable_credentials.DefaultVerifiableCredentialConsentActivity"
+            android:name=".verifiable_credentials.DefaultVcConsentActivity"
             android:exported="false"
             android:label="@string/title_activity_default_verifiable_credential_cocent"
             android:theme="@style/Theme.Vcwalletandroidapp" />

@@ -55,7 +55,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.app.ui.theme.VCWalletAppTheme
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.DefaultVerifiablePresentationInteractorExexution
+import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.DefaultVerifiableCredentialInteractor
+import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.DefaultVerifiablePresentationInteractor
 
 class MainActivity : ComponentActivity() {
 
@@ -102,13 +103,12 @@ class MainActivity : ComponentActivity() {
     lifecycleScope.launch(errorHandler) {
       if (format == "vp") {
         viewModel.handleVpRequest(
-            this@MainActivity,
-            barcodeValue,
-            interactor = DefaultVerifiablePresentationInteractorExexution())
+            this@MainActivity, barcodeValue, interactor = DefaultVerifiablePresentationInteractor())
         Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
         return@launch
       }
-      viewModel.request(barcodeValue, format)
+      viewModel.request(
+          this@MainActivity, barcodeValue, format, DefaultVerifiableCredentialInteractor())
       Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
     }
   }
