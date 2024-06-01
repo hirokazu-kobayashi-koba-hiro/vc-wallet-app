@@ -1,12 +1,12 @@
 package org.idp.wallet.app
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +49,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.zxing.client.android.Intents
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -66,6 +67,36 @@ class MainActivity : ComponentActivity() {
     ViewModelProvider(this).get(VerifiableCredentialIssuanceViewModel::class.java)
   }
 
+  private val launcher =
+      this.registerForActivityResult(
+          contract = ActivityResultContracts.StartActivityForResult(),
+          callback = {
+            val result: IntentResult = IntentIntegrator.parseActivityResult(it.resultCode, it.data)
+
+            val barcodeValue = result.contents
+
+            if (null == barcodeValue) {
+              Toast.makeText(this, "Read Error", Toast.LENGTH_LONG).show()
+              return@registerForActivityResult
+            }
+            val errorHandler = CoroutineExceptionHandler { _, error ->
+              Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
+            }
+            lifecycleScope.launch(errorHandler) {
+              if (format == "vp") {
+                viewModel.handleVpRequest(
+                    this@MainActivity,
+                    barcodeValue,
+                    interactor = DefaultVerifiablePresentationInteractor())
+                Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+                return@launch
+              }
+              viewModel.request(
+                  this@MainActivity, barcodeValue, format, DefaultVerifiableCredentialInteractor())
+              Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+            }
+          })
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     VerifiableCredentialsClient.initialize(this, "218232426")
@@ -74,43 +105,13 @@ class MainActivity : ComponentActivity() {
           viewModel,
           onClick = {
             format = it
-            val intentIntegrator =
-                IntentIntegrator(this@MainActivity)
-                    .apply {
-                      setPrompt("Scan a QR code")
-                      captureActivity = PortraitCaptureActivity::class.java
-                    }
-                    .initiateScan()
+            val intent = Intent(this@MainActivity, PortraitCaptureActivity::class.java)
+            intent.putExtra(Intents.Scan.PROMPT_MESSAGE, "Scan a QR code")
+            launcher.launch(intent)
           },
           onClickShow = { viewModel.getAllCredentials() })
     }
     lifecycleScope.launch { viewModel.getAllCredentials() }
-  }
-
-  @SuppressLint("ShowToast")
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    val result: IntentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-
-    val barcodeValue = result.contents
-
-    if (null == barcodeValue) {
-      Toast.makeText(this, "Read Error", Toast.LENGTH_LONG).show()
-      return
-    }
-    val errorHandler = CoroutineExceptionHandler { _, error ->
-      Toast.makeText(this, error.message, Toast.LENGTH_LONG).show()
-    }
-    lifecycleScope.launch(errorHandler) {
-      if (format == "vp") {
-        viewModel.handleVpRequest(
-            this@MainActivity, barcodeValue, interactor = DefaultVerifiablePresentationInteractor())
-        Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
-        return@launch
-      }
-      viewModel.request(
-          this@MainActivity, barcodeValue, format, DefaultVerifiableCredentialInteractor())
-      Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
-    }
   }
 }
 
