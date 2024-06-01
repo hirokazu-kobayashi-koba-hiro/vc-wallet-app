@@ -90,4 +90,11 @@ class VerifiableCredentialsService(
     val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
+
+  fun registerCredential(
+      credentialIssuer: String,
+      verifiableCredentialsRecord: VerifiableCredentialsRecord
+  ) {
+    registry.save(credentialIssuer, verifiableCredentialsRecord)
+  }
 }

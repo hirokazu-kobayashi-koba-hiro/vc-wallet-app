@@ -49,19 +49,27 @@ class DefaultVcConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    val cancelCallback = { VerifiableCredentialInteracotrCallbackProvider.callback.reject() }
+    val cancelCallback = {
+      VerifiableCredentialInteracotrCallbackProvider.callback.reject()
+      finish()
+    }
     val credentialIssuerMetadataValue =
         intent.getStringExtra("credentialIssuerMetadata") ?: throw RuntimeException("")
     val credentialIssuerMetadata =
-        JsonUtils.read(credentialIssuerMetadataValue, CredentialIssuerMetadata::class.java)
+        JsonUtils.read(
+            credentialIssuerMetadataValue, CredentialIssuerMetadata::class.java, snakeCase = false)
     val credentialOfferValue =
         intent.getStringExtra("credentialOffer") ?: throw RuntimeException("")
-    val credentialOffer = JsonUtils.read(credentialOfferValue, CredentialOffer::class.java)
+    val credentialOffer =
+        JsonUtils.read(credentialOfferValue, CredentialOffer::class.java, snakeCase = false)
     setContent {
       DefaultVcView(
           credentialIssuerMetadata = credentialIssuerMetadata,
           credentialOffer = credentialOffer,
-          onContinue = { VerifiableCredentialInteracotrCallbackProvider.callback.accept(it) },
+          onContinue = {
+            VerifiableCredentialInteracotrCallbackProvider.callback.accept(it)
+            finish()
+          },
           onCancel = { cancelCallback() })
     }
     onBackPressedDispatcher.addCallback {
@@ -136,7 +144,7 @@ fun DefaultVcView(
   var pinCode by remember { mutableStateOf("") }
   VcWalletTheme {
     Scaffold(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = Dp(24.0F), bottom = Dp(24.0F)),
         topBar = {
           TopAppBar(
               modifier = Modifier.fillMaxWidth().padding(),
@@ -212,7 +220,7 @@ fun DefaultVcView(
         },
         bottomBar = {
           Row(
-              modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+              modifier = Modifier.fillMaxWidth().padding(Dp(20.0F)),
               verticalAlignment = Alignment.Top,
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Button(

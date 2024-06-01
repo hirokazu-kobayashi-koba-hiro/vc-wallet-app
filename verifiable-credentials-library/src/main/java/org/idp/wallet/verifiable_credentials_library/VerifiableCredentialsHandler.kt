@@ -49,7 +49,7 @@ class VerifiableCredentialsHandler(private val service: VerifiableCredentialsSer
             "https://credentials.example.com/identity_credential")
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord = service.transform(format, it)
-      //        registry.save(credentialIssuer, it)
+      service.registerCredential(credentialOffer.credentialIssuer, verifiableCredentialsRecord)
     }
   }
 

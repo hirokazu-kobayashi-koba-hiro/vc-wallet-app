@@ -15,7 +15,7 @@ class CredentialOfferRequestValidator(private val request: CredentialOfferReques
     if (scheme == null) {
       throw CredentialOfferRequestException("Scheme is required.")
     }
-    if (scheme != "openid-credential-offer://") {
+    if (scheme != "openid-credential-offer") {
       throw CredentialOfferRequestException("Scheme must be 'openid-credential-offer://'.")
     }
   }
