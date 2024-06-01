@@ -212,22 +212,19 @@ fun HomeScreen(
             }
         val cardList = mutableListOf<Pair<String, String>>()
         val vc = vciState.value
-        vc.keys.forEach { key ->
-          val values = vc.values
-          values.forEach { records ->
-            records.forEach { record ->
-              val stringBuilder = StringBuilder()
-              record.payload.forEach {
-                stringBuilder.append(it.key + ":" + it.value)
-                stringBuilder.append("\n")
-              }
-              cardList.add(Pair(key, stringBuilder.toString()))
+        vc.entries.forEach { (key, records) ->
+          records.forEach { record ->
+            val stringBuilder = StringBuilder()
+            record.payload.forEach {
+              stringBuilder.append(it.key + ":" + it.value)
+              stringBuilder.append("\n")
             }
+            cardList.add(Pair(key, stringBuilder.toString()))
           }
-        }
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-          items(cardList) { (issuer, content) ->
-            VcCardComponent(title = issuer, content = content)
+          LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            items(cardList) { (issuer, content) ->
+              VcCardComponent(title = issuer, content = content)
+            }
           }
         }
       }
