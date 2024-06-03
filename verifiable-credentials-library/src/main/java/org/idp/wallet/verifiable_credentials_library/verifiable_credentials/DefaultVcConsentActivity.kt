@@ -11,20 +11,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import org.idp.wallet.verifiable_credentials_library.basic.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.type.vc.BackgroundImage
@@ -129,11 +133,15 @@ fun DefaultVcPreview() {
           CredentialOffer(
               credentialIssuer = "https://example.com",
               credentialConfigurationIds =
-                  listOf("UniversityDegreeCredential", "HighSchoolDegreeCredential")),
+                  listOf(
+                      "UniversityDegreeCredential",
+                      "HighSchoolDegreeCredential",
+                      "JuniorHighSchoolDegreeCredential")),
       onContinue = {},
       onCancel = {})
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultVcView(
     credentialIssuerMetadata: CredentialIssuerMetadata,
@@ -142,103 +150,133 @@ fun DefaultVcView(
     onCancel: () -> Unit
 ) {
   var pinCode by remember { mutableStateOf("") }
-  VcWalletTheme {
+  VcWalletTheme(darkTheme = false) {
     Scaffold(
-        modifier = Modifier.fillMaxWidth().padding(top = Dp(24.0F), bottom = Dp(24.0F)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = Dp(24.0F), bottom = Dp(24.0F)),
         topBar = {
-          TopAppBar(
-              modifier = Modifier.fillMaxWidth().padding(),
-              backgroundColor = Color.Black,
-              contentColor = Color.White,
+          CenterAlignedTopAppBar(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(),
               title = {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                  Row {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "AccountCircle")
-                    Spacer(modifier = Modifier.padding(Dp(4.0F)))
-                    Text(text = "Credential")
-                  }
-                }
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Icon(
+                          imageVector = Icons.Default.AccountCircle,
+                          contentDescription = "AccountCircle")
+                      Spacer(modifier = Modifier.padding(Dp(4.0F)))
+                      Text(text = "Credential", style = MaterialTheme.typography.displayLarge)
+                    }
               })
         },
         content = { paddingValues ->
           Column(
-              modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+              modifier =
+              Modifier
+                  .fillMaxWidth()
+                  .padding(
+                      top = paddingValues.calculateTopPadding(),
+                      bottom = paddingValues.calculateBottomPadding(),
+                      start = Dp(16.0F),
+                      end = Dp(16.0F)
+                  ),
               verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
               horizontalAlignment = Alignment.CenterHorizontally) {
-                credentialOffer.credentialConfigurationIds.forEach { credential ->
-                  Card(
-                      backgroundColor = Color.Transparent,
-                      contentColor = Color.Black,
-                      border = BorderStroke(width = Dp(2.0F), color = Color.Black)) {
-                        Column(modifier = Modifier.fillMaxWidth().padding(Dp(4.0F))) {
-                          val credentialConfiguration =
-                              credentialIssuerMetadata.findCredentialConfiguration(credential)
-                          AsyncImage(
-                              model = credentialConfiguration?.getFirstLogo()?.uri,
-                              contentDescription = "contentDescription",
-                              modifier = Modifier.size(Dp(160.0F)),
-                              contentScale = ContentScale.Crop)
-                          Row(
-                              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-                              horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(text = "Issuer", style = MaterialTheme.typography.subtitle1)
-                                Text(text = "University")
-                              }
-                          Row(
-                              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-                              horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(text = "Type", style = MaterialTheme.typography.subtitle1)
-                                Text(text = credential)
-                              }
-                          credentialConfiguration?.getFirstDisplay()?.description?.let {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                  Text(
-                                      text = "Description",
-                                      style = MaterialTheme.typography.subtitle1)
-                                  Text(text = it)
-                                }
-                          }
-                        }
-                      }
-                }
+                CredentialCards(credentialOffer, credentialIssuerMetadata)
                 Text("Insert provided code for the offer from Issuer")
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(text = "PinCode") },
-                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                     value = pinCode,
                     onValueChange = { pinCode = it })
               }
         },
         bottomBar = {
           Row(
-              modifier = Modifier.fillMaxWidth().padding(Dp(20.0F)),
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(Dp(20.0F)),
               verticalAlignment = Alignment.Top,
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Button(
                     onClick = onCancel,
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White, contentColor = Color.Black)) {
-                      Text("Cancel")
-                    }
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                    border = BorderStroke(width = Dp(1.0F), color = Color.Black)
+                ) {
+                  Text("Cancel")
+                }
                 Button(
                     onClick = { onContinue(pinCode) },
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Black, contentColor = Color.White)) {
+                    colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
                       Text("Continue")
                     }
               }
         },
     )
   }
+}
+
+@Composable
+fun CredentialCards(
+    credentialOffer: CredentialOffer,
+    credentialIssuerMetadata: CredentialIssuerMetadata
+) {
+  LazyColumn(
+      Modifier
+          .fillMaxWidth()
+          .padding(Dp(16.0F))) {
+    items(credentialOffer.credentialConfigurationIds) {
+      CredentialCard(
+          credential = it,
+          credentialConfiguration = credentialIssuerMetadata.findCredentialConfiguration(it))
+    }
+  }
+}
+
+@Composable
+fun CredentialCard(credential: String, credentialConfiguration: CredentialConfiguration?) {
+  Card(
+      modifier = Modifier.padding(top = Dp(16.0F)),
+      shape = RoundedCornerShape(20.dp),
+      border = BorderStroke(width = Dp(2.0F), color = Color.Black)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(Dp(4.0F))) {
+          AsyncImage(
+              model =
+                  credentialConfiguration?.getFirstLogo()?.uri,
+              contentDescription = credentialConfiguration?.getFirstLogo()?.altText,
+              modifier = Modifier.height(Dp(100.0F)),
+              contentScale = ContentScale.Crop)
+          Row(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(Dp(4.0F)),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Issuer", style = MaterialTheme.typography.displaySmall)
+                Text(text = "University", style = MaterialTheme.typography.bodyLarge)
+              }
+          Row(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(Dp(4.0F)),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Type", style = MaterialTheme.typography.displaySmall)
+                Text(text = credential, style = MaterialTheme.typography.bodyLarge)
+              }
+          credentialConfiguration?.getFirstDisplay()?.description?.let {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dp(4.0F)),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                  Text(text = "Description", style = MaterialTheme.typography.displaySmall)
+                  Text(text = it, style = MaterialTheme.typography.bodyLarge)
+                }
+          }
+        }
+      }
 }
