@@ -54,7 +54,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.compose.material3:material3")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.activity:activity-ktx:1.9.0")
@@ -82,13 +82,16 @@ dependencies {
     //JSONPath refer to https://identity.foundation/presentation-exchange/spec/v2.0.0/#jsonpath-implementations
     implementation("com.nfeld.jsonpathkt:jsonpathkt:2.0.1")
 
-
     //jose
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+
+    //QR
+    implementation("com.google.zxing:core:3.4.0")
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")

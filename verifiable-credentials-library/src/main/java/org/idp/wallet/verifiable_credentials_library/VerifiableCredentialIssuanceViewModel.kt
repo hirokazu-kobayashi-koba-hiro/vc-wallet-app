@@ -1,10 +1,9 @@
-package org.idp.wallet.app
+package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor

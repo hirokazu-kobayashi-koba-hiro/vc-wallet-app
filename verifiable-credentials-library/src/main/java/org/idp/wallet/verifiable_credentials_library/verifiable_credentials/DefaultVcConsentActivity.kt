@@ -152,14 +152,10 @@ fun DefaultVcView(
   var pinCode by remember { mutableStateOf("") }
   VcWalletTheme(darkTheme = false) {
     Scaffold(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = Dp(24.0F), bottom = Dp(24.0F)),
+        modifier = Modifier.fillMaxWidth().padding(top = Dp(24.0F), bottom = Dp(24.0F)),
         topBar = {
           CenterAlignedTopAppBar(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(),
+              modifier = Modifier.fillMaxWidth().padding(),
               title = {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -175,14 +171,12 @@ fun DefaultVcView(
         content = { paddingValues ->
           Column(
               modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .padding(
-                      top = paddingValues.calculateTopPadding(),
-                      bottom = paddingValues.calculateBottomPadding(),
-                      start = Dp(16.0F),
-                      end = Dp(16.0F)
-                  ),
+                  Modifier.fillMaxWidth()
+                      .padding(
+                          top = paddingValues.calculateTopPadding(),
+                          bottom = paddingValues.calculateBottomPadding(),
+                          start = Dp(16.0F),
+                          end = Dp(16.0F)),
               verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 CredentialCards(credentialOffer, credentialIssuerMetadata)
@@ -196,18 +190,17 @@ fun DefaultVcView(
         },
         bottomBar = {
           Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(Dp(20.0F)),
+              modifier = Modifier.fillMaxWidth().padding(Dp(20.0F)),
               verticalAlignment = Alignment.Top,
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Button(
                     onClick = onCancel,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                    border = BorderStroke(width = Dp(1.0F), color = Color.Black)
-                ) {
-                  Text("Cancel")
-                }
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color.White, contentColor = Color.Black),
+                    border = BorderStroke(width = Dp(1.0F), color = Color.Black)) {
+                      Text("Cancel")
+                    }
                 Button(
                     onClick = { onContinue(pinCode) },
                     colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
@@ -224,10 +217,7 @@ fun CredentialCards(
     credentialOffer: CredentialOffer,
     credentialIssuerMetadata: CredentialIssuerMetadata
 ) {
-  LazyColumn(
-      Modifier
-          .fillMaxWidth()
-          .padding(Dp(16.0F))) {
+  LazyColumn(Modifier.fillMaxWidth().padding(Dp(16.0F))) {
     items(credentialOffer.credentialConfigurationIds) {
       CredentialCard(
           credential = it,
@@ -242,36 +232,27 @@ fun CredentialCard(credential: String, credentialConfiguration: CredentialConfig
       modifier = Modifier.padding(top = Dp(16.0F)),
       shape = RoundedCornerShape(20.dp),
       border = BorderStroke(width = Dp(2.0F), color = Color.Black)) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(Dp(4.0F))) {
+        Column(modifier = Modifier.fillMaxWidth().padding(Dp(4.0F))) {
           AsyncImage(
-              model =
-                  credentialConfiguration?.getFirstLogo()?.uri,
+              model = credentialConfiguration?.getFirstLogo()?.uri,
               contentDescription = credentialConfiguration?.getFirstLogo()?.altText,
               modifier = Modifier.height(Dp(100.0F)),
               contentScale = ContentScale.Crop)
           Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(Dp(4.0F)),
+              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Issuer", style = MaterialTheme.typography.displaySmall)
                 Text(text = "University", style = MaterialTheme.typography.bodyLarge)
               }
           Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(Dp(4.0F)),
+              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Type", style = MaterialTheme.typography.displaySmall)
                 Text(text = credential, style = MaterialTheme.typography.bodyLarge)
               }
           credentialConfiguration?.getFirstDisplay()?.description?.let {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Dp(4.0F)),
+                modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
                 horizontalArrangement = Arrangement.SpaceBetween) {
                   Text(text = "Description", style = MaterialTheme.typography.displaySmall)
                   Text(text = it, style = MaterialTheme.typography.bodyLarge)

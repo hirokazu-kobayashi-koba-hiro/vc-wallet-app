@@ -1,4 +1,4 @@
-package org.idp.wallet.app
+package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -27,7 +24,10 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -54,12 +54,11 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import org.idp.wallet.app.ui.theme.VCWalletAppTheme
-import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.DefaultVerifiablePresentationInteractor
 
-class MainActivity : ComponentActivity() {
+class VcHomeActivity : ComponentActivity() {
 
   var format: String = ""
 
@@ -85,15 +84,18 @@ class MainActivity : ComponentActivity() {
             lifecycleScope.launch(errorHandler) {
               if (format == "vp") {
                 viewModel.handleVpRequest(
-                    this@MainActivity,
+                    this@VcHomeActivity,
                     barcodeValue,
                     interactor = DefaultVerifiablePresentationInteractor())
-                Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@VcHomeActivity, "Success", Toast.LENGTH_LONG).show()
                 return@launch
               }
               viewModel.request(
-                  this@MainActivity, barcodeValue, format, DefaultVerifiableCredentialInteractor())
-              Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+                  this@VcHomeActivity,
+                  barcodeValue,
+                  format,
+                  DefaultVerifiableCredentialInteractor())
+              Toast.makeText(this@VcHomeActivity, "Success", Toast.LENGTH_LONG).show()
             }
           })
 
@@ -105,7 +107,7 @@ class MainActivity : ComponentActivity() {
           viewModel,
           onClick = {
             format = it
-            val intent = Intent(this@MainActivity, PortraitCaptureActivity::class.java)
+            val intent = Intent(this@VcHomeActivity, PortraitCaptureActivity::class.java)
             intent.putExtra(Intents.Scan.PROMPT_MESSAGE, "Scan a QR code")
             launcher.launch(intent)
           },
@@ -128,7 +130,7 @@ fun HomeView(
     onClickShow: () -> Unit
 ) {
   val navController = rememberNavController()
-  VCWalletAppTheme {
+  VcWalletTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
       MainScreen(
           viewModel = viewModel,
@@ -148,13 +150,13 @@ fun MainScreen(
 ) {
   Scaffold(
       bottomBar = {
-        BottomNavigation {
+        NavigationBar {
           val items = listOf(Screen.Home, Screen.Vc, Screen.Vp)
           val navBackStackEntry by navController.currentBackStackEntryAsState()
           val currentRoute = navBackStackEntry?.destination?.route
 
           items.forEach { screen ->
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = null) },
                 label = { Text(screen.title) },
                 selected = currentRoute == screen.route,
