@@ -28,29 +28,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.google.zxing.client.android.Intents
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
@@ -131,58 +125,27 @@ fun HomeView(
     onClick: (format: String) -> Unit,
     onClickShow: () -> Unit
 ) {
-  val navController = rememberNavController()
+  var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
   VcWalletTheme {
-    Surface(color = MaterialTheme.colorScheme.background) {
-      MainScreen(
-          viewModel = viewModel,
-          onClick = onClick,
-          onClickShow = onClickShow,
-          navController = navController)
-    }
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+          AppDestinations.entries.forEach {
+            item(
+                icon = { Icon(it.icon, contentDescription = it.contentDescription) },
+                label = { Text(it.label) },
+                selected = it == currentDestination,
+                onClick = { currentDestination = it })
+          }
+        }) {
+          when (currentDestination) {
+            AppDestinations.HOME ->
+                HomeScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
+            AppDestinations.VC ->
+                VcScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
+            AppDestinations.VP -> VpScreen(onClick = onClick)
+          }
+        }
   }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen(
-    viewModel: VerifiableCredentialIssuanceViewModel,
-    onClick: (format: String) -> Unit,
-    onClickShow: () -> Unit,
-    navController: NavHostController
-) {
-  Scaffold(
-      bottomBar = {
-        NavigationBar {
-          val items = listOf(Screen.Home, Screen.Vc, Screen.Vp)
-          val navBackStackEntry by navController.currentBackStackEntryAsState()
-          val currentRoute = navBackStackEntry?.destination?.route
-
-          items.forEach { screen ->
-            NavigationBarItem(
-                icon = { Icon(screen.icon, contentDescription = null) },
-                label = { Text(screen.title) },
-                selected = currentRoute == screen.route,
-                onClick = { navController.navigate(screen.route) { launchSingleTop = true } })
-          }
-        }
-      }) { padding ->
-        Log.d("Vc library app", padding.toString())
-        NavHost(navController, startDestination = Screen.Home.route) {
-          composable(Screen.Home.route) {
-            HomeScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
-          }
-          composable(Screen.Vc.route) {
-            VcScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
-          }
-          composable(Screen.Vp.route) {
-            VpScreen(
-                navController,
-                onClick = onClick,
-            )
-          }
-        }
-      }
 }
 
 @Composable
@@ -288,7 +251,6 @@ fun VcScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VpScreen(
-    navController: NavHostController,
     onClick: (format: String) -> Unit,
 ) {
   Column(
@@ -311,14 +273,12 @@ fun VpScreen(
       }
 }
 
-sealed class Screen(
-    val route: String,
-    val title: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+enum class AppDestinations(
+    val label: String,
+    val icon: ImageVector,
+    val contentDescription: String
 ) {
-  object Home : Screen("home", "Home", Icons.Default.Home)
-
-  object Vc : Screen("vc", "Vc", Icons.Default.Add)
-
-  object Vp : Screen("vp", "Vp", Icons.Default.Share)
+  HOME("home", Icons.Default.Home, "home"),
+  VC("vc", Icons.Default.Add, "vc"),
+  VP("vp", Icons.Default.Share, "vp"),
 }
