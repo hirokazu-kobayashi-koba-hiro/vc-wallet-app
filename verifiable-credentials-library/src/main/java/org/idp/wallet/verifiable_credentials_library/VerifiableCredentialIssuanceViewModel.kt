@@ -11,20 +11,32 @@ import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.Ver
 class VerifiableCredentialIssuanceViewModel : ViewModel() {
 
   var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
+  var _loading = MutableStateFlow(false)
   val vciState = _vcContent.asStateFlow()
+  val loadingState = _loading.asStateFlow()
 
-  suspend fun request(
+  suspend fun requestVcOnPreAuthorization(
       context: Context,
       uri: String,
       format: String,
       interactor: VerifiableCredentialInteractor
   ) {
-    VerifiableCredentialsClient.handlePreAuthorization(context, uri, format, interactor)
+    try {
+      _loading.value = true
+      VerifiableCredentialsClient.handlePreAuthorization(context, uri, format, interactor)
+    } finally {
+      _loading.value = false
+    }
   }
 
   fun getAllCredentials() {
-    val allCredentials = VerifiableCredentialsClient.getAllCredentials()
-    _vcContent.value = allCredentials
+    try {
+      _loading.value = true
+      val allCredentials = VerifiableCredentialsClient.getAllCredentials()
+      _vcContent.value = allCredentials
+    } finally {
+      _loading.value = false
+    }
   }
 
   suspend fun handleVpRequest(
@@ -32,7 +44,12 @@ class VerifiableCredentialIssuanceViewModel : ViewModel() {
       url: String,
       interactor: VerifiablePresentationInteractor
   ) {
-    val result = VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
-    println(result)
+    try {
+      _loading.value = true
+      val result = VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
+      println(result)
+    } finally {
+      _loading.value = false
+    }
   }
 }

@@ -50,6 +50,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.DefaultVerifiablePresentationInteractor
@@ -86,7 +87,7 @@ class VcHomeActivity : ComponentActivity() {
                 Toast.makeText(this@VcHomeActivity, "Success", Toast.LENGTH_LONG).show()
                 return@launch
               }
-              viewModel.request(
+              viewModel.requestVcOnPreAuthorization(
                   this@VcHomeActivity,
                   barcodeValue,
                   format,
@@ -142,7 +143,7 @@ fun HomeView(
                 HomeScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
             AppDestinations.VC ->
                 VcScreen(viewModel = viewModel, onClick = onClick, onClickShow = onClickShow)
-            AppDestinations.VP -> VpScreen(onClick = onClick)
+            AppDestinations.VP -> VpScreen(viewModel = viewModel, onClick = onClick)
           }
         }
   }
@@ -167,6 +168,10 @@ fun HomeScreen(
     onClickShow: () -> Unit
 ) {
   val vciState = viewModel.vciState.collectAsState()
+  if (viewModel.loadingState.collectAsState().value) {
+    LoadingScreen()
+    return
+  }
   Column(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
@@ -212,6 +217,10 @@ fun VcScreen(
     onClick: (format: String) -> Unit,
     onClickShow: () -> Unit
 ) {
+  if (viewModel.loadingState.collectAsState().value) {
+    LoadingScreen()
+    return
+  }
   Column(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
@@ -251,8 +260,13 @@ fun VcScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VpScreen(
+    viewModel: VerifiableCredentialIssuanceViewModel,
     onClick: (format: String) -> Unit,
 ) {
+  if (viewModel.loadingState.collectAsState().value) {
+    LoadingScreen()
+    return
+  }
   Column(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
