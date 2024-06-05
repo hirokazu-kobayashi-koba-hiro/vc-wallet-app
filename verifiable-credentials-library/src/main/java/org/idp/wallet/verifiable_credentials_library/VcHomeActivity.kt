@@ -232,10 +232,11 @@ fun HomeScreen(
             }
             cardList.add(Pair(key, stringBuilder.toString()))
           }
-          LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(cardList) { (issuer, content) ->
-              VcCardComponent(title = issuer, content = content)
-            }
+        }
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+          items(cardList) { (issuer, content) ->
+            VcCardComponent(title = issuer, content = content)
+            Log.d("Vc library app", issuer)
           }
         }
       }
@@ -252,7 +253,7 @@ fun VcScreen(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        var format by remember { mutableStateOf("") }
+        var format by remember { mutableStateOf("vc+sd-jwt") }
         val vciState = viewModel.vciState.collectAsState()
         Column() {
           CenterAlignedTopAppBar(
