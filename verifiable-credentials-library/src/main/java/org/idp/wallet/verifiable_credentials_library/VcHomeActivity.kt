@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -141,6 +143,7 @@ fun HomeView(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: VerifiableCredentialIssuanceViewModel,
@@ -193,6 +196,7 @@ fun VcCardComponent(title: String, content: String) {
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: VerifiableCredentialIssuanceViewModel,
@@ -204,15 +208,19 @@ fun HomeScreen(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              Text(text = "")
-              Text(text = "VerifiableCredentials")
-              IconButton(onClick = onClickShow) {
-                Icon(Icons.Default.Refresh, contentDescription = null)
-              }
-            }
+        CenterAlignedTopAppBar(
+            title = {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "VerifiableCredentials",
+                        style = MaterialTheme.typography.displayMedium)
+                    IconButton(onClick = onClickShow) {
+                      Icon(Icons.Default.Refresh, contentDescription = null)
+                    }
+                  }
+            })
         val cardList = mutableListOf<Pair<String, String>>()
         val vc = vciState.value
         vc.entries.forEach { (key, records) ->
@@ -233,6 +241,7 @@ fun HomeScreen(
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VcScreen(
     viewModel: VerifiableCredentialIssuanceViewModel,
@@ -245,8 +254,15 @@ fun VcScreen(
       horizontalAlignment = Alignment.CenterHorizontally) {
         var format by remember { mutableStateOf("") }
         val vciState = viewModel.vciState.collectAsState()
-
-        Column {
+        Column() {
+          CenterAlignedTopAppBar(
+              title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                      Text(text = "Issue Vc", style = MaterialTheme.typography.displayMedium)
+                    }
+              })
           Row(
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.SpaceBetween) {
@@ -268,6 +284,7 @@ fun VcScreen(
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VpScreen(
     navController: NavHostController,
@@ -277,7 +294,14 @@ fun VpScreen(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Vp Screen")
+        CenterAlignedTopAppBar(
+            title = {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = "Present Vp", style = MaterialTheme.typography.displayMedium)
+                  }
+            })
         Row {
           Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = { onClick("vp") }) {
             Text(text = "scan QR")
