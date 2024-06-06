@@ -1,6 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.mock
 
-import org.idp.wallet.verifiable_credentials_library.basic.resource.ResourceReader
+import org.idp.wallet.verifiable_credentials_library.util.resource.ResourceReader
 
 class MockAssetsReader : ResourceReader {
   override fun read(fileName: String): String {

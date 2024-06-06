@@ -1,24 +1,24 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
-import org.idp.wallet.verifiable_credentials_library.basic.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.basic.resource.AssetsReader
-import org.idp.wallet.verifiable_credentials_library.basic.store.KeyStore
-import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfiguration
-import org.idp.wallet.verifiable_credentials_library.configuration.ClientConfigurationRepository
-import org.idp.wallet.verifiable_credentials_library.configuration.WalletConfigurationService
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialInteractor
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialRegistry
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecord
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsRecords
-import org.idp.wallet.verifiable_credentials_library.verifiable_credentials.VerifiableCredentialsService
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationInteractor
-import org.idp.wallet.verifiable_credentials_library.verifiable_presentation.VerifiablePresentationRequestContextService
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.resource.AssetsReader
+import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialRegistry
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
 
 object VerifiableCredentialsClient {
 
-  private lateinit var verifiableCredentialsHandler: VerifiableCredentialsHandler
-  private lateinit var verifiablePresentationHandler: VerifiablePresentationHandler
+  private lateinit var verifiableCredentialsApi: VerifiableCredentialsApi
+  private lateinit var verifiablePresentationApi: VerifiablePresentationApi
   private lateinit var walletConfigurationService: WalletConfigurationService
 
   fun initialize(context: Context, clientId: String) {
@@ -29,12 +29,12 @@ object VerifiableCredentialsClient {
     walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
     walletConfigurationService.initialize()
     val verifiableCredentialsService = VerifiableCredentialsService(registry, clientId)
-    verifiableCredentialsHandler = VerifiableCredentialsHandler(verifiableCredentialsService)
+    verifiableCredentialsApi = VerifiableCredentialsApi(verifiableCredentialsService)
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()
     }
-    verifiablePresentationHandler =
-        VerifiablePresentationHandler(
+    verifiablePresentationApi =
+        VerifiablePresentationApi(
             registry, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
   }
 
@@ -44,11 +44,11 @@ object VerifiableCredentialsClient {
       format: String = "vc+sd-jwt",
       interactor: VerifiableCredentialInteractor
   ) {
-    verifiableCredentialsHandler.handlePreAuthorization(context, url, format, interactor)
+    verifiableCredentialsApi.handlePreAuthorization(context, url, format, interactor)
   }
 
   fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return verifiableCredentialsHandler.getAllCredentials()
+    return verifiableCredentialsApi.getAllCredentials()
   }
 
   suspend fun handleVpRequest(
@@ -56,7 +56,7 @@ object VerifiableCredentialsClient {
       url: String,
       interactor: VerifiablePresentationInteractor
   ): Result<Any> {
-    return verifiablePresentationHandler.handleRequest(context, url, interactor)
+    return verifiablePresentationApi.handleRequest(context, url, interactor)
   }
 
   private fun registerTestData(registry: VerifiableCredentialRegistry) {

@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.idp.wallet.verifiable_credentials_library.VcHomeActivity
+import org.idp.wallet.verifiable_credentials_library.ui.VcHomeActivity
 
 class MainActivity : ComponentActivity() {
 
