@@ -55,7 +55,8 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
   private suspend fun interact(
       context: Context,
       credentialIssuerMetadata: CredentialIssuerMetadata,
-      credentialOffer: org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
+      credentialOffer:
+          org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
       interactor: VerifiableCredentialInteractor
   ): Boolean = suspendCoroutine { continuation ->
     val callback =

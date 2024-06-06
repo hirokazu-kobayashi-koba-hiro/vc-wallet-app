@@ -1,9 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.util.resource.AssetsReader
-import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
@@ -14,6 +11,9 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.resource.AssetsReader
+import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 
 object VerifiableCredentialsClient {
 

@@ -15,26 +15,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.Constraints
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.InputDescriptorDetail
-import org.idp.wallet.verifiable_credentials_library.ui.component.VcCardComponent
-import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractorCallbackProvider
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.ui.component.VcCardComponent
+import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVpConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,11 +107,17 @@ fun DefaultVpConsentView(
     Scaffold(
         modifier = Modifier.fillMaxWidth().padding(),
         topBar = {
-          Column(modifier = Modifier.padding(Dp(16.0F))) {
-            TopAppBar(
-                title = { Text(text = "Verifiable Presentation Consent") },
-            )
-          }
+          CenterAlignedTopAppBar(
+              modifier = Modifier.fillMaxWidth().padding(),
+              title = {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Text(
+                          text = "Present Credential",
+                          style = MaterialTheme.typography.displayLarge)
+                    }
+              })
         },
         content = { paddingValue ->
           Column(
@@ -128,18 +135,14 @@ fun DefaultVpConsentView(
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Button(
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                onClick = { onReject() }) {
-                  Text(text = "Reject")
-                }
-            Button(
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = Color.White, contentColor = Color.Black),
                 border = BorderStroke(Dp(1.0F), Color.Black),
-                onClick = { onAccept() }) {
-                  Text(text = "Accept")
+                onClick = { onReject() }) {
+                  Text(text = "Reject")
                 }
+            Button(onClick = { onAccept() }) { Text(text = "Accept") }
           }
         },
     )
@@ -181,5 +184,3 @@ fun VerifiableCredentialsView(evaluation: PresentationDefinitionEvaluation) {
     items(cardList) { (issuer, content) -> VcCardComponent(title = issuer, content = content) }
   }
 }
-
-

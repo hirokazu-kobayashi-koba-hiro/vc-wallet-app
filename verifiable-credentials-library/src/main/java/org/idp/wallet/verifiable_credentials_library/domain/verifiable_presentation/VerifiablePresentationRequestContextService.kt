@@ -1,16 +1,16 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation
 
-import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.util.http.extractQueries
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.ClientIdScheme
+import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
+import org.idp.wallet.verifiable_credentials_library.util.http.extractQueries
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class VerifiablePresentationRequestContextService(
-  private val walletConfigurationService: WalletConfigurationService,
-  private val clientConfigurationRepository: ClientConfigurationRepository
+    private val walletConfigurationService: WalletConfigurationService,
+    private val clientConfigurationRepository: ClientConfigurationRepository
 ) {
 
   suspend fun create(url: String): VerifiablePresentationRequestContext {

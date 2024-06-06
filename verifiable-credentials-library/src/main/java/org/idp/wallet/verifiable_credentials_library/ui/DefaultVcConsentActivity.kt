@@ -41,14 +41,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.BackgroundImage
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.Display
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.Logo
-import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteracotrCallbackProvider
+import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVcConsentActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +67,12 @@ class DefaultVcConsentActivity : ComponentActivity() {
     val credentialOfferValue =
         intent.getStringExtra("credentialOffer") ?: throw RuntimeException("")
     val credentialOffer =
-        JsonUtils.read(credentialOfferValue, org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer::class.java, snakeCase = false)
+        JsonUtils.read(
+            credentialOfferValue,
+            org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
+                    .CredentialOffer::class
+                .java,
+            snakeCase = false)
     setContent {
       DefaultVcView(
           credentialIssuerMetadata = credentialIssuerMetadata,
@@ -102,7 +108,7 @@ fun DefaultVcPreview() {
               display =
                   listOf(
                       Display(
-                          "UniversityDegreeCredential",
+                          "Example University",
                           "en-US",
                           Logo(
                               "https://university.example.edu/public/logo.png",
@@ -110,8 +116,7 @@ fun DefaultVcPreview() {
                           "ExampleUniversity Degree Credential",
                           "#12107c",
                           BackgroundImage(""),
-                          "#FFFFFF")
-                  ),
+                          "#FFFFFF")),
               credentialConfigurationsSupported =
                   mapOf(
                       "UniversityDegreeCredential" to
@@ -122,7 +127,7 @@ fun DefaultVcPreview() {
                               null,
                               listOf(
                                   Display(
-                                      "UniversityDegreeCredential",
+                                      "Sample University",
                                       "en-US",
                                       Logo(
                                           "https://university.example.edu/public/logo.png",
@@ -130,19 +135,15 @@ fun DefaultVcPreview() {
                                       "ExampleUniversity Degree Credential",
                                       "#12107c",
                                       BackgroundImage(""),
-                                      "#FFFFFF")
-                              ))
-                  )),
+                                      "#FFFFFF"))))),
       credentialOffer =
-      org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer(
-          credentialIssuer = "https://example.com",
-          credentialConfigurationIds =
-          listOf(
-              "UniversityDegreeCredential",
-              "HighSchoolDegreeCredential",
-              "JuniorHighSchoolDegreeCredential"
-          )
-      ),
+          CredentialOffer(
+              credentialIssuer = "https://example.com",
+              credentialConfigurationIds =
+                  listOf(
+                      "UniversityDegreeCredential",
+                      "HighSchoolDegreeCredential",
+                      "JuniorHighSchoolDegreeCredential")),
       onContinue = {},
       onCancel = {})
 }
@@ -151,7 +152,7 @@ fun DefaultVcPreview() {
 @Composable
 fun DefaultVcView(
     credentialIssuerMetadata: CredentialIssuerMetadata,
-    credentialOffer: org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
+    credentialOffer: CredentialOffer,
     onContinue: (pinCode: String) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -170,7 +171,7 @@ fun DefaultVcView(
                           imageVector = Icons.Default.AccountCircle,
                           contentDescription = "AccountCircle")
                       Spacer(modifier = Modifier.padding(Dp(4.0F)))
-                      Text(text = "Credential", style = MaterialTheme.typography.displayLarge)
+                      Text(text = "Issue Credential", style = MaterialTheme.typography.displayLarge)
                     }
               })
         },
@@ -220,7 +221,7 @@ fun DefaultVcView(
 
 @Composable
 fun CredentialCards(
-    credentialOffer: org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
+    credentialOffer: CredentialOffer,
     credentialIssuerMetadata: CredentialIssuerMetadata
 ) {
   LazyColumn(Modifier.fillMaxWidth().padding(Dp(16.0F))) {
@@ -237,18 +238,23 @@ fun CredentialCard(credential: String, credentialConfiguration: CredentialConfig
   Card(
       modifier = Modifier.padding(top = Dp(16.0F)),
       shape = RoundedCornerShape(20.dp),
-      border = BorderStroke(width = Dp(2.0F), color = Color.Black)) {
+      border = BorderStroke(width = Dp(2.0F), color = Color.Black),
+      content = {
         Column(modifier = Modifier.fillMaxWidth().padding(Dp(4.0F))) {
-          AsyncImage(
-              model = credentialConfiguration?.getFirstLogo()?.uri,
-              contentDescription = credentialConfiguration?.getFirstLogo()?.altText,
-              modifier = Modifier.height(Dp(100.0F)),
-              contentScale = ContentScale.Crop)
+          credentialConfiguration?.getFirstLogo()?.let {
+            AsyncImage(
+                model = it.uri,
+                contentDescription = it.altText,
+                modifier = Modifier.height(Dp(100.0F)),
+                contentScale = ContentScale.Crop)
+          }
           Row(
               modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Issuer", style = MaterialTheme.typography.displaySmall)
-                Text(text = "University", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = credentialConfiguration?.getFirstDisplay()?.name ?: "",
+                    style = MaterialTheme.typography.bodyLarge)
               }
           Row(
               modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
@@ -265,5 +271,5 @@ fun CredentialCard(credential: String, credentialConfiguration: CredentialConfig
                 }
           }
         }
-      }
+      })
 }

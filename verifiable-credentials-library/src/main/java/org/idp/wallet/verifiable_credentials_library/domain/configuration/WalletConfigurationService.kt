@@ -1,11 +1,11 @@
 package org.idp.wallet.verifiable_credentials_library.domain.configuration
 
+import org.idp.wallet.verifiable_credentials_library.domain.error.SettingError
+import org.idp.wallet.verifiable_credentials_library.domain.error.SettingInvalidException
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.util.resource.ResourceReader
 import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
-import org.idp.wallet.verifiable_credentials_library.domain.error.SettingError
-import org.idp.wallet.verifiable_credentials_library.domain.error.SettingInvalidException
 
 class WalletConfigurationService(
     private val keyStore: KeyStore,

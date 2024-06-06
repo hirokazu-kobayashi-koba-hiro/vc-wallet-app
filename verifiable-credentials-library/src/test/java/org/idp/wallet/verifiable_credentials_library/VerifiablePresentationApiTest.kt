@@ -4,12 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
-import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
@@ -17,6 +14,9 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentat
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
+import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -3,13 +3,13 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credenti
 import id.walt.sdjwt.SDJwt
 import java.util.UUID
 import kotlin.js.ExperimentalJsExport
-import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialResponse
+import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
@@ -40,16 +40,22 @@ class VerifiableCredentialsService(
     return registry.getAll()
   }
 
-  suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer {
+  suspend fun getCredentialOffer(
+      credentialOfferRequest: CredentialOfferRequest
+  ): org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer {
     val credentialOfferUri = credentialOfferRequest.credentialOfferUri()
     credentialOfferUri?.let {
       val response = HttpClient.get(it)
-      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferCreator.create(response)
+      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
+          .CredentialOfferCreator
+          .create(response)
     }
     val credentialOffer = credentialOfferRequest.credentialOffer()
     credentialOffer?.let {
       val json = JSONObject(it)
-      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferCreator.create(json)
+      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
+          .CredentialOfferCreator
+          .create(json)
     }
     throw CredentialOfferRequestException(
         "Credential offer request must contain either credential_offer or credential_offer_uri.")

@@ -14,11 +14,11 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 fun VcCardComponent(title: String, content: String) {
-    Card(modifier = Modifier.fillMaxWidth().padding(Dp(16.0F))) {
-        Column(modifier = Modifier.padding(Dp(16.0F))) {
-            Text(text = title, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(Dp(8.0F)))
-            Text(text = content, style = MaterialTheme.typography.bodySmall)
-        }
+  Card(modifier = Modifier.fillMaxWidth().padding(Dp(16.0F))) {
+    Column(modifier = Modifier.padding(Dp(16.0F))) {
+      Text(text = title, style = MaterialTheme.typography.bodyMedium)
+      Spacer(modifier = Modifier.height(Dp(8.0F)))
+      Text(text = content, style = MaterialTheme.typography.bodySmall)
     }
+  }
 }

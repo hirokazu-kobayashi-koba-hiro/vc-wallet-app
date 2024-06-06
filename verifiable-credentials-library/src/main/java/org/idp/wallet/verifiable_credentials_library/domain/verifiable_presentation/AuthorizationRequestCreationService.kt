@@ -2,13 +2,13 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presenta
 
 import java.util.UUID
 import java.util.stream.Collectors
+import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseMode
+import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseType
+import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
 import org.idp.wallet.verifiable_credentials_library.util.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseMode
-import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseType
-import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationDefinition
 
 class AuthorizationRequestCreationService(
     private val parameters: VerifiablePresentationRequestParameters

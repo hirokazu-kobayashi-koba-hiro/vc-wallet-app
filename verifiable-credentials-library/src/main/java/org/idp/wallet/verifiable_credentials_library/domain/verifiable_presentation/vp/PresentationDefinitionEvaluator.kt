@@ -1,16 +1,16 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp
 
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonPathUtils
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.Constraints
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.Field
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.InputDescriptorDetail
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonPathUtils
 import org.json.JSONObject
 
 class PresentationDefinitionEvaluator(
-  private val presentationDefinition: PresentationDefinition,
-  private val verifiableCredentialsRecords: VerifiableCredentialsRecords
+    private val presentationDefinition: PresentationDefinition,
+    private val verifiableCredentialsRecords: VerifiableCredentialsRecords
 ) {
 
   fun evaluate(): PresentationDefinitionEvaluation {
