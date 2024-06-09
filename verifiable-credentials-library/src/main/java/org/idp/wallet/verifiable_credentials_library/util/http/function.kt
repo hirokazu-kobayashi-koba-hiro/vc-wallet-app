@@ -29,6 +29,10 @@ fun extractQueries(url: String): Map<String, List<String>> {
 
 fun extractQueriesAsSingleStringMap(url: String): Map<String, String> {
   val uri = Uri.parse(url)
+  return extractQueriesAsSingleStringMap(uri)
+}
+
+fun extractQueriesAsSingleStringMap(uri: Uri): Map<String, String> {
   val query = uri.query
   val splittedQueries = query?.split("&")
   val mutableMapOf = mutableMapOf<String, String>()

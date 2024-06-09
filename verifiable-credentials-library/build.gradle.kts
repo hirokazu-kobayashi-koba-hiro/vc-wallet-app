@@ -18,6 +18,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["vcWalletDomain"] = "@string/com_vc_wallet_domain"
+        manifestPlaceholders["vcWalletScheme"] = "@string/com_vc_wallet_scheme"
     }
 
     buildTypes {
@@ -97,6 +99,8 @@ dependencies {
 
     //custom tabs
     implementation("androidx.browser:browser:1.8.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity:1.9.0")
 
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")

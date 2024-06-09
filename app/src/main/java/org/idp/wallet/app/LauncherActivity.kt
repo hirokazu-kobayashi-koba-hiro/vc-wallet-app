@@ -2,6 +2,7 @@ package org.idp.wallet.app
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.ui.VcHomeActivity
 
@@ -35,8 +37,13 @@ class LauncherActivity : FragmentActivity() {
   }
 
   private fun login() {
-    lifecycleScope.launch {
-      viewModel.login(
+    val errorHandler =
+        CoroutineExceptionHandler(
+            handler = { _, throwable ->
+              Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
+            })
+    lifecycleScope.launch(errorHandler) {
+      viewModel.loginWithOpenIdConnect(
           this@LauncherActivity,
           successCallback = {
             val intent = Intent(this@LauncherActivity, VcHomeActivity::class.java)
