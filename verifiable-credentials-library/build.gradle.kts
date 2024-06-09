@@ -95,6 +95,9 @@ dependencies {
     implementation("com.google.zxing:core:3.4.0")
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
 
+    //custom tabs
+    implementation("androidx.browser:browser:1.8.0")
+
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("org.robolectric:robolectric:4.11.1")
     testImplementation("junit:junit:4.13.2")
