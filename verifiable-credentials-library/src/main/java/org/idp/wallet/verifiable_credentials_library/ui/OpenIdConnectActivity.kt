@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.OpenIdConnectRequestCallbackProvider
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.util.activity.open
 import org.idp.wallet.verifiable_credentials_library.util.http.extractQueriesAsSingleStringMap
@@ -30,6 +31,9 @@ class OpenIdConnectActivity : ComponentActivity() {
 //            OpenIdConnectRequestCallbackProvider.callback.onFailure()
 //            finish()
           })
+  lateinit var clientId: String
+  lateinit var redirectUri: String
+  lateinit var oidcMetadata: OidcMetadata
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -40,7 +44,12 @@ class OpenIdConnectActivity : ComponentActivity() {
       finish()
     }
     lifecycleScope.launch(errorHandler) {
-      val authenticationRequestUri = intent.getStringExtra("authenticationRequestUri").toString()
+      val issuer = intent.getStringExtra("issuer").toString()
+      clientId = intent.getStringExtra("clientId").toString()
+      redirectUri = intent.getStringExtra("redirectUri").toString()
+      val queries = intent.getStringExtra("queries").toString()
+      oidcMetadata = viewModel.getOidcMetadata("$issuer/.well-known/openid-configuration/")
+      val authenticationRequestUri = oidcMetadata.authorizationEndpoint + queries
       open(launcher = launcher, uri = authenticationRequestUri)
     }
     onBackPressedDispatcher.addCallback {
@@ -53,10 +62,22 @@ class OpenIdConnectActivity : ComponentActivity() {
     super.onNewIntent(intent)
     val data = intent.data
     data?.let {
-      val query = extractQueriesAsSingleStringMap(it)
-      Log.d("OpenIdConnectActivity", it.toString())
+      lifecycleScope.launch {
+        val params = extractQueriesAsSingleStringMap(it)
+        Log.d("OpenIdConnectActivity", it.toString())
+        val tokenEndpoint = oidcMetadata.tokenEndpoint
+        val code = params["code"] ?: ""
+        viewModel.requestToken(
+          url = tokenEndpoint,
+          clientId = clientId,
+          code = code,
+          redirectUri = redirectUri)
+        OpenIdConnectRequestCallbackProvider.callback.onSuccess()
+        finish()
+      }
+    } ?: {
+      OpenIdConnectRequestCallbackProvider.callback.onFailure()
+      finish()
     }
-    OpenIdConnectRequestCallbackProvider.callback.onSuccess()
-    finish()
   }
 }

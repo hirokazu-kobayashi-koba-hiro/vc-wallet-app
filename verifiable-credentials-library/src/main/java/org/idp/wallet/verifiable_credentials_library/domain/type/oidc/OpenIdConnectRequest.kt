@@ -3,7 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.domain.type.oidc
 import android.net.Uri
 
 data class OpenIdConnectRequest(
-    val url: String,
+    val issuer: String,
     val clientId: String,
     val scope: String,
     val redirectUri: String,
@@ -14,8 +14,8 @@ data class OpenIdConnectRequest(
     val codeChallengeMethod: CodeChallengeMethod? = null,
 ) {
 
-  fun authenticationRequestUri(): String {
-    val builder = Uri.parse(url).buildUpon()
+  fun queries(): String {
+    val builder = Uri.Builder()
     builder.appendQueryParameter("client_id", clientId)
     builder.appendQueryParameter("scope", scope)
     builder.appendQueryParameter("response_type", responseType)

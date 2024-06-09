@@ -33,13 +33,15 @@ class LauncherViewModel : ViewModel() {
       _loading.value = true
       val request =
           OpenIdConnectRequest(
-              url = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com/authorize",
+              issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
               clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
               scope = "openid profile phone email address",
               redirectUri =
                   "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
-      OpenIdConnectApi.connect(fragmentActivity, request)
-      successCallback()
+      val result = OpenIdConnectApi.connect(fragmentActivity, request)
+      if (result) {
+          successCallback()
+      }
     } finally {
       _loading.value = false
     }

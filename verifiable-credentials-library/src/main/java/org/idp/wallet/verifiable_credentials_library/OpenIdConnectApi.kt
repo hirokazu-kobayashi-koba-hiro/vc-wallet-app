@@ -8,13 +8,13 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConn
 import org.idp.wallet.verifiable_credentials_library.ui.OpenIdConnectActivity
 
 object OpenIdConnectApi {
-  suspend fun connect(context: Context, request: OpenIdConnectRequest) {
-    val authenticationRequestUri = request.authenticationRequestUri()
-    val requestResponse = request(context, authenticationRequestUri)
+  suspend fun connect(context: Context, request: OpenIdConnectRequest): Boolean {
+    return request(context, request)
   }
 
-  private suspend fun request(context: Context, authenticationRequestUri: String): Boolean =
+  private suspend fun request(context: Context, request: OpenIdConnectRequest): Boolean =
       suspendCoroutine { continuation ->
+        val queries = request.queries()
         val callback =
             object : OpenidConnectRequestCallback {
               override fun onSuccess() {
@@ -27,7 +27,10 @@ object OpenIdConnectApi {
             }
         OpenIdConnectRequestCallbackProvider.callback = callback
         val intent = Intent(context, OpenIdConnectActivity::class.java)
-        intent.putExtra("authenticationRequestUri", authenticationRequestUri)
+        intent.putExtra("issuer", request.issuer)
+        intent.putExtra("clientId", request.clientId)
+        intent.putExtra("redirectUri", request.redirectUri)
+        intent.putExtra("queries", queries)
         context.startActivity(intent)
       }
 }
