@@ -19,6 +19,7 @@ data class OpenIdConnectRequest(
     builder.appendQueryParameter("client_id", clientId)
     builder.appendQueryParameter("scope", scope)
     builder.appendQueryParameter("response_type", responseType)
+    builder.appendQueryParameter("redirect_uri", redirectUri)
     state?.let { builder.appendQueryParameter("state", it) }
     nonce?.let { builder.appendQueryParameter("nonce", it) }
     codeChallenge?.let { builder.appendQueryParameter("code_challenge", it) }

@@ -37,7 +37,7 @@ class LauncherViewModel : ViewModel() {
               clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
               scope = "openid profile phone email address",
               redirectUri =
-                  "demo://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
+                  "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
       OpenIdConnectApi.connect(fragmentActivity, request)
       successCallback()
     } finally {

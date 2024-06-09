@@ -27,8 +27,8 @@ class OpenIdConnectActivity : ComponentActivity() {
       registerForActivityResult(
           contract = ActivityResultContracts.StartActivityForResult(),
           callback = {
-            OpenIdConnectRequestCallbackProvider.callback.onFailure()
-            finish()
+//            OpenIdConnectRequestCallbackProvider.callback.onFailure()
+//            finish()
           })
 
   override fun onCreate(savedInstanceState: Bundle?) {

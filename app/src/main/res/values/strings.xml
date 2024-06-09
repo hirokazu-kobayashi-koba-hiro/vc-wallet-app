@@ -2,5 +2,5 @@
     <string name="app_name">VCWalletApp</string>
     <string name="com_vc_wallet_client_id">sKUsWLY5BCzdXAggk78km7kOjfQP1rWR</string>
     <string name="com_vc_wallet_domain">dev-l6ns7qgdx81yv2rs.us.auth0.com</string>
-    <string name="com_vc_wallet_scheme">demo</string>
+    <string name="com_vc_wallet_scheme">org.idp.verifiable.credentials</string>
 </resources>

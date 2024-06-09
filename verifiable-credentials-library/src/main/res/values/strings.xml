@@ -4,4 +4,7 @@
     <string name="title_activity_default_verifiable_credential_cocent">
         DefaultVerifiableCredentialCocentActivity
     </string>
+    <string name="com_vc_wallet_client_id">clientId</string>
+    <string name="com_vc_wallet_domain">domain</string>
+    <string name="com_vc_wallet_scheme">scheme</string>
 </resources>
