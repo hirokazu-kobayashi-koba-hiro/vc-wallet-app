@@ -38,10 +38,8 @@ class LauncherViewModel : ViewModel() {
               scope = "openid profile phone email address",
               redirectUri =
                   "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
-      val result = OpenIdConnectApi.connect(fragmentActivity, request)
-      if (result) {
-          successCallback()
-      }
+      val response = OpenIdConnectApi.login(fragmentActivity, request)
+      successCallback()
     } finally {
       _loading.value = false
     }

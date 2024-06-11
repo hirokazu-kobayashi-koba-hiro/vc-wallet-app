@@ -14,6 +14,10 @@ data class OpenIdConnectRequest(
     val codeChallengeMethod: CodeChallengeMethod? = null,
 ) {
 
+  fun isResponseTypeCode(): Boolean {
+    return responseType == "code"
+  }
+
   fun queries(): String {
     val builder = Uri.Builder()
     builder.appendQueryParameter("client_id", clientId)
