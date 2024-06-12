@@ -54,8 +54,6 @@ object JoseUtils {
     return filteredJwks.keys[0]
   }
 
-  private fun transformPublicKey() {}
-
   fun sign(
       header: Map<String, Any>,
       payload: Map<String, Any>,
@@ -129,6 +127,13 @@ class JwtObject(private val jwt: JWT) {
   fun valueAsStringFromPayload(key: String): String? {
     if (containsKey(key)) {
       return jwt.jwtClaimsSet.getStringClaim(key)
+    }
+    return null
+  }
+
+  fun valueAsLongFromPayload(key: String): Long? {
+    if (containsKey(key)) {
+      return jwt.jwtClaimsSet.getLongClaim(key)
     }
     return null
   }
