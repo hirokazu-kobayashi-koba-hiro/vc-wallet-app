@@ -6,7 +6,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseM
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.ResponseType
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationDefinition
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.jose.JwtObject
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
@@ -98,10 +98,10 @@ class AuthorizationRequestCreationService(
   private suspend fun getRequestObject(): JwtObject? {
     parameters.getRequestUri()?.let {
       val requestObjectResponse = HttpClient.getForJwt(it)
-      return JoseHandler.parse(requestObjectResponse)
+      return JoseUtils.parse(requestObjectResponse)
     }
     return parameters.getRequestObject()?.let {
-      return JoseHandler.parse(it)
+      return JoseUtils.parse(it)
     }
   }
 

@@ -32,6 +32,10 @@ data class OpenIdConnectRequest(
     }
     return builder.build().toString()
   }
+
+  fun containsOidcInScope(): Boolean {
+    return scope.contains("openid")
+  }
 }
 
 enum class CodeChallengeMethod {

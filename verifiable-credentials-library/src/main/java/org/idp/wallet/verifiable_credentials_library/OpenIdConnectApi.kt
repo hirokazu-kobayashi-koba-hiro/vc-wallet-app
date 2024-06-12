@@ -8,9 +8,11 @@ import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.error.OidcError
 import org.idp.wallet.verifiable_credentials_library.domain.error.OpenIdConnectException
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.AuthenticationResponseValidator
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.IdTokenValidator
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.AuthenticationResponse
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.JwksResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.UserinfoResponse
@@ -32,8 +34,14 @@ object OpenIdConnectApi {
     val tokenResponse =
         requestToken(
             oidcMetadata.tokenEndpoint, request.clientId, response.code(), request.redirectUri)
-    val userinfoResponse = getUserinfo(oidcMetadata.userinfoEndpoint, tokenResponse.accessToken)
-    return OpenIdConnectResponse(tokenResponse, userinfoResponse)
+    if (request.containsOidcInScope()) {
+      val jwkResponse = getJwks(oidcMetadata.jwksUri)
+      val idTokenValidator = IdTokenValidator(request, tokenResponse, jwkResponse)
+      idTokenValidator.validate()
+      val userinfoResponse = getUserinfo(oidcMetadata.userinfoEndpoint, tokenResponse.accessToken)
+      return OpenIdConnectResponse(tokenResponse, userinfoResponse)
+    }
+    return OpenIdConnectResponse(tokenResponse)
   }
 
   suspend fun getOidcMetadata(url: String): OidcMetadata {
@@ -56,6 +64,11 @@ object OpenIdConnectApi {
     val response = HttpClient.post(url, requestBody = request)
     val tokenResponse = JsonUtils.read(response.toString(), TokenResponse::class.java)
     return tokenResponse
+  }
+
+  suspend fun getJwks(url: String): JwksResponse {
+    val response = HttpClient.get(url)
+    return JwksResponse(response)
   }
 
   suspend fun getUserinfo(url: String, accessToken: String): UserinfoResponse {

@@ -2,7 +2,7 @@ package org.idp.wallet.verifiable_credentials_library.domain.configuration
 
 import org.idp.wallet.verifiable_credentials_library.domain.error.SettingError
 import org.idp.wallet.verifiable_credentials_library.domain.error.SettingInvalidException
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.util.resource.ResourceReader
 import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
@@ -15,7 +15,7 @@ class WalletConfigurationService(
 
   fun initialize() {
     if (!keyStore.contains(keyId)) {
-      val ecKey = JoseHandler.generateECKey(keyId)
+      val ecKey = JoseUtils.generateECKey(keyId)
       keyStore.store(keyId, ecKey)
     }
   }
@@ -26,7 +26,7 @@ class WalletConfigurationService(
       val walletConfiguration = JsonUtils.read(configurationValue, WalletConfiguration::class.java)
       val key = keyStore.find(keyId)
       key?.let {
-        val jwks = JoseHandler.transformJwksAsString(it)
+        val jwks = JoseUtils.transformJwksAsString(it)
         walletConfiguration.jwks = jwks
       }
       return walletConfiguration

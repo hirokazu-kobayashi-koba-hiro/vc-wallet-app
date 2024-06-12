@@ -5,5 +5,5 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.UserinfoRe
 
 class OpenIdConnectResponse(
     val tokenResponse: TokenResponse,
-    val userinfoResponse: UserinfoResponse?
+    val userinfoResponse: UserinfoResponse? = null
 ) {}

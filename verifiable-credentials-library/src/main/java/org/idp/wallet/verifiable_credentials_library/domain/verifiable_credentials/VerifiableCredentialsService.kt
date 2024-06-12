@@ -8,7 +8,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetada
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialResponse
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.json.JSONObject
 
@@ -26,7 +26,7 @@ class VerifiableCredentialsService(
         VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, fullPayload)
       }
       "jwt_vc_json" -> {
-        val jwt = JoseHandler.parse(rawVc)
+        val jwt = JoseUtils.parse(rawVc)
         val payload = jwt.payload()
         VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, payload)
       }

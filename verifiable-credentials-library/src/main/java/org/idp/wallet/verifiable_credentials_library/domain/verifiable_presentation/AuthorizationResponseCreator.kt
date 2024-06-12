@@ -4,7 +4,7 @@ import java.util.UUID
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationSubmission
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.PresentationSubmissionDescriptor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 
 class AuthorizationResponseCreator(
     private val verifiablePresentationRequestContext: VerifiablePresentationRequestContext,
@@ -61,6 +61,6 @@ class AuthorizationResponseCreator(
         listOf(
             "https://www.w3.org/ns/credentials/v2",
             "https://www.w3.org/ns/credentials/examples/v2"))
-    return JoseHandler.sign(header = header, payload = payload, jwks = jwks, keyId = keyId)
+    return JoseUtils.sign(header = header, payload = payload, jwks = jwks, keyId = keyId)
   }
 }

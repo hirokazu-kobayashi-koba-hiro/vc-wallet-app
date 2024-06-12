@@ -11,7 +11,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseHandler
+import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.resource.AssetsReader
 import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 
@@ -107,8 +107,8 @@ object VerifiableCredentialsClient {
             }
         """
             .trimIndent()
-    val signedValue = JoseHandler.sign(header, payloadValue, jwk)
-    val payload = JoseHandler.parse(signedValue).payload()
+    val signedValue = JoseUtils.sign(header, payloadValue, jwk)
+    val payload = JoseUtils.parse(signedValue).payload()
     val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
     registry.save("test", record)
   }

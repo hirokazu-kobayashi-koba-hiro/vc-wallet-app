@@ -4,11 +4,11 @@ import junit.framework.TestCase.assertTrue
 import org.junit.Assert
 import org.junit.Test
 
-class JoseHandlerTest {
+class JoseUtilsTest {
 
   @Test
   fun to_generate_ec_key() {
-    val ecKey = JoseHandler.generateECKey("123")
+    val ecKey = JoseUtils.generateECKey("123")
     println(ecKey)
     Assert.assertTrue(
         ecKey.contains(
@@ -36,7 +36,7 @@ class JoseHandlerTest {
             }
         """
             .trimIndent()
-    val signedValue = JoseHandler.sign(header, payload, jwk)
+    val signedValue = JoseUtils.sign(header, payload, jwk)
     assertTrue(signedValue.contains("."))
   }
 
@@ -156,7 +156,7 @@ class JoseHandlerTest {
             }
         """
             .trimIndent()
-    val signedValue = JoseHandler.sign(header, payload, jwk)
+    val signedValue = JoseUtils.sign(header, payload, jwk)
     println(signedValue)
     assertTrue(signedValue.contains("."))
   }
@@ -207,7 +207,7 @@ class JoseHandlerTest {
             }
         """
             .trimIndent()
-    val signedValue = JoseHandler.sign(header, payload, jwk)
+    val signedValue = JoseUtils.sign(header, payload, jwk)
     println(signedValue)
     assertTrue(signedValue.contains("."))
   }
