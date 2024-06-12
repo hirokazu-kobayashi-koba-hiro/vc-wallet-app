@@ -131,6 +131,13 @@ class JwtObject(private val jwt: JWT) {
     return null
   }
 
+  fun valueAsStringListFromPayload(key: String): List<Any>? {
+    if (containsKey(key)) {
+      return jwt.jwtClaimsSet.getListClaim(key)
+    }
+    return null
+  }
+
   fun valueAsLongFromPayload(key: String): Long? {
     if (containsKey(key)) {
       return jwt.jwtClaimsSet.getLongClaim(key)

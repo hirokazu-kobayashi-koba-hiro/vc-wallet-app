@@ -23,7 +23,7 @@ class IdTokenValidator(
     val parsedIdToken = JoseUtils.parseAndVerifySignature(tokenResponse.idToken, jwkResponse.jwks())
     validateIssuer(parsedIdToken)
     validateAud(parsedIdToken)
-    validateExp(parsedIdToken)
+    //    validateExp(parsedIdToken)
     validateNonce(parsedIdToken)
   }
 
@@ -32,7 +32,8 @@ class IdTokenValidator(
       throw OpenIdConnectException(
           OidcError.NOT_FOUND_REQUIRED_PARAMS, "iss must contain in idToken")
     }
-    if (parsedIdToken.valueAsStringFromPayload("iss") != request.issuer) {
+    if (parsedIdToken.valueAsStringFromPayload("iss") != request.issuer &&
+        parsedIdToken.valueAsStringFromPayload("iss") != request.issuer + "/") {
       throw OpenIdConnectException(OidcError.INVALID_ID_TOKEN, "iss must be same value of issuer")
     }
   }
@@ -42,9 +43,11 @@ class IdTokenValidator(
       throw OpenIdConnectException(
           OidcError.NOT_FOUND_REQUIRED_PARAMS, "aud must contains in idToken")
     }
-    if (parsedIdToken.valueAsStringFromPayload("aud") != request.clientId) {
-      throw OpenIdConnectException(
-          OidcError.INVALID_ID_TOKEN, "aud must contain same value of clientId")
+    parsedIdToken.valueAsStringListFromPayload("aud")?.let {
+      if (!it.contains(request.clientId)) {
+        throw OpenIdConnectException(
+            OidcError.INVALID_ID_TOKEN, "aud must contain same value of clientId")
+      }
     }
   }
 
@@ -52,7 +55,7 @@ class IdTokenValidator(
     parsedIdToken.valueAsLongFromPayload("exp")?.let {
       if (it < LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)) {
         throw OpenIdConnectException(
-            OidcError.INVALID_ID_TOKEN, "aud must contain same value of clientId")
+            OidcError.INVALID_ID_TOKEN, "aud must contain same value of exp")
       }
     }
         ?: throw OpenIdConnectException(

@@ -10,6 +10,11 @@ import org.idp.wallet.verifiable_credentials_library.domain.error.OpenIdConnectE
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.AuthenticationResponseValidator
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.IdTokenValidator
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.TokenDirection
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.TokenDirector
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.TokenRecord
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.TokenRegistry
+import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenRequest
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.AuthenticationResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.JwksResponse
@@ -21,27 +26,73 @@ import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 object OpenIdConnectApi {
+
+  private val tokenRegistry = TokenRegistry()
+
   suspend fun login(
       context: Context,
       request: OpenIdConnectRequest,
       force: Boolean = false
   ): OpenIdConnectResponse {
+    val tokenRecord = tokenRegistry.find(request.scope)
+    val tokenDirector = TokenDirector(force, tokenRecord, 3600)
+    val direction = tokenDirector.direct()
     val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
-    val authenticationRequestUri = "${oidcMetadata.authorizationEndpoint}${request.queries()}"
-    val response = request(context, authenticationRequestUri)
-    val authenticationResponseValidator = AuthenticationResponseValidator(request, response)
-    authenticationResponseValidator.validate()
-    val tokenResponse =
-        requestToken(
-            oidcMetadata.tokenEndpoint, request.clientId, response.code(), request.redirectUri)
-    if (request.containsOidcInScope()) {
-      val jwkResponse = getJwks(oidcMetadata.jwksUri)
-      val idTokenValidator = IdTokenValidator(request, tokenResponse, jwkResponse)
-      idTokenValidator.validate()
-      val userinfoResponse = getUserinfo(oidcMetadata.userinfoEndpoint, tokenResponse.accessToken)
-      return OpenIdConnectResponse(tokenResponse, userinfoResponse)
+    when (direction) {
+      TokenDirection.CACHE -> {
+        tokenRecord?.let {
+          if (request.containsOidcInScope()) {
+            val userinfoResponse =
+                getUserinfo(oidcMetadata.userinfoEndpoint, it.tokenResponse.accessToken)
+            return OpenIdConnectResponse(it.tokenResponse, userinfoResponse)
+          }
+          return OpenIdConnectResponse(it.tokenResponse)
+        }
+      }
+      TokenDirection.ISSUE -> {
+        val authenticationRequestUri = "${oidcMetadata.authorizationEndpoint}${request.queries()}"
+        val response = request(context, authenticationRequestUri)
+        val authenticationResponseValidator = AuthenticationResponseValidator(request, response)
+        authenticationResponseValidator.validate()
+        val tokenRequest =
+            TokenRequest(
+                clientId = request.clientId,
+                grantType = "authorization_code",
+                code = response.code(),
+                redirectUri = request.redirectUri,
+            )
+        val tokenResponse = requestToken(oidcMetadata.tokenEndpoint, tokenRequest)
+        tokenRegistry.add(request.scope, TokenRecord(tokenResponse, 3600))
+        if (request.containsOidcInScope()) {
+          val jwkResponse = getJwks(oidcMetadata.jwksUri)
+          val idTokenValidator = IdTokenValidator(request, tokenResponse, jwkResponse)
+          idTokenValidator.validate()
+          val userinfoResponse =
+              getUserinfo(oidcMetadata.userinfoEndpoint, tokenResponse.accessToken)
+          return OpenIdConnectResponse(tokenResponse, userinfoResponse)
+        }
+        return OpenIdConnectResponse(tokenResponse)
+      }
+      TokenDirection.REFRESH -> {
+        tokenRecord?.let {
+          val tokenRequest =
+              TokenRequest(
+                  clientId = request.clientId,
+                  grantType = "refresh_token",
+                  refreshToken = it.tokenResponse.refreshToken)
+          val tokenResponse = requestToken(oidcMetadata.tokenEndpoint, tokenRequest)
+          val refreshedTokenRecord = it.refresh(tokenResponse)
+          tokenRegistry.add(request.scope, refreshedTokenRecord)
+          if (request.containsOidcInScope()) {
+            val userinfoResponse =
+                getUserinfo(oidcMetadata.userinfoEndpoint, tokenResponse.accessToken)
+            return OpenIdConnectResponse(tokenResponse, userinfoResponse)
+          }
+          return OpenIdConnectResponse(tokenResponse)
+        }
+      }
     }
-    return OpenIdConnectResponse(tokenResponse)
+    throw RuntimeException("unexpected error on login")
   }
 
   suspend fun getOidcMetadata(url: String): OidcMetadata {
@@ -49,19 +100,8 @@ object OpenIdConnectApi {
     return JsonUtils.read(response.toString(), OidcMetadata::class.java)
   }
 
-  suspend fun requestToken(
-      url: String,
-      clientId: String,
-      code: String,
-      redirectUri: String
-  ): TokenResponse {
-    val request =
-        mapOf(
-            "client_id" to clientId,
-            "code" to code,
-            "redirect_uri" to redirectUri,
-            "grant_type" to "authorization_code")
-    val response = HttpClient.post(url, requestBody = request)
+  suspend fun requestToken(url: String, request: TokenRequest): TokenResponse {
+    val response = HttpClient.post(url, requestBody = request.values())
     val tokenResponse = JsonUtils.read(response.toString(), TokenResponse::class.java)
     return tokenResponse
   }

@@ -2,6 +2,7 @@ package org.idp.wallet.app
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.OpenIdConnectApi
@@ -36,9 +37,11 @@ class LauncherViewModel : ViewModel() {
               issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
               clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
               scope = "openid profile phone email address",
+              state = UUID.randomUUID().toString(),
+              nonce = UUID.randomUUID().toString(),
               redirectUri =
                   "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
-      val response = OpenIdConnectApi.login(fragmentActivity, request)
+      val response = OpenIdConnectApi.login(fragmentActivity, request, force = false)
       successCallback()
     } finally {
       _loading.value = false

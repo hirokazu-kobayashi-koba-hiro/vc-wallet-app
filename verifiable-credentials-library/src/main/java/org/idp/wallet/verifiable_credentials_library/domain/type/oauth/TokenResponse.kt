@@ -4,7 +4,7 @@ data class TokenResponse(
     val accessToken: String,
     val refreshToken: String?,
     val idToken: String?,
-    val expiresIn: Int,
+    val expiresIn: Long,
     val scope: String?,
     val cNonce: String?
 )
