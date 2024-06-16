@@ -61,6 +61,10 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
+    //web3
+    implementation("org.web3j:core:4.10.2")
+    implementation("org.web3j:crypto:5.0.0")
+
     //compose
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation(platform("androidx.compose:compose-bom:2024.05.00"))
