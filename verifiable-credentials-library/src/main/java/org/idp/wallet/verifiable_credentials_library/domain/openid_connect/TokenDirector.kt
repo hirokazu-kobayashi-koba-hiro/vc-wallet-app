@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 class TokenDirector(
     private val force: Boolean,
     private val tokenRecord: TokenRecord?,
-    private val refreshTokenDuration: Int = 3600
 ) {
 
   fun direct(): TokenDirection {
@@ -16,8 +15,10 @@ class TokenDirector(
     if (!tokenRecord.isExpiredAccessToken(now)) {
       return TokenDirection.CACHE
     }
-    if (tokenRecord.isExpiredAccessToken(now) && !tokenRecord.isExpiredRefreshToken(now)) {
-      return TokenDirection.REFRESH
+    tokenRecord.tokenResponse.refreshToken?.let {
+      if (tokenRecord.isExpiredAccessToken(now) && !tokenRecord.isExpiredRefreshToken(now)) {
+        return TokenDirection.REFRESH
+      }
     }
     return TokenDirection.ISSUE
   }

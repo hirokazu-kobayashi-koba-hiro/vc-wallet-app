@@ -35,7 +35,7 @@ object OpenIdConnectApi {
       force: Boolean = false
   ): OpenIdConnectResponse {
     val tokenRecord = tokenRegistry.find(request.scope)
-    val tokenDirector = TokenDirector(force, tokenRecord, 3600)
+    val tokenDirector = TokenDirector(force, tokenRecord)
     val direction = tokenDirector.direct()
     val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
     when (direction) {

@@ -36,7 +36,7 @@ class LauncherViewModel : ViewModel() {
           OpenIdConnectRequest(
               issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
               clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
-              scope = "openid profile phone email address",
+              scope = "openid profile phone email address offline_access",
               state = UUID.randomUUID().toString(),
               nonce = UUID.randomUUID().toString(),
               redirectUri =
