@@ -15,7 +15,7 @@ class AuthorizationResponseCallbackService(
 
   suspend fun callback() {
     if (authorizationContext.isDirectPost()) {
-      Log.d("Vc library", "response mode is direct post")
+      Log.d("VcWalletLibrary", "response mode is direct post")
       val response = post()
       val redirectUri = response.optString("redirect_uri", "")
       val responseCode = response.optString("response_code", "")

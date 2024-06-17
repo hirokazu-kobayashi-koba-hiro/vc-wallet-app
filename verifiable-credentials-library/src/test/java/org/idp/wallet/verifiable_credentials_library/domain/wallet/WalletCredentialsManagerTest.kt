@@ -1,6 +1,5 @@
-package org.idp.wallet.verifiable_credentials_library.util.web3
+package org.idp.wallet.verifiable_credentials_library.domain.wallet
 
-import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test

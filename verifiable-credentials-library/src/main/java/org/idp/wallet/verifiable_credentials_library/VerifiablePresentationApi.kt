@@ -27,7 +27,7 @@ class VerifiablePresentationApi(
       interactor: VerifiablePresentationInteractor
   ): Result<Unit> {
     try {
-      Log.d("Vc library", "handleVpRequest")
+      Log.d("VcWalletLibrary", "handleVpRequest")
       val verifiablePresentationRequestContext =
           verifiablePresentationRequestContextService.create(url)
       val records = registry.getAllAsCollection()

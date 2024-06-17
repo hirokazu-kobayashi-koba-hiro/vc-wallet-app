@@ -193,7 +193,7 @@ fun HomeScreen(
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
           items(cardList) { (issuer, content) ->
             VcCardComponent(title = issuer, content = content)
-            Log.d("Vc library app", issuer)
+            Log.d("VcWalletLibrary", issuer)
           }
         }
       }

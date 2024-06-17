@@ -47,7 +47,7 @@ class OpenIdConnectActivity : ComponentActivity() {
     data?.let {
       lifecycleScope.launch {
         val params = extractQueriesAsSingleStringMap(it)
-        Log.d("OpenIdConnectActivity", it.toString())
+        Log.d("VcWalletLibrary", it.toString())
         OpenIdConnectRequestCallbackProvider.callback.onSuccess(AuthenticationResponse(params))
         finish()
       }

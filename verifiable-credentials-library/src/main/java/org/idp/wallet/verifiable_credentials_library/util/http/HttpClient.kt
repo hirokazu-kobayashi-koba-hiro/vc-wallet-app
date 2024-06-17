@@ -107,18 +107,18 @@ object ResponseResolver {
     when (val status = connection.responseCode) {
       in (200..299) -> {
         val message = connection.inputStream.bufferedReader().use { it.readText() }
-        Log.d("Vc library", message)
+        Log.d("VcWalletLibrary", message)
         return message
       }
       in (400..499) -> {
         val message = connection.errorStream.bufferedReader().use { it.readText() }
-        Log.d("Vc library", message)
+        Log.d("VcWalletLibrary", message)
         throw NetworkException(
             "0001", "network client error statusCode: $status, response: $message")
       }
       in (500..599) -> {
         val message = connection.errorStream.bufferedReader().use { it.readText() }
-        Log.d("Vc library", message)
+        Log.d("VcWalletLibrary", message)
         throw NetworkException(
             "0002", "network server error statusCode: $status, response: $message")
       }
