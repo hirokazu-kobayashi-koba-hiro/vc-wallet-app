@@ -2,7 +2,10 @@ package org.idp.wallet.verifiable_credentials_library.domain.blockchain
 
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class Web3ClientTest {
   val url = System.getenv("WEB3_URL") ?: ""
   val address = System.getenv("ADDRESS") ?: ""

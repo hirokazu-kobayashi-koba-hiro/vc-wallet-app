@@ -28,8 +28,8 @@ object Web3Client {
     val transaction = createTransaction(address, data, chain)
     val signedTransaction = signTransaction(transaction, privateKey)
     val transactionHash = sendSignedTransaction(signedTransaction)
-    val transactionResult = getTransaction(transactionHash)
-    return transactionResult.transactionHash
+    //    val transactionResult = getTransaction(transactionHash)
+    return transactionHash
   }
 
   fun getBalance(address: String): BigInteger {
@@ -41,12 +41,11 @@ object Web3Client {
   fun sendSignedTransaction(signedTransaction: String): String {
     for (index in 0 until 10) {
       try {
-        val hexRawTransaction = Numeric.toHexString(signedTransaction.toByteArray())
-        Log.d("VcWalletLibrary", "hexRawTransaction: $hexRawTransaction")
-        val sendResult = web3.ethSendRawTransaction(hexRawTransaction).send()
+        println("VcWalletLibrary hexRawTransaction: $signedTransaction")
+        val sendResult = web3.ethSendRawTransaction(signedTransaction).send()
         Log.d("VcWalletLibrary", "success sendSignedTransaction")
         if (sendResult.hasError()) {
-          Log.d("VcWalletLibrary", "sendSignedTransaction is error, ${sendResult.error.message}")
+          println("VcWalletLibrary sendSignedTransaction is error, ${sendResult.error.message}")
           continue
         }
         return sendResult.transactionHash
@@ -91,9 +90,14 @@ object Web3Client {
   }
 
   fun getTransaction(transactionHash: String): TransactionReceipt {
-    return web3.ethGetTransactionReceipt(transactionHash).send().transactionReceipt.orElseThrow {
-      RuntimeException("Transaction receipt not found")
+    for (index in 0 until 10) {
+      val result = web3.ethGetTransactionReceipt(transactionHash).send().transactionReceipt
+      if (result.isPresent) {
+        return result.get()
+      }
+      continue
     }
+    throw RuntimeException("Transaction receipt not found: $transactionHash")
   }
 
   fun toChainId(chainValue: String): Int {
