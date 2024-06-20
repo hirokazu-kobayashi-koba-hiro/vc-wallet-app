@@ -61,27 +61,37 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
-    //web3
+    //blockchain
+    ////web3
     implementation("org.web3j:core:4.10.2")
     implementation("org.web3j:crypto:5.0.0")
+    ////jsonld
+    implementation("com.github.jsonld-java:jsonld-java:0.13.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    ////MerkleTree
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.13.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    ////Base58
+    implementation("com.github.multiformats:java-multibase:v1.1.1")
 
     //compose
     implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2024.05.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.material:material:1.6.8")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0-beta02")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0-beta03")
 
     //state
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
     //JSON
     implementation("com.beust:klaxon:5.6")
@@ -93,9 +103,9 @@ dependencies {
     //jose
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
-    implementation(platform("androidx.compose:compose-bom:2024.05.00"))
-    implementation(platform("androidx.compose:compose-bom:2024.05.00"))
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
 
     //QR
     implementation("com.google.zxing:core:3.4.0")
@@ -111,9 +121,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
