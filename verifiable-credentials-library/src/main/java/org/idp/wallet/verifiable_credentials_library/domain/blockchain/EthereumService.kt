@@ -3,7 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.domain.blockchain
 import android.util.Log
 import java.math.BigInteger
 
-object Web3Service {
+object EthereumService {
 
   private lateinit var web3: Web3Wrapper
 

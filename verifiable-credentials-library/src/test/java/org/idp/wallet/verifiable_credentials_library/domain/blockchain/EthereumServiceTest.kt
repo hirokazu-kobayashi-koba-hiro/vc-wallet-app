@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class Web3ServiceTest {
+class EthereumServiceTest {
   val url = System.getenv("WEB3_URL") ?: ""
   val address = System.getenv("ADDRESS") ?: ""
   val privateKey = System.getenv("PRIVATE_KEY") ?: ""
@@ -18,7 +18,7 @@ class Web3ServiceTest {
 
   @Before
   fun init() {
-    Web3Service.init(url)
+    EthereumService.init(url)
   }
 
   @Test
@@ -44,7 +44,7 @@ class Web3ServiceTest {
     val blockchainData = merkleTreeGenerator.getBlockchainData()
     println(blockchainData)
     val transactionId =
-        Web3Service.issueTransaction(address, privateKey, chain, blockchainData.toString())
+        EthereumService.issueTransaction(address, privateKey, chain, blockchainData.toString())
     val proof = merkleTreeGenerator.generateProof(transactionId, verificationMethod, chain)
     //     println(Decoder(proof["proofValue"].toString()).decode())
     println(JsonUtils.write(proof))
