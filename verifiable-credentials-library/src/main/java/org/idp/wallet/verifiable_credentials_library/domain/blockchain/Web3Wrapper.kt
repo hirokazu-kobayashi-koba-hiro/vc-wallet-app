@@ -11,26 +11,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.utils.Numeric
 
-object Web3Client {
+class Web3Wrapper(url: String) {
 
-  private lateinit var web3: Web3j
-
-  fun init(url: String) {
-    web3 = Web3j.build(HttpService(url))
-  }
-
-  fun issueTransaction(address: String, privateKey: String, chain: String, data: String): String {
-    val balance = getBalance(address)
-    if (balance < BigInteger.valueOf(20000000)) {
-      Log.w("VcWalletLibrary", "balance is less than 20000000")
-      throw RuntimeException("balance is less than gas price")
-    }
-    val transaction = createTransaction(address, data, chain)
-    val signedTransaction = signTransaction(transaction, privateKey)
-    val transactionHash = sendSignedTransaction(signedTransaction)
-    //    val transactionResult = getTransaction(transactionHash)
-    return transactionHash
-  }
+  private val web3 = Web3j.build(HttpService(url))
 
   fun getBalance(address: String): BigInteger {
     val balance = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().balance
@@ -38,8 +21,8 @@ object Web3Client {
     return balance
   }
 
-  fun sendSignedTransaction(signedTransaction: String): String {
-    for (index in 0 until 10) {
+  fun sendSignedTransaction(signedTransaction: String, retryCount: Int = 10): String {
+    for (index in 0 until retryCount) {
       try {
         println("VcWalletLibrary hexRawTransaction: $signedTransaction")
         val sendResult = web3.ethSendRawTransaction(signedTransaction).send()
@@ -64,9 +47,13 @@ object Web3Client {
     return signedTransaction
   }
 
-  fun createTransaction(address: String, data: String, chain: String): RawTransaction {
-    val nonce = getNonceByTransactionCount(address)
-    val toAddress = "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead"
+  fun createTransaction(
+      fromAddress: String,
+      toAddress: String,
+      data: String,
+      chain: String
+  ): RawTransaction {
+    val nonce = getLatestTransactionCount(fromAddress)
     val transaction =
         RawTransaction.createTransaction(
             nonce,
@@ -74,12 +61,14 @@ object Web3Client {
             BigInteger.valueOf(25000),
             toAddress,
             BigInteger.ZERO,
-            data)
+            data,
+            BigInteger.ZERO,
+            BigInteger.ZERO)
     println(transaction)
     return transaction
   }
 
-  fun getNonceByTransactionCount(address: String): BigInteger {
+  fun getLatestTransactionCount(address: String): BigInteger {
     val nonce =
         web3
             .ethGetTransactionCount(address, DefaultBlockParameterName.LATEST)
@@ -89,18 +78,15 @@ object Web3Client {
     return nonce
   }
 
-  fun getTransaction(transactionHash: String): TransactionReceipt {
-    for (index in 0 until 10) {
-      val result = web3.ethGetTransactionReceipt(transactionHash).send().transactionReceipt
-      if (result.isPresent) {
-        return result.get()
-      }
-      continue
+  fun getTransaction(transactionHash: String): TransactionReceipt? {
+    val response = web3.ethGetTransactionReceipt(transactionHash).send().transactionReceipt
+    if (response.isPresent) {
+      return response.get()
     }
-    throw RuntimeException("Transaction receipt not found: $transactionHash")
+    return null
   }
 
-  fun toChainId(chainValue: String): Int {
+  private fun toChainId(chainValue: String): Int {
     return when (chainValue) {
       "ethereum_mainnet" -> 1
       "ethereum_ropsten" -> 3

@@ -7,7 +7,6 @@ import java.security.MessageDigest
 import java.util.Date
 import kotlin.jvm.Throws
 import org.bouncycastle.util.encoders.Hex
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class MerkleTreeGenerator(normalizedData: String) {
   private val tree = MerkleTree()
@@ -58,7 +57,6 @@ class MerkleTreeGenerator(normalizedData: String) {
             "proofPurpose" to "assertionMethod",
             "verificationMethod" to verificationMethod)
 
-    println("merkleProof: ${JsonUtils.write(merkleProof)}")
     return merkleProof
   }
 
@@ -204,5 +202,90 @@ class Encoder(private val json: Map<String, Any>) {
       i += 2
     }
     return data
+  }
+}
+
+class Decoder(private val base58: String) {
+  init {
+    if (!isValidBase58(base58)) {
+      throw IllegalArgumentException("Base58 string is invalid. Cannot construct Decoder.")
+    }
+  }
+
+  private fun isValidBase58(base58: String): Boolean {
+    return try {
+      Multibase.decode(base58)
+      true
+    } catch (e: Exception) {
+      false
+    }
+  }
+
+  private fun constructRootJSON(decoded: List<List<Any>>): Map<String, Any> {
+    val rootKeymap = Keymap.root.entries.associate { (k, v) -> v to k }
+
+    return decoded.fold(mutableMapOf()) { acc, value ->
+      val key = rootKeymap[value[0] as Int]
+      var value = value[1]
+
+      if (value is List<*>) {
+        when (key) {
+          "anchors" -> value = constructAnchorsJSON(value as List<List<Any>>)
+          "path" -> value = constructPathJSON(value as List<List<Any>>)
+        }
+      }
+
+      if (value is ByteArray) {
+        value = decodeCbor(value).toString()
+      }
+
+      if (key != null) {
+        acc[key] = value
+      }
+      acc
+    }
+  }
+
+  private fun constructAnchorsJSON(anchors: List<List<Any>>): List<String> {
+    val chainKeymap = Keymap.chain.entries.associate { (k, v) -> v.id to k }
+
+    return anchors.map { anchor ->
+      anchor.fold("blink") { acc, value ->
+        when (value) {
+          0 -> "$acc:${chainKeymap[value as Int]}"
+          1 -> {
+            val chain = acc.split(":").last()
+            val networkKeymap =
+                Keymap.chain[chain]!!.networks.entries.associate { (k, v) -> v to k }
+            "$acc:${networkKeymap[value as Int]}"
+          }
+          else -> "$acc:${decodeCbor(value as ByteArray)}"
+        }
+      }
+    }
+  }
+
+  private fun constructPathJSON(path: List<List<Any>>): List<Map<String, String>> {
+    val pathKeymap = Keymap.path.entries.associate { (k, v) -> v to k }
+
+    return path.map { item ->
+      val key = pathKeymap[item[0] as Int].toString()
+      val value = decodeCbor(item[1] as ByteArray).toString()
+      mapOf(key to value)
+    }
+  }
+
+  @Throws(Exception::class)
+  fun decode(): Map<String, Any> {
+    val encoded = Multibase.decode(base58)
+    val map = decodeCbor(encoded) as List<List<Any>>
+    return constructRootJSON(map)
+  }
+
+  private fun decodeCbor(data: ByteArray): Any {
+    val cborFactory = CBORFactory()
+    val objectMapper = ObjectMapper(cborFactory)
+    val result = objectMapper.readValue(data, Any::class.java)
+    return result
   }
 }

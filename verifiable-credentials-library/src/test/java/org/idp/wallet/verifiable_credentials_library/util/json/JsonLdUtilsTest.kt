@@ -11,6 +11,9 @@ class JsonLdUtilsTest {
             {
               "issuer": "did:web:assets.dev.trustid.sbi-fc.com",
               "issuanceDate": "2024-01-03T21:57:00Z",
+              "@context": [
+                  "https://www.w3.org/ns/credentials/v2"
+                ],
               "type": [
                 "VerifiableCredential"
               ],

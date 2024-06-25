@@ -14,7 +14,7 @@ class AuthorizationRequest(
     val responseMode: ResponseMode? = null,
     val nonce: String? = null,
     val requestObject: String? = null,
-    val requestUri: String? = null,
+    var requestUri: String? = null,
     val presentationDefinition: PresentationDefinition,
     val presentationDefinitionUri: String? = null
 ) {
