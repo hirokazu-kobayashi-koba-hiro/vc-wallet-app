@@ -2,6 +2,9 @@ package org.idp.wallet.verifiable_credentials_library.domain.blockchain
 
 import android.util.Log
 import java.math.BigInteger
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import org.web3j.protocol.core.methods.response.TransactionReceipt
 
 object EthereumService {
 
@@ -23,5 +26,24 @@ object EthereumService {
     val signedTransaction = web3.signTransaction(transaction, privateKey)
     val transactionHash = web3.sendSignedTransaction(signedTransaction)
     return transactionHash
+  }
+
+  fun getTransaction(
+      transactionHash: String,
+      retryCount: Int = 5,
+      interval: Long = 2000
+  ): TransactionReceipt? {
+    for (index in 0 until retryCount) {
+      val transaction = web3.getTransaction(transactionHash)
+      transaction?.let {
+        return it
+      }
+      delayWithRunBlocking(interval)
+    }
+    return null
+  }
+
+  private fun delayWithRunBlocking(sec: Long) {
+    runBlocking { delay(sec) }
   }
 }
