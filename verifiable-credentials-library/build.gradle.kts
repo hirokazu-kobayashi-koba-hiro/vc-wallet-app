@@ -56,7 +56,6 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.compose.material3:material3")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.activity:activity-ktx:1.9.0")
@@ -65,8 +64,11 @@ dependencies {
     ////web3
     implementation("org.web3j:core:4.10.2")
     implementation("org.web3j:crypto:5.0.0")
+
     ////jsonld
-    implementation("com.github.jsonld-java:jsonld-java:0.13.5")
+//    implementation("com.github.jsonld-java:jsonld-java:0.13.5") {
+//        exclude(group = "commons-codec", module = "commons-codec")
+//    }
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     ////MerkleTree
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.13.1")
@@ -95,7 +97,6 @@ dependencies {
 
     //JSON
     implementation("com.beust:klaxon:5.6")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     //JSONPath refer to https://identity.foundation/presentation-exchange/spec/v2.0.0/#jsonpath-implementations
     implementation("com.nfeld.jsonpathkt:jsonpathkt:2.0.1")
@@ -104,8 +105,6 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
 
     //QR
     implementation("com.google.zxing:core:3.4.0")
@@ -123,7 +122,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

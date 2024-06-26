@@ -1,6 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.util.json
 
-import com.github.jsonldjava.utils.JsonUtils
+// import com.github.jsonldjava.utils.JsonUtils
 import com.nimbusds.jose.shaded.gson.FieldNamingPolicy
 import com.nimbusds.jose.shaded.gson.Gson
 import com.nimbusds.jose.shaded.gson.GsonBuilder
@@ -22,7 +22,7 @@ object JsonUtils {
     return gson.fromJson(value, type)
   }
 
-  fun toPrettyString(data: Any): String {
-    return JsonUtils.toPrettyString(data)
-  }
+  //  fun toPrettyString(data: Any): String {
+  //    return JsonUtils.toPrettyString(data)
+  //  }
 }
