@@ -6,8 +6,8 @@ import org.web3j.crypto.WalletUtils
 
 object WalletCredentialsManager {
 
-  fun create(password: String): WalletCredentials {
-    val bip39Wallet = WalletUtils.generateBip39Wallet(password, File("./"))
+  fun create(password: String, file: File): WalletCredentials {
+    val bip39Wallet = WalletUtils.generateBip39Wallet(password, file)
     val mnemonic = bip39Wallet.mnemonic
     val credentials = WalletUtils.loadBip39Credentials(password, mnemonic)
 
