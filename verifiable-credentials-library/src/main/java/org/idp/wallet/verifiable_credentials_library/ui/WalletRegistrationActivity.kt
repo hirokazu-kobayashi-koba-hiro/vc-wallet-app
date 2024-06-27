@@ -47,10 +47,11 @@ class WalletRegistrationActivity : ComponentActivity() {
     setContent {
       val filesDir = this.filesDir
       WalletRegistrationView(
-          onClick = { password ->
+          goNext = { password ->
             val walletCredentials = WalletCredentialsManager.create(password, filesDir)
             println(walletCredentials)
-          })
+          },
+      )
     }
   }
 }
@@ -58,12 +59,12 @@ class WalletRegistrationActivity : ComponentActivity() {
 @Preview
 @Composable
 fun WalletRegistrationPreView() {
-  WalletRegistrationView(onClick = { password -> })
+  WalletRegistrationView(goNext = {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletRegistrationView(onClick: (password: String) -> Unit) {
+fun WalletRegistrationView(goNext: (password: String) -> Unit) {
   var username by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
   var passwordVisible by remember { mutableStateOf(false) }
@@ -98,7 +99,6 @@ fun WalletRegistrationView(onClick: (password: String) -> Unit) {
               horizontalAlignment = Alignment.CenterHorizontally,
               content = {
                 Text(text = "Create Account", style = MaterialTheme.typography.displayMedium)
-                Text(text = "description", style = MaterialTheme.typography.bodyMedium)
                 OutlinedTextField(
                     label = { Text(text = "username") },
                     value = username,
@@ -120,7 +120,7 @@ fun WalletRegistrationView(onClick: (password: String) -> Unit) {
                       }
                     },
                 )
-                Button(content = { Text(text = "next") }, onClick = { onClick(password) })
+                Button(content = { Text(text = "next") }, onClick = { goNext(password) })
               })
         },
     )
