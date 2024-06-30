@@ -31,14 +31,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentials
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
-import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
+import org.web3j.crypto.Bip39Wallet
+import org.web3j.crypto.Credentials
+
+@Preview
+@Composable
+fun WalletRegistrationPreView() {
+  WalletRegistrationView(
+      createCredential = { password: String ->
+        return@WalletRegistrationView WalletCredentials(
+            credentials = Credentials.create(""), bip39Wallet = Bip39Wallet("", ""))
+      },
+      goNext = {})
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletRegistrationView(
-    viewModel: VerifiableCredentialsViewModel,
+    createCredential: (password: String) -> WalletCredentials,
     goNext: (seed: String) -> Unit
 ) {
   var username by remember { mutableStateOf("") }
@@ -73,6 +87,7 @@ fun WalletRegistrationView(
                           start = Dp(20.0F),
                           end = Dp(20.0F)),
               horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.spacedBy(Dp(20.0F)),
               content = {
                 Text(text = "Create Account", style = MaterialTheme.typography.displayMedium)
                 OutlinedTextField(
@@ -99,7 +114,7 @@ fun WalletRegistrationView(
                 Button(
                     content = { Text(text = "next") },
                     onClick = {
-                      val walletCredentials = viewModel.createCredential(password)
+                      val walletCredentials = createCredential(password)
                       goNext(walletCredentials.bip39Wallet.mnemonic)
                     })
               })

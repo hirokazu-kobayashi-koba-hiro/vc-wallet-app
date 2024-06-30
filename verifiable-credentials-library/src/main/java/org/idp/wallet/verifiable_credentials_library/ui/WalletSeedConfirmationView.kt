@@ -21,8 +21,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
+
+@Preview
+@Composable
+fun WalletSeedConfirmationPreviewView() {
+  WalletSeedConfirmationView("seed test registration car bug transaction", {})
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +63,7 @@ fun WalletSeedConfirmationView(seed: String, goNext: () -> Unit) {
                           start = Dp(20.0F),
                           end = Dp(20.0F)),
               horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.spacedBy(Dp(20.0F)),
               content = {
                 Text(text = "Confirm Seed", style = MaterialTheme.typography.displayMedium)
                 Text(text = seed, style = MaterialTheme.typography.displaySmall)

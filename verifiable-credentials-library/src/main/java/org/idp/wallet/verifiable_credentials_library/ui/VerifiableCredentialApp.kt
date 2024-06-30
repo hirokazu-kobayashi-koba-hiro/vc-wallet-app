@@ -31,7 +31,9 @@ fun VerifiableCredentialsApp(
         "wallet-registration",
         content = {
           WalletRegistrationView(
-              viewModel = viewModel,
+              createCredential = { password: String ->
+                return@WalletRegistrationView viewModel.createCredential(password)
+              },
               goNext = { seed -> navController.navigate("wallet-seed-confirmation?seed=$seed") })
         })
     composable(
