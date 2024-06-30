@@ -1,37 +1,34 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
-import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
-
 @Composable
 fun VerifiableCredentialsApp(
-    context: Context,
+    context: ComponentActivity,
     viewModel: VerifiableCredentialsViewModel,
     resolveQrCode: (qr: String) -> Unit,
 ) {
-    val navController = rememberNavController()
+  val navController = rememberNavController()
+  viewModel.filesDir = context.filesDir
 
-    NavHost(navController = navController, startDestination = "registration") {
-        composable("registration", content = {
-            WalletRegistrationView(goNext = { password ->
-                viewModel.createKeyPair(password, context.filesDir)
-                navController.navigate("main")
-            })
+  NavHost(navController = navController, startDestination = "registration") {
+    composable(
+        "registration",
+        content = {
+          WalletRegistrationView(viewModel = viewModel, goNext = { navController.navigate("main") })
         })
-        composable("main", content = {
-            MainView(
-                viewModel = viewModel,
-                resolveQrCode = {
-                  resolveQrCode(it)
-                },
-                refreshVc = {
-                    viewModel.getAllCredentials()
-            })
+    composable(
+        "main",
+        content = {
+          MainView(
+              viewModel = viewModel,
+              resolveQrCode = { resolveQrCode(it) },
+              refreshVc = { viewModel.getAllCredentials() })
         })
-    }
+  }
 }

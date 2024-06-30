@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.client.android.Intents
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.DefaultVerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
 import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
 class VerifiableCredentialsActivity : ComponentActivity() {
@@ -23,7 +25,15 @@ class VerifiableCredentialsActivity : ComponentActivity() {
   var format: String = ""
 
   private val viewModel: VerifiableCredentialsViewModel by lazy {
-    ViewModelProvider(this).get(VerifiableCredentialsViewModel::class.java)
+    val factory =
+        object : ViewModelProvider.Factory {
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return VerifiableCredentialsViewModel(
+                EncryptedDataStore(this@VerifiableCredentialsActivity))
+                as T
+          }
+        }
+    ViewModelProvider(this, factory).get(VerifiableCredentialsViewModel::class.java)
   }
 
   private val launcher =
@@ -47,7 +57,8 @@ class VerifiableCredentialsActivity : ComponentActivity() {
                     this@VerifiableCredentialsActivity,
                     barcodeValue,
                     interactor = DefaultVerifiablePresentationInteractor())
-                Toast.makeText(this@VerifiableCredentialsActivity, "Success", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@VerifiableCredentialsActivity, "Success", Toast.LENGTH_LONG)
+                    .show()
                 return@launch
               }
               viewModel.requestVcOnPreAuthorization(
@@ -55,7 +66,8 @@ class VerifiableCredentialsActivity : ComponentActivity() {
                   barcodeValue,
                   format,
                   DefaultVerifiableCredentialInteractor())
-              Toast.makeText(this@VerifiableCredentialsActivity, "Success", Toast.LENGTH_LONG).show()
+              Toast.makeText(this@VerifiableCredentialsActivity, "Success", Toast.LENGTH_LONG)
+                  .show()
             }
           })
 
@@ -63,19 +75,18 @@ class VerifiableCredentialsActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     VerifiableCredentialsClient.initialize(this, "218232426")
     setContent {
-        VerifiableCredentialsApp(
-            context = this,
-            viewModel = viewModel,
-            resolveQrCode = {
-                format = it
-                val intent =
-                    Intent(this@VerifiableCredentialsActivity, PortraitCaptureActivity::class.java)
-                intent.putExtra(Intents.Scan.PROMPT_MESSAGE, "Scan a QR code")
-                launcher.launch(intent)
-            },
-        )
+      VerifiableCredentialsApp(
+          context = this,
+          viewModel = viewModel,
+          resolveQrCode = {
+            format = it
+            val intent =
+                Intent(this@VerifiableCredentialsActivity, PortraitCaptureActivity::class.java)
+            intent.putExtra(Intents.Scan.PROMPT_MESSAGE, "Scan a QR code")
+            launcher.launch(intent)
+          },
+      )
     }
     lifecycleScope.launch { viewModel.getAllCredentials() }
   }
 }
-

@@ -31,26 +31,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
-
-
-
-@Preview
-@Composable
-fun WalletRegistrationPreView() {
-  WalletRegistrationView(goNext = {})
-}
+import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletRegistrationView(goNext: (password: String) -> Unit) {
+fun WalletRegistrationView(viewModel: VerifiableCredentialsViewModel, goNext: () -> Unit) {
   var username by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
   var passwordVisible by remember { mutableStateOf(false) }
+  val credentials = viewModel.findCredentials()
 
-  VcWalletTheme() {
+  if (credentials != null) {
+    goNext()
+    return
+  }
+
+  VcWalletTheme {
     Scaffold(
         modifier = Modifier.fillMaxWidth().fillMaxHeight(),
         topBar = {
@@ -101,7 +99,12 @@ fun WalletRegistrationView(goNext: (password: String) -> Unit) {
                       }
                     },
                 )
-                Button(content = { Text(text = "next") }, onClick = { goNext(password) })
+                Button(
+                    content = { Text(text = "next") },
+                    onClick = {
+                      viewModel.createKeyPair(password)
+                      goNext()
+                    })
               })
         },
     )
