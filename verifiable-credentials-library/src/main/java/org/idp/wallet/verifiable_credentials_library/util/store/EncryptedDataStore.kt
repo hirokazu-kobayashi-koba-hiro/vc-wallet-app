@@ -9,7 +9,7 @@ class EncryptedDataStore(val context: Context) {
   private val encryptedSharedPreferences =
       EncryptedSharedPreferences.create(
           context,
-          "secret_shared_prefs",
+          "vc_encrypted_shared_prefs",
           MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
           EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
           EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
@@ -22,7 +22,11 @@ class EncryptedDataStore(val context: Context) {
     return encryptedSharedPreferences.getString(key, null)
   }
 
-  fun contains(keyId: String): Boolean {
-    return encryptedSharedPreferences.contains(keyId)
+  fun contains(key: String): Boolean {
+    return encryptedSharedPreferences.contains(key)
+  }
+
+  fun delete(key: String) {
+    encryptedSharedPreferences.edit().remove(key).apply()
   }
 }

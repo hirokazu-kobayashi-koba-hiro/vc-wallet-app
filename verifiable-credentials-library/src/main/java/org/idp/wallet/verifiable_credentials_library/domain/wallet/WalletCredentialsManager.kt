@@ -10,7 +10,6 @@ object WalletCredentialsManager {
     val bip39Wallet = WalletUtils.generateBip39Wallet(password, file)
     val mnemonic = bip39Wallet.mnemonic
     val credentials = WalletUtils.loadBip39Credentials(password, mnemonic)
-
     return WalletCredentials(credentials, bip39Wallet)
   }
 

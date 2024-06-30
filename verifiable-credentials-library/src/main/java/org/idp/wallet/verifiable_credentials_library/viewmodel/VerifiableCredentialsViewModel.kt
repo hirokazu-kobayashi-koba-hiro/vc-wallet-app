@@ -13,27 +13,33 @@ import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredent
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
+import org.web3j.crypto.Credentials
 
-class VerifiableCredentialsViewModel(private val encryptedDataStore: EncryptedDataStore) :
-    ViewModel() {
+class VerifiableCredentialsViewModel(context: Context) : ViewModel() {
 
   private var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
   private var _loading = MutableStateFlow(false)
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
-  lateinit var filesDir: File
+  private val filesDir: File = context.filesDir
+  private val encryptedDataStore = EncryptedDataStore(context)
 
-  fun findCredentials(): WalletCredentials? {
-    val credentials = encryptedDataStore.find("walletCredentials")
+  fun createCredential(password: String): WalletCredentials {
+    val walletCredentials = WalletCredentialsManager.create(password, filesDir)
+    encryptedDataStore.store("credentials", JsonUtils.write(walletCredentials.credentials))
+    return walletCredentials
+  }
+
+  fun findCredential(): Credentials? {
+    val credentials = encryptedDataStore.find("credentials")
     credentials?.let {
-      return JsonUtils.read(it, WalletCredentials::class.java)
+      return JsonUtils.read(it, Credentials::class.java)
     }
     return null
   }
 
-  fun createKeyPair(password: String) {
-    val walletCredentials = WalletCredentialsManager.create(password, filesDir)
-    encryptedDataStore.store("walletCredentials", JsonUtils.write(walletCredentials.bip39Wallet))
+  fun deleteCredential() {
+    encryptedDataStore.delete("credentials")
   }
 
   suspend fun requestVcOnPreAuthorization(

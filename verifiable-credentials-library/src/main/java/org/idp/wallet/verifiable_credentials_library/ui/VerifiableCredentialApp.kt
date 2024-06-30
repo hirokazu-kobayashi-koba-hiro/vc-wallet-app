@@ -1,26 +1,45 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
 @Composable
 fun VerifiableCredentialsApp(
-    context: ComponentActivity,
     viewModel: VerifiableCredentialsViewModel,
     resolveQrCode: (qr: String) -> Unit,
 ) {
   val navController = rememberNavController()
-  viewModel.filesDir = context.filesDir
-
-  NavHost(navController = navController, startDestination = "registration") {
+  NavHost(navController = navController, startDestination = "launcher") {
     composable(
-        "registration",
+        "launcher",
         content = {
-          WalletRegistrationView(viewModel = viewModel, goNext = { navController.navigate("main") })
+          WalletLauncherView(
+              goNext = {
+                val credential = viewModel.findCredential()
+                if (credential == null) {
+                  navController.navigate("wallet-registration")
+                } else {
+                  navController.navigate("main")
+                }
+              })
+        })
+    composable(
+        "wallet-registration",
+        content = {
+          WalletRegistrationView(
+              viewModel = viewModel,
+              goNext = { seed -> navController.navigate("wallet-seed-confirmation?seed=$seed") })
+        })
+    composable(
+        "wallet-seed-confirmation?seed={seed}",
+        arguments = listOf(navArgument("seed") { defaultValue = "" }),
+        content = {
+          val seed = it.arguments?.getString("seed")
+          WalletSeedConfirmationView(seed = seed ?: "", goNext = { navController.navigate("main") })
         })
     composable(
         "main",

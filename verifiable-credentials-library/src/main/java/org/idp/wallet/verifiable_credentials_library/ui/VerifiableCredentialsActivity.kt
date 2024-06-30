@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.DefaultVerifiablePresentationInteractor
-import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
 import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
 class VerifiableCredentialsActivity : ComponentActivity() {
@@ -28,9 +27,7 @@ class VerifiableCredentialsActivity : ComponentActivity() {
     val factory =
         object : ViewModelProvider.Factory {
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return VerifiableCredentialsViewModel(
-                EncryptedDataStore(this@VerifiableCredentialsActivity))
-                as T
+            return VerifiableCredentialsViewModel(this@VerifiableCredentialsActivity) as T
           }
         }
     ViewModelProvider(this, factory).get(VerifiableCredentialsViewModel::class.java)
@@ -76,7 +73,6 @@ class VerifiableCredentialsActivity : ComponentActivity() {
     VerifiableCredentialsClient.initialize(this, "218232426")
     setContent {
       VerifiableCredentialsApp(
-          context = this,
           viewModel = viewModel,
           resolveQrCode = {
             format = it
