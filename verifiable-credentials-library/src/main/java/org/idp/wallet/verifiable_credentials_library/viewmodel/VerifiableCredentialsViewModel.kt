@@ -2,7 +2,6 @@ package org.idp.wallet.verifiable_credentials_library.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
@@ -11,35 +10,26 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentials
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
-import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
 import org.web3j.crypto.Credentials
 
-class VerifiableCredentialsViewModel(context: Context) : ViewModel() {
+class VerifiableCredentialsViewModel(private val walletCredentialsManager: WalletCredentialsManager) : ViewModel() {
 
   private var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
   private var _loading = MutableStateFlow(false)
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
-  private val filesDir: File = context.filesDir
-  private val encryptedDataStore = EncryptedDataStore(context)
 
   fun createCredential(password: String): WalletCredentials {
-    val walletCredentials = WalletCredentialsManager.create(password, filesDir)
-    encryptedDataStore.store("credentials", JsonUtils.write(walletCredentials.credentials))
+    val walletCredentials = walletCredentialsManager.create(password)
     return walletCredentials
   }
 
   fun findCredential(): Credentials? {
-    val credentials = encryptedDataStore.find("credentials")
-    credentials?.let {
-      return JsonUtils.read(it, Credentials::class.java)
-    }
-    return null
+    return walletCredentialsManager.find()
   }
 
   fun deleteCredential() {
-    encryptedDataStore.delete("credentials")
+    walletCredentialsManager.delete()
   }
 
   suspend fun requestVcOnPreAuthorization(
