@@ -8,13 +8,20 @@ import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
+import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
+import java.io.File
 
-class VerifiableCredentialIssuanceViewModel : ViewModel() {
+class VerifiableCredentialsViewModel : ViewModel() {
 
   var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
   var _loading = MutableStateFlow(false)
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
+
+  fun createKeyPair(password: String, filesDir: File) {
+    val walletCredentials = WalletCredentialsManager.create(password, filesDir)
+    println(walletCredentials)
+  }
 
   suspend fun requestVcOnPreAuthorization(
       context: Context,

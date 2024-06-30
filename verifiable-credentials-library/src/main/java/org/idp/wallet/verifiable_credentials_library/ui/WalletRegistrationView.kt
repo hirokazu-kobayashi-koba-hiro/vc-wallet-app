@@ -1,9 +1,5 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,24 +33,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 
-class WalletRegistrationActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
-    setContent {
-      val filesDir = this.filesDir
-      WalletRegistrationView(
-          goNext = { password ->
-            val walletCredentials = WalletCredentialsManager.create(password, filesDir)
-            println(walletCredentials)
-          },
-      )
-    }
-  }
-}
+
 
 @Preview
 @Composable

@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import org.idp.wallet.verifiable_credentials_library.ui.VcHomeActivity
+import org.idp.wallet.verifiable_credentials_library.ui.VerifiableCredentialsActivity
 
 class LauncherActivity : FragmentActivity() {
 
@@ -46,7 +46,7 @@ class LauncherActivity : FragmentActivity() {
       viewModel.loginWithOpenIdConnect(
           this@LauncherActivity,
           successCallback = {
-            val intent = Intent(this@LauncherActivity, VcHomeActivity::class.java)
+            val intent = Intent(this@LauncherActivity, VerifiableCredentialsActivity::class.java)
             startActivity(intent)
           })
     }
