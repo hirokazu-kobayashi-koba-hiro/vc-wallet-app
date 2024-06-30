@@ -5,7 +5,7 @@ import android.content.Intent
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import org.idp.wallet.verifiable_credentials_library.activitity.OpenIdConnectActivity
+import org.idp.wallet.verifiable_credentials_library.activity.OpenIdConnectActivity
 import org.idp.wallet.verifiable_credentials_library.domain.error.OidcError
 import org.idp.wallet.verifiable_credentials_library.domain.error.OpenIdConnectException
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.AuthenticationResponseValidator

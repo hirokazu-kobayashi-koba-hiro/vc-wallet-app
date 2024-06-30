@@ -7,7 +7,7 @@
 
     <application>
         <activity
-            android:name=".activitity.OpenIdConnectActivity"
+            android:name=".activity.OpenIdConnectActivity"
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter android:autoVerify="true">
@@ -23,26 +23,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activitity.VerifiableCredentialsActivity"
+            android:name=".activity.VerifiableCredentialsActivity"
             android:exported="false"
             android:theme="@style/Theme.Vcwalletandroidapp" />
         <activity
-            android:name=".activitity.DefaultVcConsentActivity"
+            android:name=".activity.DefaultVcConsentActivity"
             android:exported="false"
             android:label="@string/title_activity_default_verifiable_credential_cocent"
             android:theme="@style/Theme.Vcwalletandroidapp" />
         <activity
-            android:name=".activitity.OAuthErrorActivity"
+            android:name=".activity.OAuthErrorActivity"
             android:exported="false"
             android:label="@string/title_activity_oauth_error"
             android:theme="@style/Theme.Vcwalletandroidapp" />
         <activity
-            android:name=".activitity.DefaultVpConsentActivity"
+            android:name=".activity.DefaultVpConsentActivity"
             android:exported="false"
             android:label="@string/title_activity_default_vp_consent"
             android:theme="@style/Theme.Vcwalletandroidapp" />
         <activity
-            android:name=".activitity.PortraitCaptureActivity"
+            android:name=".activity.PortraitCaptureActivity"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
