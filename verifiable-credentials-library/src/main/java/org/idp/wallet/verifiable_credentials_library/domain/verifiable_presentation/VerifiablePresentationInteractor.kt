@@ -2,8 +2,8 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presenta
 
 import android.content.Context
 import android.content.Intent
+import org.idp.wallet.verifiable_credentials_library.activitity.DefaultVpConsentActivity
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
-import org.idp.wallet.verifiable_credentials_library.ui.DefaultVpConsentActivity
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVerifiablePresentationInteractor : VerifiablePresentationInteractor {

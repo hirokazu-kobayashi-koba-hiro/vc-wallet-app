@@ -2,8 +2,8 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credenti
 
 import android.content.Context
 import android.content.Intent
+import org.idp.wallet.verifiable_credentials_library.activitity.DefaultVcConsentActivity
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
-import org.idp.wallet.verifiable_credentials_library.ui.DefaultVcConsentActivity
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVerifiableCredentialInteractor : VerifiableCredentialInteractor {

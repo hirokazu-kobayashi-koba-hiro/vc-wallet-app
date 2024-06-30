@@ -1,11 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
+import org.idp.wallet.verifiable_credentials_library.ui.component.SystemDialog
+import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 
 @Composable
 fun VerifiableCredentialsApp(
@@ -13,11 +15,12 @@ fun VerifiableCredentialsApp(
     resolveQrCode: (qr: String) -> Unit,
 ) {
   val navController = rememberNavController()
+  var systemDialogState = viewModel.systemDialogState.collectAsState()
   NavHost(navController = navController, startDestination = "launcher") {
     composable(
         "launcher",
         content = {
-          WalletLauncherView(
+          WalletLauncherScreen(
               goNext = {
                 val credential = viewModel.findCredential()
                 if (credential == null) {
@@ -30,9 +33,9 @@ fun VerifiableCredentialsApp(
     composable(
         "wallet-registration",
         content = {
-          WalletRegistrationView(
+          WalletRegistrationScreen(
               createCredential = { password: String ->
-                return@WalletRegistrationView viewModel.createCredential(password)
+                return@WalletRegistrationScreen viewModel.createCredential(password)
               },
               goNext = { seed -> navController.navigate("wallet-seed-confirmation?seed=$seed") })
         })
@@ -41,15 +44,17 @@ fun VerifiableCredentialsApp(
         arguments = listOf(navArgument("seed") { defaultValue = "" }),
         content = {
           val seed = it.arguments?.getString("seed")
-          WalletSeedConfirmationView(seed = seed ?: "", goNext = { navController.navigate("main") })
+          WalletSeedConfirmationScreen(
+              seed = seed ?: "", goNext = { navController.navigate("main") })
         })
     composable(
         "main",
         content = {
-          MainView(
+          MainScreen(
               viewModel = viewModel,
               resolveQrCode = { resolveQrCode(it) },
               refreshVc = { viewModel.getAllCredentials() })
         })
   }
+  SystemDialog(systemDialogState = systemDialogState.value)
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.idp.wallet.verifiable_credentials_library.activitity.OAuthErrorActivityWrapper
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.AuthorizationResponseCallbackService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.AuthorizationResponseCreator
@@ -13,7 +14,6 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentat
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluator
-import org.idp.wallet.verifiable_credentials_library.ui.OAuthErrorActivityWrapper
 
 class VerifiablePresentationApi(
     val registry: VerifiableCredentialRegistry,

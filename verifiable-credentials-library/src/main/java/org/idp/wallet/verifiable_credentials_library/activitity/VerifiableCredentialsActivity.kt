@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.ui
+package org.idp.wallet.verifiable_credentials_library.activitity
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,8 +18,9 @@ import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.DefaultVerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
+import org.idp.wallet.verifiable_credentials_library.ui.VerifiableCredentialsApp
+import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
-import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
 
 class VerifiableCredentialsActivity : ComponentActivity() {
 
@@ -29,8 +30,9 @@ class VerifiableCredentialsActivity : ComponentActivity() {
     val factory =
         object : ViewModelProvider.Factory {
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-              val context = this@VerifiableCredentialsActivity
-              val walletCredentialsManager = WalletCredentialsManager(context.filesDir, EncryptedDataStore(context))
+            val context = this@VerifiableCredentialsActivity
+            val walletCredentialsManager =
+                WalletCredentialsManager(context.filesDir, EncryptedDataStore(context))
             return VerifiableCredentialsViewModel(walletCredentialsManager) as T
           }
         }

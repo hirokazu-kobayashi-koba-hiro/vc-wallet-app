@@ -17,8 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,12 +26,12 @@ import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 @Preview
 @Composable
 fun WalletSeedConfirmationPreviewView() {
-  WalletSeedConfirmationView("seed test registration car bug transaction", {})
+  WalletSeedConfirmationScreen("seed test registration car bug transaction", {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletSeedConfirmationView(seed: String, goNext: () -> Unit) {
+fun WalletSeedConfirmationScreen(seed: String, goNext: () -> Unit) {
 
   VcWalletTheme {
     Scaffold(

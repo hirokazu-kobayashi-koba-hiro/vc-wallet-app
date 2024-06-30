@@ -5,7 +5,6 @@ interface EncryptedDataStoreInterface {
 
   fun find(key: String): String?
 
-
   fun contains(key: String): Boolean
 
   fun delete(key: String)

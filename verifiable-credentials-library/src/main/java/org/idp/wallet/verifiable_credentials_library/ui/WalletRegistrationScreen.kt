@@ -41,9 +41,9 @@ import org.web3j.crypto.Credentials
 @Preview
 @Composable
 fun WalletRegistrationPreView() {
-  WalletRegistrationView(
+  WalletRegistrationScreen(
       createCredential = { password: String ->
-        return@WalletRegistrationView WalletCredentials(
+        return@WalletRegistrationScreen WalletCredentials(
             credentials = Credentials.create(""), bip39Wallet = Bip39Wallet("", ""))
       },
       goNext = {})
@@ -51,7 +51,7 @@ fun WalletRegistrationPreView() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletRegistrationView(
+fun WalletRegistrationScreen(
     createCredential: (password: String) -> WalletCredentials,
     goNext: (seed: String) -> Unit
 ) {

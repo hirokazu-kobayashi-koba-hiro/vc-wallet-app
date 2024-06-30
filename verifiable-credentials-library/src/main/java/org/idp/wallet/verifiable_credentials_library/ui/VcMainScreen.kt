@@ -32,45 +32,44 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import java.io.File
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.component.VcCardComponent
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
+import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStoreInterface
-import org.idp.wallet.verifiable_credentials_library.viewmodel.VerifiableCredentialsViewModel
-import java.io.File
-
 
 @Preview
 @Composable
 fun MainPreView() {
-    val walletCredentialsManager = WalletCredentialsManager(
-        file = File(""),
-        encryptedDataStoreInterface = object: EncryptedDataStoreInterface {
-            override fun store(key: String, value: String) {
+  val walletCredentialsManager =
+      WalletCredentialsManager(
+          file = File(""),
+          encryptedDataStoreInterface =
+              object : EncryptedDataStoreInterface {
+                override fun store(key: String, value: String) {}
 
-            }
+                override fun find(key: String): String? {
+                  return null
+                }
 
-            override fun find(key: String): String? {
-                return null
-            }
+                override fun contains(key: String): Boolean {
+                  return false
+                }
 
-            override fun contains(key: String): Boolean {
-                return false
-            }
-
-            override fun delete(key: String) {
-
-            }
-
-        })
-    MainView(viewModel = VerifiableCredentialsViewModel(walletCredentialsManager), resolveQrCode = {}, refreshVc = {})
+                override fun delete(key: String) {}
+              })
+  MainScreen(
+      viewModel = VerifiableCredentialsViewModel(walletCredentialsManager),
+      resolveQrCode = {},
+      refreshVc = {})
 }
+
 @Composable
-fun MainView(
+fun MainScreen(
     viewModel: VerifiableCredentialsViewModel,
     resolveQrCode: (format: String) -> Unit,
     refreshVc: () -> Unit
@@ -189,9 +188,16 @@ fun VcScreen(
               }
         }
         Row {
-          Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = { onClick(format) }) {
-            Text(text = "scan QR")
-          }
+          Button(
+              modifier = Modifier.padding(top = Dp(16.0F)),
+              onClick = {
+                viewModel.showDialog(
+                    title = "confirm",
+                    message = "Could you scan qr?",
+                    onClickPositiveButton = { onClick(format) })
+              }) {
+                Text(text = "scan QR")
+              }
         }
       }
 }

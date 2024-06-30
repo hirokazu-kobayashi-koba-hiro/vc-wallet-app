@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.viewmodel
+package org.idp.wallet.verifiable_credentials_library.ui.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -12,12 +12,16 @@ import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredent
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.web3j.crypto.Credentials
 
-class VerifiableCredentialsViewModel(private val walletCredentialsManager: WalletCredentialsManager) : ViewModel() {
+class VerifiableCredentialsViewModel(
+    private val walletCredentialsManager: WalletCredentialsManager
+) : ViewModel() {
 
   private var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
   private var _loading = MutableStateFlow(false)
+  private var _systemDialogState = MutableStateFlow(SystemDialogState())
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
+  val systemDialogState = _systemDialogState.asStateFlow()
 
   fun createCredential(password: String): WalletCredentials {
     val walletCredentials = walletCredentialsManager.create(password)
@@ -68,5 +72,28 @@ class VerifiableCredentialsViewModel(private val walletCredentialsManager: Walle
     } finally {
       _loading.value = false
     }
+  }
+
+  fun showDialog(
+      title: String,
+      message: String,
+      onClickPositiveButton: () -> Unit = {},
+      onClickNegativeButton: () -> Unit = {}
+  ) {
+    _systemDialogState.value =
+        SystemDialogState(
+            visible = true,
+            title = title,
+            message = message,
+            onClickPositiveButton = {
+              onClickPositiveButton()
+              _systemDialogState.value =
+                  SystemDialogState(visible = false, title = "", message = "")
+            },
+            onClickNegativeButton = {
+              onClickNegativeButton()
+              _systemDialogState.value =
+                  SystemDialogState(visible = false, title = "", message = "")
+            })
   }
 }

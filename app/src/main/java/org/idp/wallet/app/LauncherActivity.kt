@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import org.idp.wallet.verifiable_credentials_library.ui.VerifiableCredentialsActivity
+import org.idp.wallet.verifiable_credentials_library.activitity.VerifiableCredentialsActivity
 
 class LauncherActivity : FragmentActivity() {
 
