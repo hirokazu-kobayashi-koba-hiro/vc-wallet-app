@@ -1,5 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -15,11 +16,13 @@ import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.DefaultVerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.VerifiableCredentialsApp
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
+import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
 
 class VerifiableCredentialsActivity : ComponentActivity() {
@@ -77,9 +80,21 @@ class VerifiableCredentialsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     VerifiableCredentialsClient.initialize(this, "218232426")
+    val openIdConnectRequestValue =
+        intent.getStringExtra("openIdConnectRequest")
+            ?: RuntimeException("not found openIdConnectRequest")
+    val openIdConnectRequest =
+        JsonUtils.read(
+            openIdConnectRequestValue.toString(),
+            OpenIdConnectRequest::class.java,
+            snakeCase = false)
+    val forceLoginString = intent.getStringExtra("forceLogin") ?: "false"
     setContent {
       VerifiableCredentialsApp(
+          context = this@VerifiableCredentialsActivity,
           viewModel = viewModel,
+          openIdConnectRequest = openIdConnectRequest,
+          forceLogin = forceLoginString.toBoolean(),
           resolveQrCode = {
             format = it
             val intent =
@@ -90,5 +105,15 @@ class VerifiableCredentialsActivity : ComponentActivity() {
       )
     }
     lifecycleScope.launch { viewModel.getAllCredentials() }
+  }
+
+  companion object {
+
+    fun start(context: Context, request: OpenIdConnectRequest, forceLogin: Boolean = false) {
+      val intent = Intent(context, VerifiableCredentialsActivity::class.java)
+      intent.putExtra("openIdConnectRequest", JsonUtils.write(request))
+      intent.putExtra("forceLogin", forceLogin)
+      context.startActivity(intent)
+    }
   }
 }

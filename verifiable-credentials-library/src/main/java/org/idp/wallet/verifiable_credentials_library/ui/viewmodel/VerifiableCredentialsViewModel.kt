@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.idp.wallet.verifiable_credentials_library.OpenIdConnectApi
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
+import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
@@ -19,9 +23,22 @@ class VerifiableCredentialsViewModel(
   private var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
   private var _loading = MutableStateFlow(false)
   private var _systemDialogState = MutableStateFlow(SystemDialogState())
+  private var _loginState =
+      MutableStateFlow(OpenIdConnectResponse(TokenResponse("", "", "", 0, "", "")))
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
   val systemDialogState = _systemDialogState.asStateFlow()
+  val loginState = _loginState.asStateFlow()
+
+  suspend fun login(
+      context: Context,
+      request: OpenIdConnectRequest,
+      force: Boolean = false
+  ): OpenIdConnectResponse {
+    val openIdConnectResponse = OpenIdConnectApi.login(context, request, force)
+    _loginState.value = openIdConnectResponse
+    return openIdConnectResponse
+  }
 
   fun createCredential(password: String): WalletCredentials {
     val walletCredentials = walletCredentialsManager.create(password)

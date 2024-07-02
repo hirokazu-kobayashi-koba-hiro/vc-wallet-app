@@ -20,9 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import java.util.UUID
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.activity.VerifiableCredentialsActivity
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 
 class LauncherActivity : FragmentActivity() {
 
@@ -33,7 +35,16 @@ class LauncherActivity : FragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent { LauncherView(viewModel = viewModel, onClick = { login() }) }
-    login()
+    val request =
+        OpenIdConnectRequest(
+            issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
+            clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
+            scope = "openid profile phone email address offline_access",
+            state = UUID.randomUUID().toString(),
+            nonce = UUID.randomUUID().toString(),
+            redirectUri =
+                "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
+    VerifiableCredentialsActivity.start(context = this, request = request, forceLogin = false)
   }
 
   private fun login() {

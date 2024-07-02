@@ -1,17 +1,22 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.ui.component.SystemDialog
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 
 @Composable
 fun VerifiableCredentialsApp(
+    context: Context,
     viewModel: VerifiableCredentialsViewModel,
+    openIdConnectRequest: OpenIdConnectRequest,
+    forceLogin: Boolean,
     resolveQrCode: (qr: String) -> Unit,
 ) {
   val navController = rememberNavController()
@@ -21,6 +26,10 @@ fun VerifiableCredentialsApp(
         "launcher",
         content = {
           WalletLauncherScreen(
+              context,
+              openIdConnectRequest,
+              forceLogin,
+              viewModel,
               goNext = {
                 val credential = viewModel.findCredential()
                 if (credential == null) {

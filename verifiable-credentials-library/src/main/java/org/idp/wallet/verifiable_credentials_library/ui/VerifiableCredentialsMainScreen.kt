@@ -106,6 +106,7 @@ fun HomeScreen(
     onClickShow: () -> Unit
 ) {
   val vciState = viewModel.vciState.collectAsState()
+  val loginState = viewModel.loginState.collectAsState()
   if (viewModel.loadingState.collectAsState().value) {
     LoadingScreen()
     return
@@ -127,6 +128,10 @@ fun HomeScreen(
                     }
                   }
             })
+        loginState.value.userinfoResponse?.let {
+          Text(text = it.sub)
+          Text(text = it.name ?: "")
+        }
         val cardList = mutableListOf<Pair<String, String>>()
         val vc = vciState.value
         vc.entries.forEach { (key, records) ->
