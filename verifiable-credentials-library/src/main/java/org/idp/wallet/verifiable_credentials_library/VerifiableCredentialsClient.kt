@@ -1,9 +1,11 @@
 package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
+import org.idp.wallet.verifiable_credentials_library.activity.VerifiableCredentialsActivity
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialRegistry
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
@@ -36,6 +38,11 @@ object VerifiableCredentialsClient {
     verifiablePresentationApi =
         VerifiablePresentationApi(
             registry, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
+  }
+
+  fun start(context: Context, request: OpenIdConnectRequest, forceLogin: Boolean = false) {
+    VerifiableCredentialsActivity.start(
+        context = context, request = request, forceLogin = forceLogin)
   }
 
   suspend fun handlePreAuthorization(

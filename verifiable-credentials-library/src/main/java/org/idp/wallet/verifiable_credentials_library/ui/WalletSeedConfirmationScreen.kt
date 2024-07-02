@@ -48,7 +48,7 @@ fun WalletSeedConfirmationScreen(seed: String, goNext: () -> Unit) {
                       Spacer(modifier = Modifier.padding(Dp(4.0F)))
                       Text(
                           text = "Wallet Registration",
-                          style = MaterialTheme.typography.displayLarge)
+                          style = MaterialTheme.typography.displayMedium)
                     }
               })
         },
@@ -63,8 +63,8 @@ fun WalletSeedConfirmationScreen(seed: String, goNext: () -> Unit) {
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.spacedBy(Dp(20.0F)),
               content = {
-                Text(text = "Confirm Seed", style = MaterialTheme.typography.displayMedium)
-                Text(text = seed, style = MaterialTheme.typography.displaySmall)
+                Text(text = "Confirm Seed", style = MaterialTheme.typography.displaySmall)
+                Text(text = seed, style = MaterialTheme.typography.bodyMedium)
                 Button(content = { Text(text = "next") }, onClick = { goNext() })
               })
         },

@@ -74,7 +74,7 @@ fun WalletRegistrationScreen(
                       Spacer(modifier = Modifier.padding(Dp(4.0F)))
                       Text(
                           text = "Wallet Registration",
-                          style = MaterialTheme.typography.displayLarge)
+                          style = MaterialTheme.typography.displayMedium)
                     }
               })
         },
@@ -89,7 +89,7 @@ fun WalletRegistrationScreen(
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.spacedBy(Dp(20.0F)),
               content = {
-                Text(text = "Create Account", style = MaterialTheme.typography.displayMedium)
+                Text(text = "Create Account", style = MaterialTheme.typography.displaySmall)
                 OutlinedTextField(
                     label = { Text(text = "username") },
                     value = username,
