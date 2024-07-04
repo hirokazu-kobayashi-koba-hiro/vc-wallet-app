@@ -64,11 +64,9 @@ dependencies {
     ////web3
     implementation("org.web3j:core:4.10.2")
     implementation("org.web3j:crypto:5.0.0")
+    ////did https://github.com/uport-project/kotlin-did-jwt
+    implementation("com.github.uport-project.kotlin-did-jwt:jwt:0.4.0")
 
-    ////jsonld
-//    implementation("com.github.jsonld-java:jsonld-java:0.13.5") {
-//        exclude(group = "commons-codec", module = "commons-codec")
-//    }
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     ////MerkleTree
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.13.1")
