@@ -1,11 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library.activity
 
+import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +28,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -190,12 +191,6 @@ fun DefaultVcView(
               verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 CredentialCards(credentialOffer, credentialIssuerMetadata)
-                Text("Insert provided code for the offer from Issuer")
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "PinCode") },
-                    value = pinCode,
-                    onValueChange = { pinCode = it })
               }
         },
         bottomBar = {
@@ -243,40 +238,42 @@ fun CredentialCard(credential: String, credentialConfiguration: CredentialConfig
       shape = RoundedCornerShape(20.dp),
       border = BorderStroke(width = Dp(2.0F), color = Color.Black),
       content = {
-        Column(modifier = Modifier.fillMaxWidth().padding(Dp(4.0F))) {
-          credentialConfiguration?.getFirstLogo()?.let {
-            AsyncImage(
-                model = it.uri,
-                contentDescription = it.altText,
-                modifier = Modifier.height(Dp(100.0F)),
-                contentScale = ContentScale.Crop)
-          }
-              ?: Icon(
-                  painter = painterResource(R.drawable.graduation),
-                  contentDescription = "",
-                  modifier = Modifier.size(Dp(50.0F)))
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-              horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Issuer", style = MaterialTheme.typography.displaySmall)
-                Text(
-                    text = credentialConfiguration?.getFirstDisplay()?.name ?: "",
-                    style = MaterialTheme.typography.bodyLarge)
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+            verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
+              credentialConfiguration?.getFirstLogo()?.let {
+                AsyncImage(
+                    model = it.uri,
+                    contentDescription = it.altText,
+                    modifier = Modifier.height(Dp(100.0F)),
+                    contentScale = ContentScale.Crop)
               }
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-              horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Type", style = MaterialTheme.typography.displaySmall)
-                Text(text = credential, style = MaterialTheme.typography.bodyLarge)
+                  ?: Image(
+                      painter = painterResource(id = R.drawable.id_card),
+                      contentDescription = "contentDescription",
+                      modifier = Modifier.size(Dp(50.0F)))
+              Row(
+                  modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
+                  horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "type",
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.padding(end = Dp(8.0F)))
+                    Text(
+                        text = credentialConfiguration?.getFirstDisplay()?.name ?: credential,
+                        style = MaterialTheme.typography.bodyLarge)
+                  }
+              credentialConfiguration?.getFirstDisplay()?.description?.let {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(Dp(8.0F)),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                      Text(
+                          text = "description",
+                          style = MaterialTheme.typography.displaySmall,
+                          modifier = Modifier.padding(end = Dp(8.0F)))
+                      Text(text = it, style = MaterialTheme.typography.bodyLarge)
+                    }
               }
-          credentialConfiguration?.getFirstDisplay()?.description?.let {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(Dp(4.0F)),
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                  Text(text = "Description", style = MaterialTheme.typography.displaySmall)
-                  Text(text = it, style = MaterialTheme.typography.bodyLarge)
-                }
-          }
-        }
+            }
       })
 }
