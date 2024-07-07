@@ -20,7 +20,7 @@ fun VerifiableCredentialsApp(
     resolveQrCode: (qr: String) -> Unit,
 ) {
   val navController = rememberNavController()
-  var systemDialogState = viewModel.systemDialogState.collectAsState()
+  val systemDialogState = viewModel.systemDialogState.collectAsState()
   NavHost(navController = navController, startDestination = "launcher") {
     composable(
         "launcher",

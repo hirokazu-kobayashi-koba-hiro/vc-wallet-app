@@ -5,12 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -24,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.R
@@ -34,7 +37,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractorCallbackProvider
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
-import org.idp.wallet.verifiable_credentials_library.ui.component.VcCardComponent
+import org.idp.wallet.verifiable_credentials_library.ui.component.CardComponent
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
@@ -190,7 +193,15 @@ fun VerifiableCredentialsView(evaluation: PresentationDefinitionEvaluation) {
   }
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
     items(cardList) { (issuer, content) ->
-      VcCardComponent(icon = R.drawable.id_card, title = "type", detailContent = {})
+      CardComponent(
+          icon = {
+            Image(
+                painter = painterResource(id = R.drawable.id_card),
+                contentDescription = "contentDescription",
+                modifier = Modifier.size(Dp(50.0F)))
+          },
+          title = issuer,
+          detailContent = { Text(text = content) })
     }
   }
 }
