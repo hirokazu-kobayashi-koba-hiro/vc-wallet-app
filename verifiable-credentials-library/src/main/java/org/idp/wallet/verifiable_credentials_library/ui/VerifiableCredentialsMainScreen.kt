@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import java.io.File
+import org.idp.wallet.verifiable_credentials_library.R
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.component.VcCardComponent
@@ -89,7 +91,8 @@ fun MainScreen(
         content = {
           when (currentDestination) {
             AppDestinations.HOME ->
-                HomeScreen(viewModel = viewModel, onClick = resolveQrCode, onClickShow = refreshVc)
+                HomeScreen(
+                    viewModel = viewModel, gotoDetail = resolveQrCode, onClickShow = refreshVc)
             AppDestinations.VC ->
                 VcScreen(viewModel = viewModel, onClick = resolveQrCode, onClickShow = refreshVc)
             AppDestinations.VP -> VpScreen(viewModel = viewModel, onClick = resolveQrCode)
@@ -102,7 +105,7 @@ fun MainScreen(
 @Composable
 fun HomeScreen(
     viewModel: VerifiableCredentialsViewModel,
-    onClick: (pinCode: String) -> Unit,
+    gotoDetail: (id: String) -> Unit,
     onClickShow: () -> Unit
 ) {
   val vciState = viewModel.vciState.collectAsState()
@@ -132,23 +135,39 @@ fun HomeScreen(
           Text(text = it.sub)
           Text(text = it.name ?: "")
         }
-        val cardList = mutableListOf<Pair<String, String>>()
+        val cardList = mutableListOf<Pair<String, VerifiableCredentialsRecord>>()
         val vc = vciState.value
         vc.entries.forEach { (key, records) ->
-          records.forEach { record ->
-            val stringBuilder = StringBuilder()
-            record.payload.forEach {
-              stringBuilder.append(it.key + ":" + it.value)
-              stringBuilder.append("\n")
-            }
-            cardList.add(Pair(key, stringBuilder.toString()))
-          }
+          records.forEach { record -> cardList.add(Pair(record.type, record)) }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-          items(cardList) { (issuer, content) ->
-            VcCardComponent(title = issuer, content = content)
-            Log.d("VcWalletLibrary", issuer)
+          items(cardList) { (type, record) ->
+            VcCardComponent(
+                icon = R.drawable.id_card,
+                title = type,
+                detailContent = { CardDetailContent(record = record) })
+            Log.d("VcWalletLibrary", type)
           }
+        }
+      }
+}
+
+@Composable
+fun CardDetailContent(record: VerifiableCredentialsRecord) {
+  Column(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
+        record.payload.entries.forEach {
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = it.key,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(end = Dp(16.0F)))
+                Text(text = it.value.toString(), style = MaterialTheme.typography.bodyMedium)
+              }
         }
       }
 }

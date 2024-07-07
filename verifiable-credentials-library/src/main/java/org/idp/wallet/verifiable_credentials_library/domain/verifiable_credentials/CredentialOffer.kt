@@ -3,12 +3,8 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credenti
 class CredentialOffer(
     val credentialIssuer: String,
     val credentialConfigurationIds: List<String>,
-    val preAuthorizedCodeGrant:
-        org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.PreAuthorizedCodeGrant? =
-        null,
-    val authorizedCodeGrant:
-        org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.AuthorizedCodeGrant? =
-        null
+    val preAuthorizedCodeGrant: PreAuthorizedCodeGrant? = null,
+    val authorizedCodeGrant: AuthorizedCodeGrant? = null
 ) {
 
   fun credentialIssuerMetadataEndpoint(): String {

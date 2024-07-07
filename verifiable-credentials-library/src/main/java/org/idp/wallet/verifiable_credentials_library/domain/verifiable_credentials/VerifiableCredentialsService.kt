@@ -18,17 +18,17 @@ class VerifiableCredentialsService(
 ) {
 
   @OptIn(ExperimentalJsExport::class)
-  fun transform(format: String, rawVc: String): VerifiableCredentialsRecord {
+  fun transform(format: String, type: String, rawVc: String): VerifiableCredentialsRecord {
     return when (format) {
       "vc+sd-jwt" -> {
         val sdJwt = SDJwt.parse(rawVc)
         val fullPayload = sdJwt.fullPayload
-        VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, fullPayload)
+        VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, fullPayload)
       }
       "jwt_vc_json" -> {
         val jwt = JoseUtils.parse(rawVc)
         val payload = jwt.payload()
-        VerifiableCredentialsRecord(UUID.randomUUID().toString(), format, rawVc, payload)
+        VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, payload)
       }
       else -> {
         throw RuntimeException("unsupported format")
@@ -40,22 +40,16 @@ class VerifiableCredentialsService(
     return registry.getAll()
   }
 
-  suspend fun getCredentialOffer(
-      credentialOfferRequest: CredentialOfferRequest
-  ): org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer {
+  suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
     val credentialOfferUri = credentialOfferRequest.credentialOfferUri()
     credentialOfferUri?.let {
       val response = HttpClient.get(it)
-      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
-          .CredentialOfferCreator
-          .create(response)
+      return CredentialOfferCreator.create(response)
     }
     val credentialOffer = credentialOfferRequest.credentialOffer()
     credentialOffer?.let {
       val json = JSONObject(it)
-      return org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
-          .CredentialOfferCreator
-          .create(json)
+      return CredentialOfferCreator.create(json)
     }
     throw CredentialOfferRequestException(
         "Credential offer request must contain either credential_offer or credential_offer_uri.")

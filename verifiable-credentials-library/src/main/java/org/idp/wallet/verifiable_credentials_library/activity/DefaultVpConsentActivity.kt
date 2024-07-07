@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import org.idp.wallet.verifiable_credentials_library.R
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.Constraints
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.InputDescriptorDetail
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
@@ -83,13 +84,20 @@ fun DefaultVpConsentPreView() {
                   InputDescriptorDetail("", "", null, null, Constraints(null, null)) to
                       VerifiableCredentialsRecords(
                           listOf(
-                              VerifiableCredentialsRecord("1", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("2", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("3", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("4", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("5", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("6", "jwt", "", mapOf("key" to "test")),
-                              VerifiableCredentialsRecord("7", "jwt", "", mapOf("key" to "test")))),
+                              VerifiableCredentialsRecord(
+                                  "1", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "2", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "3", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "4", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "5", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "6", "", "jwt", "", mapOf("key" to "test")),
+                              VerifiableCredentialsRecord(
+                                  "7", "", "jwt", "", mapOf("key" to "test")))),
               )),
       onAccept = {},
       onReject = {})
@@ -181,6 +189,8 @@ fun VerifiableCredentialsView(evaluation: PresentationDefinitionEvaluation) {
     records.forEach { cardList.add(inputDescriptorDetail.id to JsonUtils.write(it.payload)) }
   }
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-    items(cardList) { (issuer, content) -> VcCardComponent(title = issuer, content = content) }
+    items(cardList) { (issuer, content) ->
+      VcCardComponent(icon = R.drawable.id_card, title = "type", detailContent = {})
+    }
   }
 }

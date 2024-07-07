@@ -16,7 +16,7 @@ import org.robolectric.RobolectricTestRunner
 class WalletCredentialsManagerTest {
 
   @Test
-  fun createAndRestore() = runBlocking {
+  fun `create and restore credential with eth and create did-jwt`() = runBlocking {
     val context = InstrumentationRegistry.getInstrumentation().getContext()
     val walletCredentialsManager = WalletCredentialsManager(File("./"), EncryptedDataStore(context))
     val password = "password"

@@ -116,7 +116,8 @@ object VerifiableCredentialsClient {
             .trimIndent()
     val signedValue = JoseUtils.sign(header, payloadValue, jwk)
     val payload = JoseUtils.parse(signedValue).payload()
-    val record = VerifiableCredentialsRecord("1", "jwt_vc_json", signedValue, payload)
+    val record =
+        VerifiableCredentialsRecord("1", "DegreeCredential", "jwt_vc_json", signedValue, payload)
     registry.save("test", record)
   }
 }
