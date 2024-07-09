@@ -3,8 +3,6 @@ package org.idp.wallet.verifiable_credentials_library.domain.wallet
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
 import kotlinx.coroutines.runBlocking
-import me.uport.sdk.jwt.JWTTools
-import me.uport.sdk.signer.KPSigner
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -16,7 +14,7 @@ import org.robolectric.RobolectricTestRunner
 class WalletCredentialsManagerTest {
 
   @Test
-  fun `create and restore credential with eth and create did-jwt`() = runBlocking {
+  fun `create and restore credential`() = runBlocking {
     val context = InstrumentationRegistry.getInstrumentation().getContext()
     val walletCredentialsManager = WalletCredentialsManager(File("./"), EncryptedDataStore(context))
     val password = "password"
@@ -31,20 +29,5 @@ class WalletCredentialsManagerTest {
     assertEquals(
         credentials.credentials.ecKeyPair.privateKey,
         restoreCredentials.credentials.ecKeyPair.privateKey)
-
-    val jwt = JWTTools()
-    // ...
-    val payload = mapOf("claims" to mapOf("name" to "R Daneel Olivaw"))
-
-    println("toHexPublicKey")
-    println(credentials.toHexPublicKey())
-    println("toHexPrivateKey")
-    println(credentials.toHexPrivateKey())
-
-    val signer = KPSigner(credentials.toHexPrivateKey())
-    val issuerDID = "did:ethr:${signer.getAddress()}"
-
-    val token = jwt.createJWT(payload, issuerDID, signer)
-    println(token)
   }
 }

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.UserinfoResponse
 import org.idp.wallet.verifiable_credentials_library.ui.component.SystemDialog
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 
@@ -59,10 +60,18 @@ fun VerifiableCredentialsApp(
     composable(
         "main",
         content = {
-          MainScreen(
+          VerifiableCredentialsMainScreen(
+              navController,
               viewModel = viewModel,
               resolveQrCode = { resolveQrCode(it) },
-              refreshVc = { viewModel.getAllCredentials() })
+          )
+        })
+    composable(
+        "account-detail",
+        content = {
+          AccountDetailScreen(
+              userinfoResponse =
+                  viewModel.loginState.value.userinfoResponse ?: UserinfoResponse(sub = ""))
         })
   }
   SystemDialog(systemDialogState = systemDialogState.value)

@@ -36,7 +36,7 @@ fun CardComponent(
           Row(
               horizontalArrangement = Arrangement.SpaceBetween,
               modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.padding())
+                Spacer(modifier = Modifier.padding(start = Dp(20.0F)))
                 icon()
                 IconButton(
                     onClick = { visible.value = !visible.value },

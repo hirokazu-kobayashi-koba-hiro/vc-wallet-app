@@ -92,6 +92,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0-beta03")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.35.1-alpha")
+
     //state
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")

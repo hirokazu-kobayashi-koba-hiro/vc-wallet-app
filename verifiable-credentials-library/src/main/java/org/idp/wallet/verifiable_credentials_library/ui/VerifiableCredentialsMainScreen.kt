@@ -5,26 +5,32 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,15 +39,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavHostController
 import java.io.File
 import org.idp.wallet.verifiable_credentials_library.R
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.component.CardComponent
+import org.idp.wallet.verifiable_credentials_library.ui.component.FloatingView
 import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
@@ -50,6 +60,7 @@ import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataSto
 @Preview
 @Composable
 fun MainPreView() {
+  val context = LocalContext.current
   val walletCredentialsManager =
       WalletCredentialsManager(
           file = File(""),
@@ -67,17 +78,18 @@ fun MainPreView() {
 
                 override fun delete(key: String) {}
               })
-  MainScreen(
+  VerifiableCredentialsMainScreen(
+      navController = NavHostController(context),
       viewModel = VerifiableCredentialsViewModel(walletCredentialsManager),
       resolveQrCode = {},
-      refreshVc = {})
+  )
 }
 
 @Composable
-fun MainScreen(
+fun VerifiableCredentialsMainScreen(
+    navController: NavHostController,
     viewModel: VerifiableCredentialsViewModel,
     resolveQrCode: (format: String) -> Unit,
-    refreshVc: () -> Unit
 ) {
   var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
   VcWalletTheme {
@@ -95,10 +107,11 @@ fun MainScreen(
           when (currentDestination) {
             AppDestinations.HOME ->
                 HomeScreen(
-                    viewModel = viewModel, gotoDetail = resolveQrCode, onClickShow = refreshVc)
-            AppDestinations.VC ->
-                VcScreen(viewModel = viewModel, onClick = resolveQrCode, onClickShow = refreshVc)
-            AppDestinations.VP -> VpScreen(viewModel = viewModel, onClick = resolveQrCode)
+                    navController = navController,
+                    viewModel = viewModel,
+                    gotoDetail = resolveQrCode)
+            AppDestinations.VC -> VcScreen(viewModel = viewModel, resolveQrCode = resolveQrCode)
+            AppDestinations.VP -> VpScreen(viewModel = viewModel, resolveQrCode = resolveQrCode)
           }
         })
   }
@@ -107,61 +120,113 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavHostController,
     viewModel: VerifiableCredentialsViewModel,
     gotoDetail: (id: String) -> Unit,
-    onClickShow: () -> Unit
 ) {
   val vciState = viewModel.vciState.collectAsState()
   val loginState = viewModel.loginState.collectAsState()
+  var showFloatingScreen by remember { mutableStateOf(false) }
   if (viewModel.loadingState.collectAsState().value) {
     LoadingScreen()
     return
   }
-  Column(
+  LaunchedEffect(Unit) { viewModel.getAllCredentials() }
+
+  Scaffold(
       modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        CenterAlignedTopAppBar(
-            title = {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "VerifiableCredentials",
-                        style = MaterialTheme.typography.displayMedium)
-                    IconButton(onClick = onClickShow) {
-                      Icon(Icons.Default.Refresh, contentDescription = null)
+      topBar = {
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
+          CenterAlignedTopAppBar(
+              title = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                      Spacer(modifier = Modifier.padding())
+                      Text(
+                          text = "VerifiableCredentials",
+                          style = MaterialTheme.typography.displayMedium)
+                      IconButton(onClick = { showFloatingScreen = true }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                      }
                     }
-                  }
-            })
-        loginState.value.userinfoResponse?.let {
-          Text(text = it.sub)
-          Text(text = it.name ?: "")
+              })
         }
-        val cardList = mutableListOf<Pair<String, VerifiableCredentialsRecord>>()
-        val vc = vciState.value
-        vc.entries.forEach { (key, records) ->
-          records.forEach { record -> cardList.add(Pair(record.type, record)) }
-        }
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-          items(cardList) { (type, record) ->
-            CardComponent(
-                icon = {
-                  Image(
-                      painter = painterResource(id = R.drawable.id_card),
-                      contentDescription = "contentDescription",
-                      modifier = Modifier.size(Dp(50.0F)))
-                },
-                title = type,
-                detailContent = { CardDetailContent(record = record) })
-            Log.d("VcWalletLibrary", type)
+      },
+      content = { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+          loginState.value.userinfoResponse?.let {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+                verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
+                  Text(text = it.sub)
+                  Text(text = it.name ?: "")
+                }
+          }
+          val cardList = mutableListOf<Pair<String, VerifiableCredentialsRecord>>()
+          val vc = vciState.value
+          vc.values.forEach { records ->
+            records.forEach { record -> cardList.add(Pair(record.type, record)) }
+          }
+          LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            items(cardList) { (type, record) ->
+              CardComponent(
+                  icon = {
+                    Image(
+                        painter = painterResource(id = R.drawable.id_card),
+                        contentDescription = "contentDescription",
+                        modifier = Modifier.size(Dp(50.0F)))
+                  },
+                  title = type,
+                  detailContent = { CardDetailContent(record = record) })
+              Log.d("VcWalletLibrary", type)
+            }
           }
         }
-      }
+      })
+  FloatingView(
+      visible = showFloatingScreen,
+      start = Dp(40.0F),
+      top = Dp(40.0F),
+      content = {
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Button(
+              shape = RoundedCornerShape(Dp(0F)),
+              modifier = Modifier.fillMaxWidth(),
+              colors =
+                  ButtonDefaults.buttonColors(
+                      contentColor = Color.Black, containerColor = Color.White),
+              onClick = { navController.navigate("account-detail") },
+              content = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(Dp(8.0F)),
+                    content = {
+                      Icon(Icons.Default.AccountCircle, contentDescription = "AccountCircle")
+                      Text(text = "account")
+                    })
+              })
+          Button(
+              shape = RoundedCornerShape(Dp(0F)),
+              colors =
+                  ButtonDefaults.buttonColors(
+                      contentColor = Color.Black, containerColor = Color.White),
+              onClick = {},
+              content = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(Dp(8.0F)),
+                    content = {
+                      Icon(Icons.Default.Key, contentDescription = "Key")
+                      Text(text = "key")
+                    })
+              })
+        }
+      },
+      onDismiss = { showFloatingScreen = false })
 }
 
 @Composable
-fun CardDetailContent(record: VerifiableCredentialsRecord) {
+private fun CardDetailContent(record: VerifiableCredentialsRecord) {
   Column(
       modifier = Modifier.fillMaxWidth(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -176,90 +241,6 @@ fun CardDetailContent(record: VerifiableCredentialsRecord) {
                     modifier = Modifier.padding(end = Dp(16.0F)))
                 Text(text = it.value.toString(), style = MaterialTheme.typography.bodyMedium)
               }
-        }
-      }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun VcScreen(
-    viewModel: VerifiableCredentialsViewModel,
-    onClick: (format: String) -> Unit,
-    onClickShow: () -> Unit
-) {
-  if (viewModel.loadingState.collectAsState().value) {
-    LoadingScreen()
-    return
-  }
-  Column(
-      modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        var format by remember { mutableStateOf("vc+sd-jwt") }
-        val vciState = viewModel.vciState.collectAsState()
-        Column() {
-          CenterAlignedTopAppBar(
-              title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween) {
-                      Text(text = "Issue Vc", style = MaterialTheme.typography.displayMedium)
-                    }
-              })
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.SpaceBetween) {
-                RadioButton(selected = format == "vc+sd-jwt", onClick = { format = "vc+sd-jwt" })
-                Text(text = "vc-sd-jwt")
-              }
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.SpaceBetween) {
-                RadioButton(selected = format == "mso_mdoc", onClick = { format = "mso_mdoc" })
-                Text(text = "mso_mdoc")
-              }
-        }
-        Row {
-          Button(
-              modifier = Modifier.padding(top = Dp(16.0F)),
-              onClick = {
-                viewModel.showDialog(
-                    title = "confirm",
-                    message = "Could you scan qr?",
-                    onClickPositiveButton = { onClick(format) })
-              }) {
-                Text(text = "scan QR")
-              }
-        }
-      }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun VpScreen(
-    viewModel: VerifiableCredentialsViewModel,
-    onClick: (format: String) -> Unit,
-) {
-  if (viewModel.loadingState.collectAsState().value) {
-    LoadingScreen()
-    return
-  }
-  Column(
-      modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        CenterAlignedTopAppBar(
-            title = {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "Present Vp", style = MaterialTheme.typography.displayMedium)
-                  }
-            })
-        Row {
-          Button(modifier = Modifier.padding(top = Dp(16.0F)), onClick = { onClick("vp") }) {
-            Text(text = "scan QR")
-          }
         }
       }
 }
