@@ -1,7 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
 import android.content.ClipData
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,7 +45,6 @@ fun WalletKeyScreenPreview() {
 @Composable
 fun WalletKeyScreen(credentials: Credentials) {
   val clipboardManager = LocalClipboardManager.current
-  val context = LocalContext.current
   val configuration = LocalConfiguration.current
   val screenWidth = configuration.screenWidthDp.dp
   val visiblePrivateKey = remember { mutableStateOf(false) }
@@ -84,8 +81,6 @@ fun WalletKeyScreen(credentials: Credentials) {
                               val clip =
                                   ClipData.newPlainText("Mnemonic Phrase", credentials.address)
                               clipboardManager.setClip(ClipEntry(clip))
-                              Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
-                                  .show()
                             },
                             content = {
                               Icon(Icons.Default.ContentCopy, contentDescription = "ContentCopy")
@@ -113,8 +108,6 @@ fun WalletKeyScreen(credentials: Credentials) {
                                     ClipData.newPlainText(
                                         "Mnemonic Phrase", credentials.toHexPrivateKey())
                                 clipboardManager.setClip(ClipEntry(clip))
-                                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT)
-                                    .show()
                                 visiblePrivateKey.value = false
                               },
                               content = {
