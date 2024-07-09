@@ -7,10 +7,18 @@ import org.web3j.utils.Numeric
 class WalletCredentials(val credentials: Credentials, val bip39Wallet: Bip39Wallet) {
 
   fun toHexPublicKey(): String {
-    return Numeric.toHexString(credentials.ecKeyPair.publicKey.toByteArray())
+    return credentials.toHexPublicKey()
   }
 
   fun toHexPrivateKey(): String {
-    return Numeric.toHexString(credentials.ecKeyPair.privateKey.toByteArray())
+    return credentials.toHexPrivateKey()
   }
+}
+
+fun Credentials.toHexPublicKey(): String {
+  return Numeric.toHexString(this.ecKeyPair.publicKey.toByteArray())
+}
+
+fun Credentials.toHexPrivateKey(): String {
+  return Numeric.toHexString(this.ecKeyPair.privateKey.toByteArray())
 }

@@ -23,7 +23,7 @@ class WalletCredentialsManager(
   fun find(): Credentials? {
     val credentials = encryptedDataStoreInterface.find("credentials")
     credentials?.let {
-      return JsonUtils.read(it, Credentials::class.java)
+      return JsonUtils.read(it, Credentials::class.java, snakeCase = false)
     }
     return null
   }

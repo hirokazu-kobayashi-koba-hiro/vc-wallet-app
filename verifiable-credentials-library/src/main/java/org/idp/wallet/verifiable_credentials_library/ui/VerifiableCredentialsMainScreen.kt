@@ -211,13 +211,13 @@ fun HomeScreen(
               colors =
                   ButtonDefaults.buttonColors(
                       contentColor = Color.Black, containerColor = Color.White),
-              onClick = {},
+              onClick = { navController.navigate("wallet-key") },
               content = {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(Dp(8.0F)),
                     content = {
                       Icon(Icons.Default.Key, contentDescription = "Key")
-                      Text(text = "key")
+                      Text(text = "wallet-key")
                     })
               })
         }

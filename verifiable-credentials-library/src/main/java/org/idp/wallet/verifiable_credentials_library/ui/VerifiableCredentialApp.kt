@@ -73,6 +73,8 @@ fun VerifiableCredentialsApp(
               userinfoResponse =
                   viewModel.loginState.value.userinfoResponse ?: UserinfoResponse(sub = ""))
         })
+    composable(
+        "wallet-key", content = { WalletKeyScreen(credentials = viewModel.findCredential()!!) })
   }
   SystemDialog(systemDialogState = systemDialogState.value)
 }
