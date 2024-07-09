@@ -26,7 +26,7 @@ class OpenIdConnectActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { LoadingScreen(color = MaterialTheme.colorScheme.primary) }
+    setContent { LoadingScreen() }
     val errorHandler = CoroutineExceptionHandler { _, throwable ->
       Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
       OpenIdConnectRequestCallbackProvider.callback.onFailure()

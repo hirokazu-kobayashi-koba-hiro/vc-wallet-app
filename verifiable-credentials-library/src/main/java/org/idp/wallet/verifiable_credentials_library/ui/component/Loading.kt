@@ -10,19 +10,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 
 @Preview
 @Composable
 fun LoadingScreenPreview() {
-  LoadingScreen(color = MaterialTheme.colorScheme.primary)
+  LoadingScreen()
 }
 
 @Composable
-fun LoadingScreen(color: Color = Color.Black) {
-  Box(
-      modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-      contentAlignment = Alignment.Center,
-  ) {
-    CircularProgressIndicator(color = color)
+fun LoadingScreen() {
+  VcWalletTheme {
+      Box(
+          modifier = Modifier
+              .fillMaxWidth()
+              .fillMaxHeight(),
+          contentAlignment = Alignment.Center,
+      ) {
+          CircularProgressIndicator()
+      }
   }
 }
