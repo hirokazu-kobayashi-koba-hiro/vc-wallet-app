@@ -15,7 +15,7 @@ fun WalletLauncherScreen(
     viewModel: VerifiableCredentialsViewModel,
     goNext: () -> Unit
 ) {
-  LoadingScreen()
+  LoadingScreen(color = MaterialTheme.colorScheme.primary)
   LaunchedEffect(Unit) {
     viewModel.login(context, openIdConnectRequest, forceLogin)
     goNext()

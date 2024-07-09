@@ -28,7 +28,7 @@ fun VpScreen(
     resolveQrCode: (format: String) -> Unit,
 ) {
   if (viewModel.loadingState.collectAsState().value) {
-    LoadingScreen()
+    LoadingScreen(color = MaterialTheme.colorScheme.primary)
     return
   }
   Scaffold(

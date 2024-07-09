@@ -128,7 +128,7 @@ fun HomeScreen(
   val loginState = viewModel.loginState.collectAsState()
   var showFloatingScreen by remember { mutableStateOf(false) }
   if (viewModel.loadingState.collectAsState().value) {
-    LoadingScreen()
+    LoadingScreen(color = MaterialTheme.colorScheme.primary)
     return
   }
   LaunchedEffect(Unit) { viewModel.getAllCredentials() }

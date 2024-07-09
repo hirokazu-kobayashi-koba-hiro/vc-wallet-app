@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.MaterialTheme
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class OpenIdConnectActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { LoadingScreen() }
+    setContent { LoadingScreen(color = MaterialTheme.colorScheme.primary) }
     val errorHandler = CoroutineExceptionHandler { _, throwable ->
       Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
       OpenIdConnectRequestCallbackProvider.callback.onFailure()
