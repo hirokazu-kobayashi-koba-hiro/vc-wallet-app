@@ -65,7 +65,9 @@ dependencies {
     implementation("org.web3j:core:4.10.2")
     implementation("org.web3j:crypto:5.0.0")
     ////did https://github.com/uport-project/kotlin-did-jwt
-//    implementation("com.github.uport-project.kotlin-did-jwt:jwt:0.4.0")
+    implementation("com.github.uport-project.kotlin-did-jwt:jwt:0.4.0") {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-serialization-runtime")
+    }
 
 //    ////jsonld-signature
 //    implementation("info.weboftrust:ld-signatures-java:1.6.0")
