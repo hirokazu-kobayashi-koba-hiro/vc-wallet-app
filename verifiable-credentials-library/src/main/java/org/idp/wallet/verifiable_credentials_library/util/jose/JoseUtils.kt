@@ -16,12 +16,19 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
+import java.security.interfaces.ECPublicKey
 
 object JoseUtils {
 
   fun parse(jose: String): JwtObject {
     val parsedJwt = JWTParser.parse(jose)
     return JwtObject(parsedJwt)
+  }
+
+  fun toPublicKey(jwks: String, keyId: String): ECPublicKey {
+    val jwkSet = JWKSet.parse(jwks)
+    val jwk = jwkSet.getKeyByKeyId(keyId)
+    return jwk.toEcPublicKey()
   }
 
   fun parseAndVerifySignature(jose: String, jwks: String): JwtObject {

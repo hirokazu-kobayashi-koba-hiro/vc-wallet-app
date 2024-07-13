@@ -14,6 +14,10 @@ class CredentialOffer(
   fun oiddEndpoint(): String {
     return "$credentialIssuer/.well-known/openid-configuration"
   }
+
+  fun jwtVcIssuerEndpoint(): String {
+    return "$credentialIssuer/.well-known/jwt-vc-issuer"
+  }
 }
 
 data class PreAuthorizedCodeGrant(

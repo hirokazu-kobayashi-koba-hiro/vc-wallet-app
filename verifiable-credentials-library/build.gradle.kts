@@ -56,27 +56,22 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.activity:activity-ktx:1.9.0")
+
+    //jwt
+    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    //https://github.com/eu-digital-identity-wallet/eudi-lib-jvm-sdjwt-kt
+    implementation("eu.europa.ec.eudi:eudi-lib-jvm-sdjwt-kt:0.5.0")
 
     //blockchain
     ////web3
     implementation("org.web3j:core:4.10.2")
     implementation("org.web3j:crypto:5.0.0")
-    ////did https://github.com/uport-project/kotlin-did-jwt
-    implementation("com.github.uport-project.kotlin-did-jwt:jwt:0.4.0") {
-        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-serialization-runtime")
-    }
 
-//    ////jsonld-signature
-//    implementation("info.weboftrust:ld-signatures-java:1.6.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     ////MerkleTree
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.13.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.16.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
     ////Base58
     implementation("com.github.multiformats:java-multibase:v1.1.1")
 
@@ -92,39 +87,32 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0-beta03")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0-beta04")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.35.1-alpha")
 
     //state
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
 
     //JSON
     implementation("com.beust:klaxon:5.6")
-
     //JSONPath refer to https://identity.foundation/presentation-exchange/spec/v2.0.0/#jsonpath-implementations
     implementation("com.nfeld.jsonpathkt:jsonpathkt:2.0.1")
-
-    //jose
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
-
     //QR
-    implementation("com.google.zxing:core:3.4.0")
+    implementation("com.google.zxing:core:3.5.2")
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
 
     //custom tabs
     implementation("androidx.browser:browser:1.8.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.activity:activity:1.9.0")
+    implementation("androidx.activity:activity-ktx:1.9.0")
 
-    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("androidx.test:core-ktx:1.6.1")
     testImplementation("org.robolectric:robolectric:4.11.1")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")

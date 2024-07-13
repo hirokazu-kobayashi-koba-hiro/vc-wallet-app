@@ -1,12 +1,16 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
-import id.walt.sdjwt.SDJwt
+// import id.walt.sdjwt.SDJwt
+import com.nimbusds.jose.crypto.ECDSAVerifier
+import eu.europa.ec.eudi.sdjwt.SdJwtVerifier
+import eu.europa.ec.eudi.sdjwt.asJwtVerifier
 import java.util.UUID
 import kotlin.js.ExperimentalJsExport
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialResponse
+import org.idp.wallet.verifiable_credentials_library.domain.type.vc.JwtVcConfiguration
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
@@ -18,12 +22,19 @@ class VerifiableCredentialsService(
 ) {
 
   @OptIn(ExperimentalJsExport::class)
-  fun transform(format: String, type: String, rawVc: String): VerifiableCredentialsRecord {
+  suspend fun transform(
+      format: String,
+      type: String,
+      rawVc: String,
+      jwks: String
+  ): VerifiableCredentialsRecord {
     return when (format) {
       "vc+sd-jwt" -> {
-        val sdJwt = SDJwt.parse(rawVc)
-        val fullPayload = sdJwt.fullPayload
-        VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, fullPayload)
+        val publicKey = JoseUtils.toPublicKey(jwks, "J1FwJP87C6-QN_WSIOmJAQc6n5CQ_bZdaFJ5GDnW1Rk")
+        val jwtSignatureVerifier = ECDSAVerifier(publicKey).asJwtVerifier()
+        val decodedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, rawVc).getOrThrow()
+        val claim = decodedSdJwt.jwt.second
+        return VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, claim)
       }
       "jwt_vc_json" -> {
         val jwt = JoseUtils.parse(rawVc)
@@ -96,5 +107,15 @@ class VerifiableCredentialsService(
       verifiableCredentialsRecord: VerifiableCredentialsRecord
   ) {
     registry.save(credentialIssuer, verifiableCredentialsRecord)
+  }
+
+  suspend fun getJwks(jwksEndpoint: String): String {
+    val response = HttpClient.get(jwksEndpoint)
+    return response.toString()
+  }
+
+  suspend fun getJwksConfiguration(jwtVcIssuerEndpoint: String): JwtVcConfiguration {
+    val response = HttpClient.get(jwtVcIssuerEndpoint)
+    return JsonUtils.read(response.toString(), JwtVcConfiguration::class.java)
   }
 }

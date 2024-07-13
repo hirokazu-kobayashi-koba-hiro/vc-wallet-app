@@ -47,10 +47,12 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
             tokenResponse.accessToken,
             format,
             "https://credentials.example.com/identity_credential")
+    val jwtVcIssuerResponse = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
+    val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
           service.transform(
-              format = format, type = credentialOffer.credentialConfigurationIds[0], it)
+              format = format, type = credentialOffer.credentialConfigurationIds[0], it, jwks)
       service.registerCredential(credentialOffer.credentialIssuer, verifiableCredentialsRecord)
     }
   }
