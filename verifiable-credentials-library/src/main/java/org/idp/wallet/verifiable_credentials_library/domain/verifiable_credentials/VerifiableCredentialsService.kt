@@ -1,11 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
-// import id.walt.sdjwt.SDJwt
-import com.nimbusds.jose.crypto.ECDSAVerifier
-import eu.europa.ec.eudi.sdjwt.SdJwtVerifier
-import eu.europa.ec.eudi.sdjwt.asJwtVerifier
 import java.util.UUID
-import kotlin.js.ExperimentalJsExport
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -21,7 +16,6 @@ class VerifiableCredentialsService(
     val clientId: String
 ) {
 
-  @OptIn(ExperimentalJsExport::class)
   suspend fun transform(
       format: String,
       type: String,
@@ -30,14 +24,12 @@ class VerifiableCredentialsService(
   ): VerifiableCredentialsRecord {
     return when (format) {
       "vc+sd-jwt" -> {
-        val publicKey = JoseUtils.toPublicKey(jwks, "J1FwJP87C6-QN_WSIOmJAQc6n5CQ_bZdaFJ5GDnW1Rk")
-        val jwtSignatureVerifier = ECDSAVerifier(publicKey).asJwtVerifier()
-        val decodedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, rawVc).getOrThrow()
-        val claim = decodedSdJwt.jwt.second
-        return VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, claim)
+        val claims = JoseUtils.parseAndVerifySignatureForSdJwt(rawVc, jwks)
+        return VerifiableCredentialsRecord(
+            UUID.randomUUID().toString(), type, format, rawVc, claims)
       }
       "jwt_vc_json" -> {
-        val jwt = JoseUtils.parse(rawVc)
+        val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
         val payload = jwt.payload()
         VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, payload)
       }
