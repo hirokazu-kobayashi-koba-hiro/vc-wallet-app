@@ -32,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -63,6 +63,7 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
     //https://github.com/eu-digital-identity-wallet/eudi-lib-jvm-sdjwt-kt
     implementation("eu.europa.ec.eudi:eudi-lib-jvm-sdjwt-kt:0.5.0")
+    implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
 
     //blockchain
     ////web3
