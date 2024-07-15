@@ -1,23 +1,12 @@
 package org.idp.wallet.verifiable_credentials_library.util.sdjwt
 
-import com.nimbusds.jose.*
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.crypto.*
 import com.nimbusds.jose.jwk.JWK
-import com.nimbusds.jwt.*
 import eu.europa.ec.eudi.sdjwt.*
 import eu.europa.ec.eudi.sdjwt.SdJwtIssuer
-import eu.europa.ec.eudi.sdjwt.exp
-import eu.europa.ec.eudi.sdjwt.iat
-import eu.europa.ec.eudi.sdjwt.iss
 import eu.europa.ec.eudi.sdjwt.nimbus
-import eu.europa.ec.eudi.sdjwt.plain
-import eu.europa.ec.eudi.sdjwt.recursive
-import eu.europa.ec.eudi.sdjwt.sd
-import eu.europa.ec.eudi.sdjwt.sdJwt
-import eu.europa.ec.eudi.sdjwt.sub
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.*
 import org.idp.wallet.verifiable_credentials_library.util.jose.toRsaPublicKey
 import org.junit.Test
 
@@ -43,31 +32,56 @@ class SdJwtTest {
             .trimIndent()
     val jwk = JWK.parse(issuerKeyPair)
     val rsaKey = jwk.toRSAKey()
-    val sdJwtSpec = sdJwt {
-      plain {
-        sub("6c5c0a49-b589-431d-bae7-219122a9ec2c")
-        iss("https://example.com/issuer")
-        iat(1516239022)
-        exp(1735689661)
-      }
-      recursive("address") {
-        sd {
-          put("street_address", "Schulstr. 12")
-          put("locality", "Schulpforta")
-          put("region", "Sachsen-Anhalt")
-          put("country", "DE")
-        }
-      }
-    }
+    val plainPayload =
+        listOf(
+            SdJwtElement(
+                "@context",
+                listOf("https://www.w3.org/2018/credentials/v1", "https://w3id.org/vaccination/v1"),
+                true),
+            SdJwtElement("type", listOf("VerifiableCredential", "VaccinationCertificate"), true),
+            SdJwtElement("issuer", "https://example.com/issuer", true),
+            SdJwtElement("issuanceDate", "2023-02-09T11:01:59Z", true),
+            SdJwtElement("expirationDate", "2028-02-08T11:01:59Z", true),
+            SdJwtElement("name", "Vaccination Certificate", false),
+            SdJwtElement("description", "Vaccination Certificate", false),
+            SdJwtElement(
+                "cnf",
+                mapOf(
+                    "jwk" to
+                        mapOf(
+                            "kty" to "EC",
+                            "crv" to "P-256",
+                            "x" to "TCAER19Zvu3OHF4j4W4vfSVoHIP1ILilDls7vCeGemc",
+                            "y" to "ZxjiWWbZMQGHVWKVQ4hbSIirsVfuecCE6t4jT9F2HZQ")),
+                true))
+
+    val structuredPayload =
+        mapOf(
+            "credentialSubject" to
+                listOf(
+                    SdJwtElement("type", "VaccinationEvent", false),
+                ),
+            "vaccine" to
+                listOf(
+                    SdJwtElement("type", "Vaccine", false),
+                ),
+            "recipient" to
+                listOf(
+                    SdJwtElement("type", "VaccineRecipient", false),
+                ))
+
+    val payload = SdJwtPayload(plainPayload, structuredPayload)
+    val sdObject: SdObject = SdObjectCreator.create(payload)
     val issuer =
         SdJwtIssuer.nimbus(signer = RSASSASigner(rsaKey), signAlgorithm = JWSAlgorithm.RS256)
-    val sdkJwt = issuer.issue(sdJwtSpec).getOrThrow()
+    val sdkJwt = issuer.issue(sdObject).getOrThrow()
     val rawJwt = sdkJwt.serialize()
     println(rawJwt)
 
     val publicKey = jwk.toRsaPublicKey()
     val jwtSignatureVerifier = RSASSAVerifier(publicKey).asJwtVerifier()
     val verifiedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, rawJwt).getOrThrow()
+    println(verifiedSdJwt.jwt.second)
     val recreateClaims = verifiedSdJwt.recreateClaims(claimsOf = { jwt -> jwt.second })
     print(recreateClaims)
   }
