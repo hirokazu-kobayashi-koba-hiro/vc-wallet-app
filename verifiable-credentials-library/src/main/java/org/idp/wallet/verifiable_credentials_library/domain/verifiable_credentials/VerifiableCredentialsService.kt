@@ -9,6 +9,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.vc.JwtVcConfigu
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
+import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
@@ -24,7 +25,7 @@ class VerifiableCredentialsService(
   ): VerifiableCredentialsRecord {
     return when (format) {
       "vc+sd-jwt" -> {
-        val claims = JoseUtils.parseAndVerifySignatureForSdJwt(rawVc, jwks)
+        val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
         return VerifiableCredentialsRecord(
             UUID.randomUUID().toString(), type, format, rawVc, claims)
       }

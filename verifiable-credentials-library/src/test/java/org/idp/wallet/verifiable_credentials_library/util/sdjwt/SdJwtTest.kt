@@ -1,11 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.util.sdjwt
 
-import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.crypto.*
 import com.nimbusds.jose.jwk.JWK
 import eu.europa.ec.eudi.sdjwt.*
-import eu.europa.ec.eudi.sdjwt.SdJwtIssuer
-import eu.europa.ec.eudi.sdjwt.nimbus
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.util.jose.toRsaPublicKey
 import org.junit.Test
@@ -71,10 +68,7 @@ class SdJwtTest {
                 ))
 
     val payload = SdJwtPayload(plainPayload, structuredPayload)
-    val sdObject: SdObject = SdObjectCreator.create(payload)
-    val issuer =
-        SdJwtIssuer.nimbus(signer = RSASSASigner(rsaKey), signAlgorithm = JWSAlgorithm.RS256)
-    val sdkJwt = issuer.issue(sdObject).getOrThrow()
+    val sdkJwt = SdJwtUtils.issue(payload, issuerKeyPair)
     val rawJwt = sdkJwt.serialize()
     println(rawJwt)
 

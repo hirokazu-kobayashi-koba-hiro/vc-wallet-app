@@ -4,8 +4,6 @@ import com.nimbusds.jose.Algorithm
 import com.nimbusds.jose.Header
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.crypto.ECDSAVerifier
-import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory
 import com.nimbusds.jose.jwk.Curve
@@ -18,34 +16,12 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
-import eu.europa.ec.eudi.sdjwt.SdJwtVerifier
-import eu.europa.ec.eudi.sdjwt.asJwtVerifier
-import eu.europa.ec.eudi.sdjwt.recreateClaims
 
 object JoseUtils {
 
   fun parse(jose: String): JwtObject {
     val parsedJwt = JWTParser.parse(jose)
     return JwtObject(parsedJwt)
-  }
-
-  suspend fun parseAndVerifySignatureForSdJwt(sdJwt: String, jwks: String): Map<String, Any> {
-    val jwkSet = JWKSet.parse(jwks)
-    val signedJWT = SignedJWT.parse(sdJwt)
-    val jwk = findKey(signedJWT, jwkSet)
-    if (signedJWT.header.algorithm.name.contains("EC", true)) {
-      val publicKey = jwk.toEcPublicKey()
-      val jwtSignatureVerifier = ECDSAVerifier(publicKey).asJwtVerifier()
-      val verifiedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, sdJwt).getOrThrow()
-      return verifiedSdJwt.recreateClaims(claimsOf = { jwt -> jwt.second })
-    }
-    if (signedJWT.header.algorithm.name.contains("RS", true)) {
-      val publicKey = jwk.toRsaPublicKey()
-      val jwtSignatureVerifier = RSASSAVerifier(publicKey).asJwtVerifier()
-      val verifiedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, sdJwt).getOrThrow()
-      return verifiedSdJwt.recreateClaims(claimsOf = { jwt -> jwt.second })
-    }
-    throw RuntimeException("unsupported algorithm: ${signedJWT.header.algorithm.name}")
   }
 
   fun parseAndVerifySignature(jose: String, jwks: String): JwtObject {
@@ -63,7 +39,7 @@ object JoseUtils {
     return JwtObject(signedJWT)
   }
 
-  private fun findKey(signedJWT: SignedJWT, jwkSet: JWKSet): JWK {
+  fun findKey(signedJWT: SignedJWT, jwkSet: JWKSet): JWK {
     val kid = signedJWT.header.keyID
     val jwk = jwkSet.getKeyByKeyId(kid)
     jwk?.let {

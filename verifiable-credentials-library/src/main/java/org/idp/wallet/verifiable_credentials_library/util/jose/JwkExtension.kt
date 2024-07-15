@@ -1,5 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.util.jose
 
+import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.JWK
 import java.security.PublicKey
 import java.security.interfaces.ECPublicKey
@@ -21,4 +22,16 @@ fun JWK.toEcPublicKey(): ECPublicKey {
 
 fun JWK.toRsaPublicKey(): RSAPublicKey {
   return toRSAKey().toRSAPublicKey()
+}
+
+fun JWK.toJWSAlgorithm(): JWSAlgorithm {
+  val algorithm = this.algorithm
+  if (algorithm != null) {
+    return JWSAlgorithm(algorithm.name)
+  }
+  return when (keyType.value) {
+    "EC" -> JWSAlgorithm("ES256")
+    "RSA" -> JWSAlgorithm("RS256")
+    else -> throw RuntimeException("unsupported key type: ${keyType.value}")
+  }
 }
