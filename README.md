@@ -17,9 +17,40 @@ You can issue verifiable-credentials of vc+sd-jwt format with authlete trial ser
    1. select format of vc+sd-jwt
 
 ## feature
-1. Wallet Metadata (Authorization Server Metadata)
-   1. spec
-      1. https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#section-8
-   2. A Set of Static Configuration Values bound to openid4vp://
-      1. https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#name-a-set-of-static-configurati
-2. 
+The library provides the following functionality:
+
+- Account management
+  - [x] OIDC
+- Key management
+  - [x] generate key-pair
+  - web3-eth
+    - [x] generate key-pair
+    - [ ] restore key-pair with seed 
+- Document management
+   - [ ] Storage encryption
+   - [ ] separate with namespace
+- OpenID for Verifiable Credential Issuance
+   - protocol
+      - [ ] Authorization Code Flow
+      - [x] Pre-authorization Code Flow
+      - [ ] Support for deferred issuing
+      - [ ] Dynamic registration of clients
+   - use-case
+      - [ ] ame device
+      - [x] cross device
+   - format
+      - [ ] mso_mdoc
+      - [x] sd-jwt-vc
+      - [x] jwt_vc_json
+      - [ ] did_jwt_vc
+      - [ ] jwt_vc_json-ld
+      - [ ] ldp_vc
+   - extension
+      - [ ] Support for DPoP JWT in authorization
+- OpenID for Verifiable Presentations
+   - protocol
+      - [ ] For pre-registered verifiers
+      - [ ] Dynamic registration of verifiers
+   - use-case
+     - [ ] remote
+     - [ ] proximity
