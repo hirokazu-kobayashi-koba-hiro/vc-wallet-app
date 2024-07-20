@@ -1,8 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.activity
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -21,7 +19,20 @@ class OpenIdConnectActivity : ComponentActivity() {
 
   private val launcher =
       registerForActivityResult(
-          contract = ActivityResultContracts.StartActivityForResult(), callback = {})
+          contract = ActivityResultContracts.StartActivityForResult(),
+          callback = {
+            val data = OpenIdConnectRequestCallbackProvider.callbackData
+            data?.let {
+              val params = extractQueriesAsSingleStringMap(it)
+              OpenIdConnectRequestCallbackProvider.callback.onSuccess(
+                  AuthenticationResponse(params))
+              OpenIdConnectRequestCallbackProvider.callbackData = null
+              finish()
+              return@registerForActivityResult
+            }
+            OpenIdConnectRequestCallbackProvider.callback.onFailure()
+            finish()
+          })
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -39,22 +50,5 @@ class OpenIdConnectActivity : ComponentActivity() {
       OpenIdConnectRequestCallbackProvider.callback.onFailure()
       finish()
     }
-  }
-
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    val data = intent.data
-    data?.let {
-      lifecycleScope.launch {
-        val params = extractQueriesAsSingleStringMap(it)
-        Log.d("VcWalletLibrary", it.toString())
-        OpenIdConnectRequestCallbackProvider.callback.onSuccess(AuthenticationResponse(params))
-        finish()
-      }
-    }
-        ?: {
-          OpenIdConnectRequestCallbackProvider.callback.onFailure()
-          finish()
-        }
   }
 }

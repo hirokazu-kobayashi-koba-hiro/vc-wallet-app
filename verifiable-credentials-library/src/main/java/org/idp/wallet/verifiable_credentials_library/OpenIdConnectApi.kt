@@ -50,7 +50,8 @@ object OpenIdConnectApi {
         }
       }
       TokenDirection.ISSUE -> {
-        val authenticationRequestUri = "${oidcMetadata.authorizationEndpoint}${request.queries()}"
+        val authenticationRequestUri =
+            "${oidcMetadata.authorizationEndpoint}${request.queries(forceLogin = force)}"
         val response = request(context, authenticationRequestUri)
         val authenticationResponseValidator = AuthenticationResponseValidator(request, response)
         authenticationResponseValidator.validate()
@@ -139,14 +140,9 @@ object OpenIdConnectApi {
   }
 }
 
-interface OpenidConnectCallback {
-  fun onSuccess()
-
-  fun onFailure()
-}
-
 object OpenIdConnectRequestCallbackProvider {
   lateinit var callback: OpenidConnectRequestCallback
+  var callbackData: String? = null
 }
 
 interface OpenidConnectRequestCallback {

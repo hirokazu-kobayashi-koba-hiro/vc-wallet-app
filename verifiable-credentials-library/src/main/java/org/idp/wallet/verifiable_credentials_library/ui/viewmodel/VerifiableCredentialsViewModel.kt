@@ -34,10 +34,17 @@ class VerifiableCredentialsViewModel(
       context: Context,
       request: OpenIdConnectRequest,
       force: Boolean = false
-  ): OpenIdConnectResponse {
-    val openIdConnectResponse = OpenIdConnectApi.login(context, request, force)
-    _loginState.value = openIdConnectResponse
-    return openIdConnectResponse
+  ): OpenIdConnectResponse? {
+    try {
+      _loading.value = true
+      val openIdConnectResponse = OpenIdConnectApi.login(context, request, force)
+      _loginState.value = openIdConnectResponse
+      return openIdConnectResponse
+    } catch (e: Exception) {
+      return null
+    } finally {
+      _loading.value = false
+    }
   }
 
   fun createCredential(password: String): WalletCredentials {

@@ -10,6 +10,11 @@
             android:name=".activity.OpenIdConnectActivity"
             android:exported="true"
             android:launchMode="singleTop">
+        </activity>
+        <activity
+            android:name=".activity.OpenIdConnectRedirectActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 

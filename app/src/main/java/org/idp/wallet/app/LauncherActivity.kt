@@ -1,8 +1,6 @@
 package org.idp.wallet.app
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import java.util.UUID
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
-import org.idp.wallet.verifiable_credentials_library.activity.VerifiableCredentialsActivity
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 
 class LauncherActivity : FragmentActivity() {
@@ -37,6 +31,10 @@ class LauncherActivity : FragmentActivity() {
     super.onCreate(savedInstanceState)
     setContent { LauncherView(viewModel = viewModel, onClick = { login() }) }
     VerifiableCredentialsClient.initialize(this, "218232426")
+    login()
+  }
+
+  private fun login() {
     val request =
         OpenIdConnectRequest(
             issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
@@ -46,23 +44,7 @@ class LauncherActivity : FragmentActivity() {
             nonce = UUID.randomUUID().toString(),
             redirectUri =
                 "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
-    VerifiableCredentialsClient.start(context = this, request = request, forceLogin = false)
-  }
-
-  private fun login() {
-    val errorHandler =
-        CoroutineExceptionHandler(
-            handler = { _, throwable ->
-              Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
-            })
-    lifecycleScope.launch(errorHandler) {
-      viewModel.loginWithOpenIdConnect(
-          this@LauncherActivity,
-          successCallback = {
-            val intent = Intent(this@LauncherActivity, VerifiableCredentialsActivity::class.java)
-            startActivity(intent)
-          })
-    }
+    VerifiableCredentialsClient.start(context = this, request = request, forceLogin = true)
   }
 }
 
@@ -74,7 +56,7 @@ fun PreviewMainScreen() {
 
 @Composable
 fun LauncherView(viewModel: LauncherViewModel, onClick: () -> Unit) {
-  var loading = viewModel.loadingState.collectAsState()
+  val loading = viewModel.loadingState.collectAsState()
   Column(
       modifier = Modifier.fillMaxWidth().fillMaxHeight(),
       verticalArrangement = Arrangement.Center,

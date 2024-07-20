@@ -18,7 +18,7 @@ data class OpenIdConnectRequest(
     return responseType == "code"
   }
 
-  fun queries(): String {
+  fun queries(forceLogin: Boolean): String {
     val builder = Uri.Builder()
     builder.appendQueryParameter("client_id", clientId)
     builder.appendQueryParameter("scope", scope)
@@ -29,6 +29,9 @@ data class OpenIdConnectRequest(
     codeChallenge?.let { builder.appendQueryParameter("code_challenge", it) }
     codeChallengeMethod?.let {
       builder.appendQueryParameter("code_challenge_method", codeChallengeMethod.name)
+    }
+    if (forceLogin) {
+      builder.appendQueryParameter("prompt", "login")
     }
     return builder.build().toString()
   }
