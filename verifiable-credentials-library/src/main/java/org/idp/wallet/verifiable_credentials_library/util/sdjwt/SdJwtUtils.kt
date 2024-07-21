@@ -49,7 +49,7 @@ object SdJwtUtils {
     val jwkSet = JWKSet.parse(jwks)
     val signedJWT = SignedJWT.parse(sdJwt)
     val jwk = JoseUtils.findKey(signedJWT, jwkSet)
-    if (signedJWT.header.algorithm.name.contains("EC", true)) {
+    if (signedJWT.header.algorithm.name.contains("ES", true)) {
       val publicKey = jwk.toEcPublicKey()
       val jwtSignatureVerifier = ECDSAVerifier(publicKey).asJwtVerifier()
       val verifiedSdJwt = SdJwtVerifier.verifyIssuance(jwtSignatureVerifier, sdJwt).getOrThrow()
