@@ -68,7 +68,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handlePreAuthorization(context, uri, format, interactor)
+      VerifiableCredentialsClient.handlePreAuthorization(context, loginState.value.userinfoResponse?.sub ?: "", uri, format, interactor)
     } finally {
       _loading.value = false
     }
@@ -77,7 +77,7 @@ class VerifiableCredentialsViewModel(
   suspend fun getAllCredentials() {
     try {
       _loading.value = true
-      val allCredentials = VerifiableCredentialsClient.getAllCredentials()
+      val allCredentials = VerifiableCredentialsClient.getAllCredentials(loginState.value.userinfoResponse?.sub ?: "")
       _vcContent.value = allCredentials
     } finally {
       _loading.value = false
@@ -91,7 +91,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      val result = VerifiableCredentialsClient.handleVpRequest(context, url, interactor)
+      val result = VerifiableCredentialsClient.handleVpRequest(context, loginState.value.userinfoResponse?.sub ?: "", url, interactor)
       println(result)
     } finally {
       _loading.value = false

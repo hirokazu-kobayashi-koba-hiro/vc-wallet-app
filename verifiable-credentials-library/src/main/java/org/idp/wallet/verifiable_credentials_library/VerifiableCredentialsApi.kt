@@ -16,6 +16,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
 
   suspend fun handlePreAuthorization(
       context: Context,
+      subject: String,
       url: String,
       format: String = "vc+sd-jwt",
       interactor: VerifiableCredentialInteractor
@@ -57,7 +58,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
               type = credentialOffer.credentialConfigurationIds[0],
               it,
               jwks)
-      service.registerCredential(verifiableCredentialsRecord)
+      service.registerCredential(subject, verifiableCredentialsRecord)
     }
   }
 
@@ -80,7 +81,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
   }
 
-  suspend fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return service.getAllCredentials()
+  suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
+    return service.getAllCredentials(subject)
   }
 }

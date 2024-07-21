@@ -20,11 +20,12 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
 
   private val dao = db.verifiableCredentialRecordDao()
 
-  override suspend fun save(record: VerifiableCredentialsRecord) =
+  override suspend fun save(sub: String, record: VerifiableCredentialsRecord) =
       withContext(Dispatchers.IO) {
         val entity =
             VerifiableCredentialRecordEntity(
                 id = record.id,
+                sub = sub,
                 issuer = record.issuer,
                 type = record.type,
                 format = record.format,
@@ -34,9 +35,9 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
       }
 
   @SuppressLint("SuspiciousIndentation")
-  override suspend fun getAll(): Map<String, VerifiableCredentialsRecords> =
+  override suspend fun getAll(sub: String): Map<String, VerifiableCredentialsRecords> =
       withContext(Dispatchers.IO) {
-        val entities = dao.getAll()
+        val entities = dao.getAll(sub)
         if (entities.isEmpty()) return@withContext mapOf()
         val records =
             entities
@@ -56,9 +57,9 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
             .toMap()
       }
 
-  override suspend fun getAllAsCollection(): VerifiableCredentialsRecords =
+  override suspend fun getAllAsCollection(sub: String): VerifiableCredentialsRecords =
       withContext(Dispatchers.IO) {
-        val entities = dao.getAll()
+        val entities = dao.getAll(sub)
         if (entities.isEmpty()) return@withContext VerifiableCredentialsRecords(listOf())
         val records =
             entities
@@ -75,9 +76,9 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
         return@withContext VerifiableCredentialsRecords(records)
       }
 
-  override suspend fun find(issuer: String): VerifiableCredentialsRecords? =
+  override suspend fun find(sub: String, issuer: String): VerifiableCredentialsRecords? =
       withContext(Dispatchers.IO) {
-        val entity = dao.selectByIssuer(issuer) ?: return@withContext null
+        val entity = dao.selectByIssuer(sub, issuer) ?: return@withContext null
         val record =
             VerifiableCredentialsRecord(
                 id = entity.id,
@@ -98,19 +99,20 @@ interface VerifiableCredentialRecordDao {
 
   @Delete fun delete(entity: VerifiableCredentialRecordEntity)
 
-  @Query("SELECT * FROM verifiable_credential_record_entity")
-  fun getAll(): List<VerifiableCredentialRecordEntity>
+  @Query("SELECT * FROM verifiable_credential_record_entity WHERE sub = :sub")
+  fun getAll(sub: String): List<VerifiableCredentialRecordEntity>
 
-  @Query("SELECT * FROM verifiable_credential_record_entity WHERE id = :id")
-  fun selectBy(id: String): VerifiableCredentialRecordEntity?
+  @Query("SELECT * FROM verifiable_credential_record_entity WHERE id = :id AND sub = :sub")
+  fun selectBy(sub: String, id: String): VerifiableCredentialRecordEntity?
 
-  @Query("SELECT * FROM verifiable_credential_record_entity WHERE issuer = :issuer")
-  fun selectByIssuer(issuer: String): VerifiableCredentialRecordEntity?
+  @Query("SELECT * FROM verifiable_credential_record_entity WHERE sub = :sub AND issuer = :issuer")
+  fun selectByIssuer(sub: String, issuer: String): VerifiableCredentialRecordEntity?
 }
 
 @Entity(tableName = "verifiable_credential_record_entity")
 class VerifiableCredentialRecordEntity(
     @PrimaryKey val id: String,
+    @ColumnInfo(name = "sub") val sub: String,
     @ColumnInfo(name = "issuer") val issuer: String,
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "format") val format: String,

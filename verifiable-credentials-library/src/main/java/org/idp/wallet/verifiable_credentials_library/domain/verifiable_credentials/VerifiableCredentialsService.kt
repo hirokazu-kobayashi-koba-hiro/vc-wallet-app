@@ -42,8 +42,8 @@ class VerifiableCredentialsService(
     }
   }
 
-  suspend fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return repository.getAll()
+  suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
+    return repository.getAll(subject)
   }
 
   suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
@@ -97,8 +97,8 @@ class VerifiableCredentialsService(
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
-  suspend fun registerCredential(verifiableCredentialsRecord: VerifiableCredentialsRecord) {
-    repository.save(verifiableCredentialsRecord)
+  suspend fun registerCredential(subject: String, verifiableCredentialsRecord: VerifiableCredentialsRecord) {
+    repository.save(subject, verifiableCredentialsRecord)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {

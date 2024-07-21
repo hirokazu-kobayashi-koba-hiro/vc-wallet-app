@@ -23,6 +23,7 @@ class VerifiablePresentationApi(
 
   suspend fun handleRequest(
       context: Context,
+      subject: String,
       url: String,
       interactor: VerifiablePresentationInteractor
   ): Result<Unit> {
@@ -30,7 +31,7 @@ class VerifiablePresentationApi(
       Log.d("VcWalletLibrary", "handleVpRequest")
       val verifiablePresentationRequestContext =
           verifiablePresentationRequestContextService.create(url)
-      val records = repository.getAllAsCollection()
+      val records = repository.getAllAsCollection(subject)
       val presentationDefinition = verifiablePresentationRequestContext.getPresentationDefinition()
       // create viewData
       val viewData = VerifiablePresentationViewData()

@@ -54,22 +54,24 @@ object VerifiableCredentialsClient {
 
   suspend fun handlePreAuthorization(
       context: Context,
+      subject: String,
       url: String,
       format: String = "vc+sd-jwt",
       interactor: VerifiableCredentialInteractor
   ) {
-    verifiableCredentialsApi.handlePreAuthorization(context, url, format, interactor)
+    verifiableCredentialsApi.handlePreAuthorization(context, subject, url, format, interactor)
   }
 
-  suspend fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return verifiableCredentialsApi.getAllCredentials()
+  suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
+    return verifiableCredentialsApi.getAllCredentials(subject)
   }
 
   suspend fun handleVpRequest(
       context: Context,
+      subject: String,
       url: String,
       interactor: VerifiablePresentationInteractor
   ): Result<Any> {
-    return verifiablePresentationApi.handleRequest(context, url, interactor)
+    return verifiablePresentationApi.handleRequest(context, subject, url, interactor)
   }
 }
