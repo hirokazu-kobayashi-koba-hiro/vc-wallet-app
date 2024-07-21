@@ -6,12 +6,12 @@ class VerifiableCredentialRegistry(context: Context) {
 
   private val values: MutableMap<String, VerifiableCredentialsRecords> = mutableMapOf()
 
-  fun save(credentialIssuer: String, record: VerifiableCredentialsRecord) {
-    val optVerifiableCredentialsRecords = values[credentialIssuer]
+  fun save(record: VerifiableCredentialsRecord) {
+    val optVerifiableCredentialsRecords = values[record.issuer]
     val verifiableCredentialsRecords =
         optVerifiableCredentialsRecords ?: VerifiableCredentialsRecords()
     val addedRecords = verifiableCredentialsRecords.add(record)
-    values[credentialIssuer] = addedRecords
+    values[record.issuer] = addedRecords
   }
 
   fun getAll(): Map<String, VerifiableCredentialsRecords> {

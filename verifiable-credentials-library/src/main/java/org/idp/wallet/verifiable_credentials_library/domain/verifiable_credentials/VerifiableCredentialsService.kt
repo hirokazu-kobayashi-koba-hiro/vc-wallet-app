@@ -13,11 +13,12 @@ import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
-    val registry: VerifiableCredentialRegistry,
+    val repository: VerifiableCredentialRecordRepository,
     val clientId: String
 ) {
 
   suspend fun transform(
+      issuer: String,
       format: String,
       type: String,
       rawVc: String,
@@ -27,12 +28,13 @@ class VerifiableCredentialsService(
       "vc+sd-jwt" -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
         return VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), type, format, rawVc, claims)
+            UUID.randomUUID().toString(), issuer, type, format, rawVc, claims)
       }
       "jwt_vc_json" -> {
         val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
         val payload = jwt.payload()
-        VerifiableCredentialsRecord(UUID.randomUUID().toString(), type, format, rawVc, payload)
+        VerifiableCredentialsRecord(
+            UUID.randomUUID().toString(), issuer, type, format, rawVc, payload)
       }
       else -> {
         throw RuntimeException("unsupported format")
@@ -40,8 +42,8 @@ class VerifiableCredentialsService(
     }
   }
 
-  fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
-    return registry.getAll()
+  suspend fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
+    return repository.getAll()
   }
 
   suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
@@ -95,11 +97,8 @@ class VerifiableCredentialsService(
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
-  fun registerCredential(
-      credentialIssuer: String,
-      verifiableCredentialsRecord: VerifiableCredentialsRecord
-  ) {
-    registry.save(credentialIssuer, verifiableCredentialsRecord)
+  suspend fun registerCredential(verifiableCredentialsRecord: VerifiableCredentialsRecord) {
+    repository.save(verifiableCredentialsRecord)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {

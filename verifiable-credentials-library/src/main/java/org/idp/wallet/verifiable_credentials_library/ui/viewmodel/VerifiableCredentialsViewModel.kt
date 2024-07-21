@@ -74,7 +74,7 @@ class VerifiableCredentialsViewModel(
     }
   }
 
-  fun getAllCredentials() {
+  suspend fun getAllCredentials() {
     try {
       _loading.value = true
       val allCredentials = VerifiableCredentialsClient.getAllCredentials()

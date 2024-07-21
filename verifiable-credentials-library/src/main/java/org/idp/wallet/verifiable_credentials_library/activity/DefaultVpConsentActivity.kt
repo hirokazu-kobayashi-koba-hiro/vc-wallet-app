@@ -88,19 +88,19 @@ fun DefaultVpConsentPreView() {
                       VerifiableCredentialsRecords(
                           listOf(
                               VerifiableCredentialsRecord(
-                                  "1", "", "jwt", "", mapOf("key" to "test")),
+                                  "1", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "2", "", "jwt", "", mapOf("key" to "test")),
+                                  "2", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "3", "", "jwt", "", mapOf("key" to "test")),
+                                  "3", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "4", "", "jwt", "", mapOf("key" to "test")),
+                                  "4", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "5", "", "jwt", "", mapOf("key" to "test")),
+                                  "5", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "6", "", "jwt", "", mapOf("key" to "test")),
+                                  "6", "", "", "jwt", "", mapOf("key" to "test")),
                               VerifiableCredentialsRecord(
-                                  "7", "", "jwt", "", mapOf("key" to "test")))),
+                                  "7", "", "", "jwt", "", mapOf("key" to "test")))),
               )),
       onAccept = {},
       onReject = {})

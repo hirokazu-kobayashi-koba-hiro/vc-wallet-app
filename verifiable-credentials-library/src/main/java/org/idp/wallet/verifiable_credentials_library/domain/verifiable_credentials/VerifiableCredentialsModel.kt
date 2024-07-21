@@ -36,6 +36,7 @@ class VerifiableCredentialsRecords(private val values: List<VerifiableCredential
 
 class VerifiableCredentialsRecord(
     val id: String,
+    val issuer: String,
     val type: String,
     val format: String,
     val rawVc: String,

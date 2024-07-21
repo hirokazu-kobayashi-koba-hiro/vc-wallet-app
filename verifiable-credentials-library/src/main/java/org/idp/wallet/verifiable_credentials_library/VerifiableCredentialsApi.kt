@@ -52,8 +52,12 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
           service.transform(
-              format = format, type = credentialOffer.credentialConfigurationIds[0], it, jwks)
-      service.registerCredential(credentialOffer.credentialIssuer, verifiableCredentialsRecord)
+              issuer = credentialOffer.credentialIssuer,
+              format = format,
+              type = credentialOffer.credentialConfigurationIds[0],
+              it,
+              jwks)
+      service.registerCredential(verifiableCredentialsRecord)
     }
   }
 
@@ -76,7 +80,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
   }
 
-  fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
+  suspend fun getAllCredentials(): Map<String, VerifiableCredentialsRecords> {
     return service.getAllCredentials()
   }
 }
