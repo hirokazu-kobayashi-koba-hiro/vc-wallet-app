@@ -25,10 +25,10 @@ The library provides the following functionality:
   - [x] generate key-pair
   - web3-eth
     - [x] generate key-pair
-    - [ ] restore key-pair with seed 
+    - [x] restore key-pair with seed 
 - Document management
    - [ ] Storage encryption
-   - [ ] separate with namespace
+   - [x] separate with namespace
 - OpenID for Verifiable Credential Issuance
    - protocol
       - [ ] Authorization Code Flow
