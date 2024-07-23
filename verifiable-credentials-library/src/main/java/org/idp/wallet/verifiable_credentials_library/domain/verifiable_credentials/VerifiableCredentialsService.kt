@@ -71,15 +71,17 @@ class VerifiableCredentialsService(
     return JsonUtils.read(response.toString(), OidcMetadata::class.java)
   }
 
-  suspend fun requestTokenOnPreAuthorizedCode(
+  suspend fun requestTokenWithPreAuthorizedCode(
       url: String,
-      preAuthorizationCode: String
+      preAuthorizationCode: String,
+      txCode: String?
   ): TokenResponse {
     val tokenRequest =
-        hashMapOf(
+        mutableMapOf(
             Pair("client_id", clientId),
             Pair("grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code"),
             Pair("pre-authorized_code", preAuthorizationCode))
+    txCode?.let { tokenRequest.put("tx_code", it) }
     val tokenRequestHeaders = hashMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
     val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
     return JsonUtils.read(response.toString(), TokenResponse::class.java)
@@ -97,7 +99,10 @@ class VerifiableCredentialsService(
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
-  suspend fun registerCredential(subject: String, verifiableCredentialsRecord: VerifiableCredentialsRecord) {
+  suspend fun registerCredential(
+      subject: String,
+      verifiableCredentialsRecord: VerifiableCredentialsRecord
+  ) {
     repository.save(subject, verifiableCredentialsRecord)
   }
 

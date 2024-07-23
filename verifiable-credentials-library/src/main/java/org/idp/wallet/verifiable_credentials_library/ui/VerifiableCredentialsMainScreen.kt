@@ -52,7 +52,6 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentialsManager
 import org.idp.wallet.verifiable_credentials_library.ui.component.CardComponent
 import org.idp.wallet.verifiable_credentials_library.ui.component.FloatingView
-import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 import org.idp.wallet.verifiable_credentials_library.util.store.EncryptedDataStoreInterface
@@ -127,10 +126,7 @@ fun HomeScreen(
   val vciState = viewModel.vciState.collectAsState()
   val loginState = viewModel.loginState.collectAsState()
   var showFloatingScreen by remember { mutableStateOf(false) }
-  if (viewModel.loadingState.collectAsState().value) {
-    LoadingScreen()
-    return
-  }
+
   LaunchedEffect(Unit) { viewModel.getAllCredentials() }
 
   Scaffold(

@@ -48,16 +48,16 @@ class VerifiableCredentialsViewModel(
   }
 
   fun createCredential(password: String): WalletCredentials {
-    val walletCredentials = walletCredentialsManager.create(password)
+    val walletCredentials = walletCredentialsManager.create(subject(), password)
     return walletCredentials
   }
 
   fun findCredential(): Credentials? {
-    return walletCredentialsManager.find()
+    return walletCredentialsManager.find(subject())
   }
 
   fun deleteCredential() {
-    walletCredentialsManager.delete()
+    walletCredentialsManager.delete(subject())
   }
 
   suspend fun requestVcOnPreAuthorization(
@@ -68,7 +68,8 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handlePreAuthorization(context, loginState.value.userinfoResponse?.sub ?: "", uri, format, interactor)
+      VerifiableCredentialsClient.handlePreAuthorization(
+          context, subject(), uri, format, interactor)
     } finally {
       _loading.value = false
     }
@@ -77,7 +78,7 @@ class VerifiableCredentialsViewModel(
   suspend fun getAllCredentials() {
     try {
       _loading.value = true
-      val allCredentials = VerifiableCredentialsClient.getAllCredentials(loginState.value.userinfoResponse?.sub ?: "")
+      val allCredentials = VerifiableCredentialsClient.getAllCredentials(subject())
       _vcContent.value = allCredentials
     } finally {
       _loading.value = false
@@ -91,7 +92,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      val result = VerifiableCredentialsClient.handleVpRequest(context, loginState.value.userinfoResponse?.sub ?: "", url, interactor)
+      val result = VerifiableCredentialsClient.handleVpRequest(context, subject(), url, interactor)
       println(result)
     } finally {
       _loading.value = false
@@ -119,5 +120,9 @@ class VerifiableCredentialsViewModel(
               _systemDialogState.value =
                   SystemDialogState(visible = false, title = "", message = "")
             })
+  }
+
+  private fun subject(): String {
+    return loginState.value.userinfoResponse?.sub ?: ""
   }
 }

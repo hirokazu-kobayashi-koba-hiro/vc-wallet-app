@@ -12,24 +12,24 @@ class WalletCredentialsManager(
     private val encryptedDataStoreInterface: EncryptedDataStoreInterface
 ) {
 
-  fun create(password: String): WalletCredentials {
+  fun create(subject: String, password: String): WalletCredentials {
     val bip39Wallet = WalletUtils.generateBip39Wallet(password, file)
     val mnemonic = bip39Wallet.mnemonic
     val credentials = WalletUtils.loadBip39Credentials(password, mnemonic)
-    encryptedDataStoreInterface.store("credentials", JsonUtils.write(credentials))
+    encryptedDataStoreInterface.store("$subject:credentials", JsonUtils.write(credentials))
     return WalletCredentials(credentials, bip39Wallet)
   }
 
-  fun find(): Credentials? {
-    val credentials = encryptedDataStoreInterface.find("credentials")
+  fun find(subject: String): Credentials? {
+    val credentials = encryptedDataStoreInterface.find("$subject:credentials")
     credentials?.let {
       return JsonUtils.read(it, Credentials::class.java, snakeCase = false)
     }
     return null
   }
 
-  fun delete() {
-    encryptedDataStoreInterface.delete("credentials")
+  fun delete(subject: String) {
+    encryptedDataStoreInterface.delete("$subject:credentials")
   }
 
   fun restore(password: String, mnemonic: String): WalletCredentials {

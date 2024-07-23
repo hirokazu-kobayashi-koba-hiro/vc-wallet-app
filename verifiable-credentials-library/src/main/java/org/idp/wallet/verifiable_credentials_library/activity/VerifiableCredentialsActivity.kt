@@ -102,7 +102,6 @@ class VerifiableCredentialsActivity : ComponentActivity() {
           },
       )
     }
-    lifecycleScope.launch { viewModel.getAllCredentials() }
   }
 
   companion object {

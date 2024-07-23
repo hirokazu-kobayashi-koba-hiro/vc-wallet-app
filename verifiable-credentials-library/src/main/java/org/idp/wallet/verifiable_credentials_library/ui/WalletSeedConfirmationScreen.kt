@@ -1,6 +1,7 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
 import android.content.ClipData
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
@@ -39,6 +41,7 @@ fun WalletSeedConfirmationPreviewView() {
 @Composable
 fun WalletSeedConfirmationScreen(seed: String, goNext: () -> Unit) {
   val clipboardManager = LocalClipboardManager.current
+  val context = LocalContext.current
 
   VcWalletTheme {
     Scaffold(
@@ -76,6 +79,7 @@ fun WalletSeedConfirmationScreen(seed: String, goNext: () -> Unit) {
                     onClick = {
                       val clip = ClipData.newPlainText("Mnemonic Phrase", seed)
                       clipboardManager.setClip(ClipEntry(clip))
+                      Toast.makeText(context, "copied to clipboard", Toast.LENGTH_LONG).show()
                     },
                     colors =
                         ButtonDefaults.buttonColors(
