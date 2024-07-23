@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import org.idp.wallet.verifiable_credentials_library.domain.wallet.WalletCredentials
+import org.idp.wallet.verifiable_credentials_library.ui.component.LinkButton
 import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.web3j.crypto.Bip39Wallet
 import org.web3j.crypto.Credentials
@@ -119,7 +120,7 @@ fun WalletRegistrationScreen(
                       val walletCredentials = createCredential(password)
                       goNext(walletCredentials.bip39Wallet.mnemonic)
                     })
-                Button(content = { Text(text = "restore") }, onClick = { goNextToRestore() })
+                LinkButton(text = "restore credential with seed?", onClick = { goNextToRestore() })
               })
         },
     )
