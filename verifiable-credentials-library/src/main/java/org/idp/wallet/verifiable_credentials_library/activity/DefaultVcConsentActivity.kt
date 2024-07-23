@@ -1,6 +1,5 @@
 package org.idp.wallet.verifiable_credentials_library.activity
 
-import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -28,6 +27,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -157,10 +157,10 @@ fun DefaultVcPreview() {
 fun DefaultVcView(
     credentialIssuerMetadata: CredentialIssuerMetadata,
     credentialOffer: CredentialOffer,
-    onContinue: (pinCode: String) -> Unit,
+    onContinue: (txCode: String) -> Unit,
     onCancel: () -> Unit
 ) {
-  var pinCode by remember { mutableStateOf("") }
+  var txCode by remember { mutableStateOf("") }
   VcWalletTheme(darkTheme = false) {
     Scaffold(
         modifier = Modifier.fillMaxWidth().padding(top = Dp(24.0F), bottom = Dp(24.0F)),
@@ -191,6 +191,10 @@ fun DefaultVcView(
               verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 CredentialCards(credentialOffer, credentialIssuerMetadata)
+                OutlinedTextField(
+                    label = { Text(text = "Transaction Code") },
+                    value = txCode,
+                    onValueChange = { txCode = it })
               }
         },
         bottomBar = {
@@ -207,7 +211,7 @@ fun DefaultVcView(
                       Text("Cancel")
                     }
                 Button(
-                    onClick = { onContinue(pinCode) },
+                    onClick = { onContinue(txCode) },
                     colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
                       Text("Continue")
                     }

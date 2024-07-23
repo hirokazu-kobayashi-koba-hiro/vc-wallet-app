@@ -10,8 +10,7 @@ class DefaultVerifiableCredentialInteractor : VerifiableCredentialInteractor {
   override fun confirm(
       context: Context,
       credentialIssuerMetadata: CredentialIssuerMetadata,
-      credentialOffer:
-          org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
+      credentialOffer: CredentialOffer,
       callback: VerifiableCredentialInteractorCallback
   ) {
     VerifiableCredentialInteracotrCallbackProvider.callback = callback
@@ -26,14 +25,13 @@ interface VerifiableCredentialInteractor {
   fun confirm(
       context: Context,
       credentialIssuerMetadata: CredentialIssuerMetadata,
-      credentialOffer:
-          org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer,
+      credentialOffer: CredentialOffer,
       callback: VerifiableCredentialInteractorCallback
   )
 }
 
 interface VerifiableCredentialInteractorCallback {
-  fun accept(pinCode: String)
+  fun accept(txCode: String)
 
   fun reject()
 }

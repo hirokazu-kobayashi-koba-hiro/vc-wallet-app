@@ -36,12 +36,14 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     val oidcMetadata =
         service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
     val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
-    if (!result) {
-      throw RuntimeException("")
+    if (!result.first) {
+      throw RuntimeException("user canceled")
     }
     val tokenResponse =
-        service.requestTokenOnPreAuthorizedCode(
-            oidcMetadata.tokenEndpoint, preAuthorizedCodeGrant.preAuthorizedCode)
+        service.requestTokenWithPreAuthorizedCode(
+            url = oidcMetadata.tokenEndpoint,
+            preAuthorizationCode = preAuthorizedCodeGrant.preAuthorizedCode,
+            txCode = result.second)
     val credentialResponse =
         service.requestCredential(
             credentialIssuerMetadata.credentialEndpoint,
@@ -67,15 +69,15 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
       credentialIssuerMetadata: CredentialIssuerMetadata,
       credentialOffer: CredentialOffer,
       interactor: VerifiableCredentialInteractor
-  ): Boolean = suspendCoroutine { continuation ->
+  ): Pair<Boolean, String?> = suspendCoroutine { continuation ->
     val callback =
         object : VerifiableCredentialInteractorCallback {
-          override fun accept(pinCode: String) {
-            continuation.resume(true)
+          override fun accept(txCode: String) {
+            continuation.resume(Pair(true, txCode))
           }
 
           override fun reject() {
-            continuation.resume(false)
+            continuation.resume(Pair(false, null))
           }
         }
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
