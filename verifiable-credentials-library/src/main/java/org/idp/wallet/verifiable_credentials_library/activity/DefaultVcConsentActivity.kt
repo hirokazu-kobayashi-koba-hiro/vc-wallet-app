@@ -71,12 +71,7 @@ class DefaultVcConsentActivity : ComponentActivity() {
     val credentialOfferValue =
         intent.getStringExtra("credentialOffer") ?: throw RuntimeException("")
     val credentialOffer =
-        JsonUtils.read(
-            credentialOfferValue,
-            org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
-                    .CredentialOffer::class
-                .java,
-            snakeCase = false)
+        JsonUtils.read(credentialOfferValue, CredentialOffer::class.java, snakeCase = false)
     setContent {
       DefaultVcView(
           credentialIssuerMetadata = credentialIssuerMetadata,

@@ -122,6 +122,10 @@ class VerifiableCredentialsViewModel(
             })
   }
 
+  fun restoreCredential(password: String, seed: String): WalletCredentials {
+    return walletCredentialsManager.restore(subject(), password, seed)
+  }
+
   private fun subject(): String {
     return loginState.value.userinfoResponse?.sub ?: ""
   }

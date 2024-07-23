@@ -40,25 +40,23 @@ import org.web3j.crypto.Credentials
 
 @Preview
 @Composable
-fun WalletRegistrationPreView() {
-  WalletRegistrationScreen(
-      createCredential = { password: String ->
-        return@WalletRegistrationScreen WalletCredentials(
+fun WalletRestorePreView() {
+  WalletRestoreScreen(
+      createCredential = { password: String, seed: String ->
+        return@WalletRestoreScreen WalletCredentials(
             credentials = Credentials.create(""), bip39Wallet = Bip39Wallet("", ""))
       },
-      goNext = {},
-      goNextToRestore = {})
+      goNext = {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletRegistrationScreen(
-    createCredential: (password: String) -> WalletCredentials,
-    goNext: (seed: String) -> Unit,
-    goNextToRestore: () -> Unit,
+fun WalletRestoreScreen(
+    createCredential: (password: String, seed: String) -> WalletCredentials,
+    goNext: () -> Unit
 ) {
-  var username by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
+  var seed by remember { mutableStateOf("") }
   var passwordVisible by remember { mutableStateOf(false) }
 
   VcWalletTheme {
@@ -74,9 +72,7 @@ fun WalletRegistrationScreen(
                       Icon(
                           imageVector = Icons.Default.AccountBox, contentDescription = "AccountBox")
                       Spacer(modifier = Modifier.padding(Dp(4.0F)))
-                      Text(
-                          text = "Wallet Registration",
-                          style = MaterialTheme.typography.displayMedium)
+                      Text(text = "Wallet Restore", style = MaterialTheme.typography.displayMedium)
                     }
               })
         },
@@ -91,11 +87,7 @@ fun WalletRegistrationScreen(
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.spacedBy(Dp(20.0F)),
               content = {
-                Text(text = "Create Account", style = MaterialTheme.typography.displaySmall)
-                OutlinedTextField(
-                    label = { Text(text = "username") },
-                    value = username,
-                    onValueChange = { username = it })
+                Text(text = "restore Account", style = MaterialTheme.typography.displaySmall)
                 OutlinedTextField(
                     label = { Text(text = "password") },
                     value = password,
@@ -113,13 +105,14 @@ fun WalletRegistrationScreen(
                       }
                     },
                 )
+                OutlinedTextField(
+                    label = { Text(text = "seed") }, value = seed, onValueChange = { seed = it })
                 Button(
                     content = { Text(text = "next") },
                     onClick = {
-                      val walletCredentials = createCredential(password)
-                      goNext(walletCredentials.bip39Wallet.mnemonic)
+                      val walletCredentials = createCredential(password, seed)
+                      goNext()
                     })
-                Button(content = { Text(text = "restore") }, onClick = { goNextToRestore() })
               })
         },
     )

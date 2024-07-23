@@ -47,7 +47,18 @@ fun VerifiableCredentialsApp(
               createCredential = { password: String ->
                 return@WalletRegistrationScreen viewModel.createCredential(password)
               },
-              goNext = { seed -> navController.navigate("wallet-seed-confirmation?seed=$seed") })
+              goNext = { seed -> navController.navigate("wallet-seed-confirmation?seed=$seed") },
+              goNextToRestore = { navController.navigate("wallet-restore") },
+          )
+        })
+    composable(
+        "wallet-restore",
+        content = {
+          WalletRestoreScreen(
+              createCredential = { password: String, seed: String ->
+                return@WalletRestoreScreen viewModel.restoreCredential(password, seed)
+              },
+              goNext = { navController.navigate("main") })
         })
     composable(
         "wallet-seed-confirmation?seed={seed}",

@@ -32,10 +32,11 @@ class WalletCredentialsManager(
     encryptedDataStoreInterface.delete("$subject:credentials")
   }
 
-  fun restore(password: String, mnemonic: String): WalletCredentials {
+  fun restore(subject: String, password: String, mnemonic: String): WalletCredentials {
     val credentials = WalletUtils.loadBip39Credentials(password, mnemonic)
     val fileName = WalletUtils.generateWalletFile(password, credentials.ecKeyPair, file, false)
     val bip39Wallet = Bip39Wallet(fileName, mnemonic)
+    encryptedDataStoreInterface.store("$subject:credentials", JsonUtils.write(credentials))
     return WalletCredentials(credentials, bip39Wallet)
   }
 }
