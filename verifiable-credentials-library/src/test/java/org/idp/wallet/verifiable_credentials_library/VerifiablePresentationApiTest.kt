@@ -160,7 +160,7 @@ class VerifiablePresentationApiTest {
       val payload = JoseUtils.parse(signedValue).payload()
       val record =
           VerifiableCredentialsRecord("1", "test", "type", "jwt_vc_json", signedValue, payload)
-      registry.save(record)
+      registry.save("1", record)
       println(uri.toString())
       val interactor =
           object : VerifiablePresentationInteractor {
@@ -173,7 +173,7 @@ class VerifiablePresentationApiTest {
               callback.accept()
             }
           }
-      val result = service.handleRequest(context, uri.toString(), interactor = interactor)
+      val result = service.handleRequest(context, "1", uri.toString(), interactor = interactor)
       result.onSuccess { print("success") }
       result.onFailure { print("failure") }
     }
@@ -235,7 +235,7 @@ class VerifiablePresentationApiTest {
       val payload = JoseUtils.parse(signedValue).payload()
       val record =
           VerifiableCredentialsRecord("1", "test", "type", "jwt_vc_json", signedValue, payload)
-      registry.save(record)
+      registry.save("1", record)
       val vpPayload =
           """
             {
@@ -354,7 +354,7 @@ class VerifiablePresentationApiTest {
               callback.accept()
             }
           }
-      val response = service.handleRequest(context, url, interactor = interactor)
+      val response = service.handleRequest(context, "1", url, interactor = interactor)
 
     }
   }

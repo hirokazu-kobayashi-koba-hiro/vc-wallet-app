@@ -60,4 +60,10 @@ data class OidcMetadata(
     val authorizationSigningAlgValuesSupported: List<String>?,
     val authorizationEncryptionAlgValuesSupported: List<String>?,
     val authorizationEncryptionEncValuesSupported: List<String>?,
-) {}
+) {
+
+  fun scopesSupportedAsString(): String {
+    return scopesSupported?.filter { it != "openid" && it != "offline_access" }?.joinToString(" ")
+        ?: ""
+  }
+}

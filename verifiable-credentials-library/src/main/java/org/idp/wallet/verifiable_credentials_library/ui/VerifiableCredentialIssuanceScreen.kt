@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +29,12 @@ import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCred
 fun VcScreen(
     viewModel: VerifiableCredentialsViewModel,
     resolveQrCode: (format: String) -> Unit,
+    issueVcWhenAuthorizationCodeFlow: (issuer: String) -> Unit
 ) {
+  var format by remember { mutableStateOf("vc+sd-jwt") }
+  var issuer by remember { mutableStateOf("https://trial.authlete.net") }
+  val vciState = viewModel.vciState.collectAsState()
+
   if (viewModel.loadingState.collectAsState().value) {
     LoadingScreen()
     return
@@ -49,24 +55,29 @@ fun VcScreen(
             modifier = Modifier.fillMaxWidth().padding(paddingValues),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-              var format by remember { mutableStateOf("vc+sd-jwt") }
-              val vciState = viewModel.vciState.collectAsState()
               Column(
                   modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
-                  horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row {
-                      Button(
-                          modifier = Modifier.padding(top = Dp(16.0F)),
-                          onClick = {
-                            viewModel.showDialog(
-                                title = "confirm",
-                                message = "Could you scan qr?",
-                                onClickPositiveButton = { resolveQrCode(format) })
-                          }) {
-                            Text(text = "scan QR")
-                          }
-                    }
-                  }
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
+              ) {
+                Column {
+                  Text(text = "pre-authorization")
+                  Button(
+                      modifier = Modifier.padding(top = Dp(16.0F)),
+                      onClick = { resolveQrCode(format) }) {
+                        Text(text = "scan QR")
+                      }
+                }
+                Column {
+                  Text(text = "authorization-code")
+                  OutlinedTextField(value = issuer, onValueChange = { issuer = it })
+                  Button(
+                      modifier = Modifier.padding(top = Dp(16.0F)),
+                      onClick = { issueVcWhenAuthorizationCodeFlow(issuer) }) {
+                        Text(text = "request vc")
+                      }
+                }
+              }
             }
       })
 }

@@ -69,7 +69,7 @@ class VerifiableCredentialsActivity : ComponentActivity() {
               viewModel.requestVcOnPreAuthorization(
                   this@VerifiableCredentialsActivity,
                   barcodeValue,
-                  format,
+                  "mso_mdoc",
                   DefaultVerifiableCredentialInteractor())
               Toast.makeText(this@VerifiableCredentialsActivity, "Success", Toast.LENGTH_LONG)
                   .show()

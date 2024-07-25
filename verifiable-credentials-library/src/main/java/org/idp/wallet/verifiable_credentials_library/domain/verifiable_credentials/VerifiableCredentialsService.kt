@@ -36,6 +36,10 @@ class VerifiableCredentialsService(
         VerifiableCredentialsRecord(
             UUID.randomUUID().toString(), issuer, type, format, rawVc, payload)
       }
+      "mso_mdoc" -> {
+        VerifiableCredentialsRecord(
+            UUID.randomUUID().toString(), issuer, type, format, rawVc, mapOf())
+      }
       else -> {
         throw RuntimeException("unsupported format")
       }
@@ -82,6 +86,22 @@ class VerifiableCredentialsService(
             Pair("grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code"),
             Pair("pre-authorized_code", preAuthorizationCode))
     txCode?.let { tokenRequest.put("tx_code", it) }
+    val tokenRequestHeaders = hashMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
+    val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
+    return JsonUtils.read(response.toString(), TokenResponse::class.java)
+  }
+
+  suspend fun requestTokenWithAuthorizedCode(
+      url: String,
+      authorizationCode: String,
+      redirectUri: String? = null
+  ): TokenResponse {
+    val tokenRequest =
+        mutableMapOf(
+            Pair("client_id", clientId),
+            Pair("grant_type", "authorization_code"),
+            Pair("code", authorizationCode))
+    redirectUri?.let { tokenRequest.put("redirect_uri", it) }
     val tokenRequestHeaders = hashMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
     val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
     return JsonUtils.read(response.toString(), TokenResponse::class.java)

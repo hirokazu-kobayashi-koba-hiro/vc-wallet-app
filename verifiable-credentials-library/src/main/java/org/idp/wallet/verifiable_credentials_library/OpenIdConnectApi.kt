@@ -119,25 +119,24 @@ object OpenIdConnectApi {
     return userinfoResponse
   }
 
-  private suspend fun request(
-      context: Context,
-      authenticationRequestUri: String
-  ): AuthenticationResponse = suspendCoroutine { continuation ->
-    val callback =
-        object : OpenidConnectRequestCallback {
-          override fun onSuccess(response: AuthenticationResponse) {
-            continuation.resume(response)
-          }
+  suspend fun request(context: Context, authenticationRequestUri: String): AuthenticationResponse =
+      suspendCoroutine { continuation ->
+        val callback =
+            object : OpenidConnectRequestCallback {
+              override fun onSuccess(response: AuthenticationResponse) {
+                continuation.resume(response)
+              }
 
-          override fun onFailure() {
-            continuation.resumeWithException(OpenIdConnectException(OidcError.NOT_AUTHENTICATED))
-          }
-        }
-    OpenIdConnectRequestCallbackProvider.callback = callback
-    val intent = Intent(context, OpenIdConnectActivity::class.java)
-    intent.putExtra("authenticationRequestUri", authenticationRequestUri)
-    context.startActivity(intent)
-  }
+              override fun onFailure() {
+                continuation.resumeWithException(
+                    OpenIdConnectException(OidcError.NOT_AUTHENTICATED))
+              }
+            }
+        OpenIdConnectRequestCallbackProvider.callback = callback
+        val intent = Intent(context, OpenIdConnectActivity::class.java)
+        intent.putExtra("authenticationRequestUri", authenticationRequestUri)
+        context.startActivity(intent)
+      }
 }
 
 object OpenIdConnectRequestCallbackProvider {

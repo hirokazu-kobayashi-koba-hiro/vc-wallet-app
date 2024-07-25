@@ -75,6 +75,19 @@ class VerifiableCredentialsViewModel(
     }
   }
 
+  suspend fun requestVcOnAuthorizationCode(
+      context: Context,
+      issuer: String,
+      format: String,
+  ) {
+    try {
+      _loading.value = true
+      VerifiableCredentialsClient.handleAuthorizationCode(context, subject(), issuer, format)
+    } finally {
+      _loading.value = false
+    }
+  }
+
   suspend fun getAllCredentials() {
     try {
       _loading.value = true

@@ -4,6 +4,7 @@ import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
+import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsAuthorizationRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequestValidator
@@ -60,6 +61,51 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
               type = credentialOffer.credentialConfigurationIds[0],
               it,
               jwks)
+      service.registerCredential(subject, verifiableCredentialsRecord)
+    }
+  }
+
+  suspend fun handleAuthorizationCode(
+      context: Context,
+      subject: String,
+      issuer: String,
+      format: String = "vc+sd-jwt",
+  ) {
+    val credentialIssuerMetadata =
+        service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
+
+    val oidcMetadata =
+        service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
+
+    val vcAuthorizationRequest =
+        VerifiableCredentialsAuthorizationRequest(
+            issuer = issuer,
+            clientId = service.clientId,
+            scope = oidcMetadata.scopesSupportedAsString(),
+            redirectUri = "",
+        )
+    val authenticationResponse =
+        OpenIdConnectApi.request(
+            context = context,
+            authenticationRequestUri =
+                "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries(true)}")
+    val tokenResponse =
+        service.requestTokenWithAuthorizedCode(
+            url = oidcMetadata.tokenEndpoint,
+            authorizationCode = authenticationResponse.code(),
+        )
+
+    val credentialResponse =
+        service.requestCredential(
+            credentialIssuerMetadata.credentialEndpoint,
+            tokenResponse.accessToken,
+            format,
+            "https://credentials.example.com/identity_credential")
+    val jwtVcIssuerResponse = service.getJwksConfiguration("$issuer/.well-known/jwt-vc-issuer")
+    val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
+    credentialResponse.credential?.let {
+      val verifiableCredentialsRecord =
+          service.transform(issuer = issuer, format = format, type = "", it, jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
   }
