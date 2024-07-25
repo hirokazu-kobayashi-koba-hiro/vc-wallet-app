@@ -69,7 +69,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
       context: Context,
       subject: String,
       issuer: String,
-      format: String = "vc+sd-jwt",
+      format: String,
   ) {
     val credentialIssuerMetadata =
         service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
@@ -88,7 +88,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
         OpenIdConnectApi.request(
             context = context,
             authenticationRequestUri =
-                "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries(true)}")
+                "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}")
     val tokenResponse =
         service.requestTokenWithAuthorizedCode(
             url = oidcMetadata.tokenEndpoint,

@@ -66,7 +66,7 @@ object VerifiableCredentialsClient {
       context: Context,
       subject: String,
       url: String,
-      format: String = "vc+sd-jwt",
+      format: String,
   ) {
     verifiableCredentialsApi.handleAuthorizationCode(context, subject, url, format)
   }

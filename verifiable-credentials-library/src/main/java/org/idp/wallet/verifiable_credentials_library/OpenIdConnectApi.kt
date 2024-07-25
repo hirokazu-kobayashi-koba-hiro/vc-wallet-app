@@ -1,7 +1,9 @@
 package org.idp.wallet.verifiable_credentials_library
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import androidx.appcompat.widget.AppCompatEditText
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -128,8 +130,27 @@ object OpenIdConnectApi {
               }
 
               override fun onFailure() {
-                continuation.resumeWithException(
-                    OpenIdConnectException(OidcError.NOT_AUTHENTICATED))
+                val editText =
+                    AppCompatEditText(context).apply {
+                      hint = "code"
+                      setPadding(40, 40, 40, 40)
+                    }
+                AlertDialog.Builder(context)
+                    .setTitle("Temporary Input Dialog")
+                    .setMessage("please input code")
+                    .setView(editText)
+                    .setPositiveButton("OK") { dialog, _ ->
+                      val response =
+                          AuthenticationResponse(values = mapOf("code" to editText.text.toString()))
+                      continuation.resume(response)
+                      dialog.dismiss()
+                    }
+                    .setNegativeButton("CANCEL") { dialog, _ ->
+                      continuation.resumeWithException(
+                          OpenIdConnectException(OidcError.NOT_AUTHENTICATED))
+                      dialog.dismiss()
+                    }
+                    .show()
               }
             }
         OpenIdConnectRequestCallbackProvider.callback = callback
