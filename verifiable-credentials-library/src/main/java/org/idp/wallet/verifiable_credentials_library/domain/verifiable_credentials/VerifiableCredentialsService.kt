@@ -114,12 +114,16 @@ class VerifiableCredentialsService(
 
   suspend fun requestCredential(
       url: String,
+      dpopJwt: String?,
       accessToken: String,
       format: String,
       vc: String
   ): CredentialResponse {
-    val credentialRequest = hashMapOf(Pair("format", format), Pair("vct", vc))
-    val credentialRequestHeader = hashMapOf(Pair("Authorization", "Bearer $accessToken"))
+    val credentialRequest = mapOf(Pair("format", format), Pair("vct", vc))
+    val credentialRequestHeader =
+        dpopJwt?.let {
+          return@let mapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
+        } ?: mapOf(Pair("Authorization", "Bearer $accessToken"))
     val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }

@@ -50,6 +50,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     val credentialResponse =
         service.requestCredential(
             credentialIssuerMetadata.credentialEndpoint,
+            null,
             tokenResponse.accessToken,
             format,
             "https://credentials.example.com/identity_credential")
@@ -97,9 +98,18 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
             authorizationCode = authenticationResponse.code(),
         )
 
+    val dpopJwtForCredential =
+        oidcMetadata.dpopSigningAlgValuesSupported?.let {
+          return@let DpopJwtCreator.create(
+              privateKey = service.getWalletPrivateKey(),
+              method = "POST",
+              path = credentialIssuerMetadata.credentialEndpoint,
+              accessToken = tokenResponse.accessToken)
+        }
     val credentialResponse =
         service.requestCredential(
             credentialIssuerMetadata.credentialEndpoint,
+            dpopJwtForCredential,
             tokenResponse.accessToken,
             format,
             "https://credentials.example.com/identity_credential")
@@ -129,10 +139,12 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
                       "issuer" to oidcMetadata.issuer,
                       "client_id" to service.clientId,
                       "scope" to oidcMetadata.scopesSupportedAsString(),
+                      "response_type" to "code",
                   ))
       val vcAuthorizationRequest =
           VerifiableCredentialsAuthorizationRequest(
               issuer = oidcMetadata.issuer,
+              clientId = service.clientId,
               requestUri = pushAuthenticationResponse.requestUri,
           )
       return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
