@@ -46,7 +46,7 @@ The library provides the following functionality:
       - [ ] jwt_vc_json-ld
       - [ ] ldp_vc
    - extension
-      - [ ] Support for DPoP JWT in authorization
+      - [x] Support for DPoP JWT in authorization
 - OpenID for Verifiable Presentations
    - protocol
       - [ ] For pre-registered verifiers
