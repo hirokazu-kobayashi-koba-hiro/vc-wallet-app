@@ -71,10 +71,16 @@ object JoseUtils {
     return jws.serialize()
   }
 
-  fun sign(header: Map<String, Any>, payload: Map<String, Any>, jwkValue: String): String {
-    val jwk = JWK.parse(jwkValue)
+  fun sign(
+      additionalHeaders: Map<String, Any>,
+      payload: Map<String, Any>,
+      privateKey: String
+  ): String {
+    val jwk = JWK.parse(privateKey)
     val headers =
-        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name))
+            .customParams(additionalHeaders)
+            .build()
     val claimSet = JWTClaimsSet.parse(payload)
     val jws = SignedJWT(headers, claimSet)
     val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)
@@ -82,10 +88,12 @@ object JoseUtils {
     return jws.serialize()
   }
 
-  fun sign(header: Map<String, Any>, payload: String, jwkValue: String): String {
-    val jwk = JWK.parse(jwkValue)
+  fun sign(additionalHeaders: Map<String, Any>, payload: String, privateKey: String): String {
+    val jwk = JWK.parse(privateKey)
     val headers =
-        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name)).customParams(header).build()
+        JWSHeader.Builder(JWSAlgorithm.parse(jwk.algorithm.name))
+            .customParams(additionalHeaders)
+            .build()
     val claimSet = JWTClaimsSet.parse(payload)
     val jws = SignedJWT(headers, claimSet)
     val jwsSigner = DefaultJWSSignerFactory().createJWSSigner(jwk)

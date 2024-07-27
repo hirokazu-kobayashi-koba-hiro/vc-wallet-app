@@ -59,7 +59,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.0")
 
     //jwt
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.40")
     //https://github.com/eu-digital-identity-wallet/eudi-lib-jvm-sdjwt-kt
     implementation("eu.europa.ec.eudi:eudi-lib-jvm-sdjwt-kt:0.5.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")

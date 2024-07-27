@@ -1,6 +1,7 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
 import java.util.UUID
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -13,6 +14,7 @@ import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
+    val walletConfigurationService: WalletConfigurationService,
     val repository: VerifiableCredentialRecordRepository,
     val clientId: String
 ) {
@@ -93,8 +95,9 @@ class VerifiableCredentialsService(
 
   suspend fun requestTokenWithAuthorizedCode(
       url: String,
+      dpopJwt: String? = null,
       authorizationCode: String,
-      redirectUri: String? = null
+      redirectUri: String? = null,
   ): TokenResponse {
     val tokenRequest =
         mutableMapOf(
@@ -102,7 +105,9 @@ class VerifiableCredentialsService(
             Pair("grant_type", "authorization_code"),
             Pair("code", authorizationCode))
     redirectUri?.let { tokenRequest.put("redirect_uri", it) }
-    val tokenRequestHeaders = hashMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
+    val tokenRequestHeaders =
+        mutableMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
+    dpopJwt?.let { tokenRequestHeaders.put("DPoP", it) }
     val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
     return JsonUtils.read(response.toString(), TokenResponse::class.java)
   }
@@ -134,5 +139,9 @@ class VerifiableCredentialsService(
   suspend fun getJwksConfiguration(jwtVcIssuerEndpoint: String): JwtVcConfiguration {
     val response = HttpClient.get(jwtVcIssuerEndpoint)
     return JsonUtils.read(response.toString(), JwtVcConfiguration::class.java)
+  }
+
+  fun getWalletPrivateKey(): String {
+    return walletConfigurationService.getWalletPrivateKey()
   }
 }

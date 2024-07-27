@@ -123,7 +123,7 @@ fun VerifiableCredentialsMainScreen(
                       val errorHandler =
                           CoroutineExceptionHandler(
                               handler = { _, error ->
-                                 Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
                               })
                       scope.launch(errorHandler) {
                         viewModel.requestVcOnAuthorizationCode(context = context, it, "mso_mdoc")

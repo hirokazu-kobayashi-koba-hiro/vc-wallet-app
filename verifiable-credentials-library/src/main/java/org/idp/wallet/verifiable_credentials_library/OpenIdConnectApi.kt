@@ -23,6 +23,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.Authentica
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.JwksResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.PushAuthenticationResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.UserinfoResponse
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
@@ -119,6 +120,19 @@ object OpenIdConnectApi {
     val response = HttpClient.get(url, headers = headers)
     val userinfoResponse = JsonUtils.read(response.toString(), UserinfoResponse::class.java)
     return userinfoResponse
+  }
+
+  suspend fun pushAuthenticationRequest(
+      url: String,
+      dpopJwt: String?,
+      body: Map<String, Any>
+  ): PushAuthenticationResponse {
+    val headers = mutableMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
+    dpopJwt?.let { headers.put("DPoP", it) }
+    val response = HttpClient.post(url, headers = headers, requestBody = body)
+    val pushAuthenticationResponse =
+        JsonUtils.read(response.toString(), PushAuthenticationResponse::class.java)
+    return pushAuthenticationResponse
   }
 
   suspend fun request(context: Context, authenticationRequestUri: String): AuthenticationResponse =

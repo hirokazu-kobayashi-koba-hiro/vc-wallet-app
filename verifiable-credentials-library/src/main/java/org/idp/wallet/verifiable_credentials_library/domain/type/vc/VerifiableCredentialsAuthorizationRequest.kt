@@ -4,10 +4,11 @@ import android.net.Uri
 
 data class VerifiableCredentialsAuthorizationRequest(
     val issuer: String,
-    val clientId: String,
-    val scope: String,
-    val redirectUri: String,
-    val responseType: String = "code",
+    val requestUri: String? = null,
+    val clientId: String? = null,
+    val scope: String? = null,
+    val redirectUri: String? = null,
+    val responseType: String? = null,
     val state: String? = null,
     val nonce: String? = null,
     val codeChallenge: String? = null,
@@ -20,10 +21,11 @@ data class VerifiableCredentialsAuthorizationRequest(
 
   fun queries(): String {
     val builder = Uri.Builder()
-    builder.appendQueryParameter("client_id", clientId)
-    builder.appendQueryParameter("scope", scope)
-    builder.appendQueryParameter("response_type", responseType)
-    builder.appendQueryParameter("redirect_uri", redirectUri)
+    requestUri?.let { builder.appendQueryParameter("request_uri", requestUri) }
+    clientId?.let { builder.appendQueryParameter("client_id", clientId) }
+    scope?.let { builder.appendQueryParameter("scope", scope) }
+    responseType?.let { builder.appendQueryParameter("response_type", responseType) }
+    redirectUri?.let { builder.appendQueryParameter("redirect_uri", redirectUri) }
     state?.let { builder.appendQueryParameter("state", it) }
     nonce?.let { builder.appendQueryParameter("nonce", it) }
     codeChallenge?.let { builder.appendQueryParameter("code_challenge", it) }
@@ -34,7 +36,7 @@ data class VerifiableCredentialsAuthorizationRequest(
   }
 
   fun containsOidcInScope(): Boolean {
-    return scope.contains("openid")
+    return scope?.contains("openid") ?: false
   }
 }
 

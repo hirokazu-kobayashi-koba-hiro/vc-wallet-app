@@ -36,7 +36,8 @@ object VerifiableCredentialsClient {
     val repository = VerifiableCredentialRecordDataSource(database)
     walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
     walletConfigurationService.initialize()
-    val verifiableCredentialsService = VerifiableCredentialsService(repository, clientId)
+    val verifiableCredentialsService =
+        VerifiableCredentialsService(walletConfigurationService, repository, clientId)
     verifiableCredentialsApi = VerifiableCredentialsApi(verifiableCredentialsService)
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()

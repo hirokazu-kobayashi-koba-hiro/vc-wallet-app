@@ -73,31 +73,35 @@ object HttpURLConnectionCreator {
       headers: Map<String, String>,
       requestBody: Map<String, Any>? = null
   ): HttpURLConnection {
-    val httpURLConnection = URL(url).openConnection() as HttpURLConnection
-    return httpURLConnection.also {
-      it.connectTimeout = 30000
-      it.readTimeout = 30000
-      it.requestMethod = method
-      it.doInput = true
-      if (!headers.containsKey("content-type")) {
-        it.setRequestProperty("content-type", "application/json")
-      }
-      headers.forEach { header -> it.setRequestProperty(header.key, header.value) }
-      if (headers.getOrDefault("content-type", "") == "application/x-www-form-urlencoded") {
-        requestBody?.let { body ->
-          it.doOutput = true
-          val builder = Uri.Builder()
-          body.forEach { param -> builder.appendQueryParameter(param.key, param.value as String) }
-          builder.build().encodedQuery?.let { encodedQuery ->
-            it.outputStream.write(encodedQuery.toByteArray())
+    try {
+      val httpURLConnection = URL(url).openConnection() as HttpURLConnection
+      return httpURLConnection.also {
+        it.connectTimeout = 30000
+        it.readTimeout = 30000
+        it.requestMethod = method
+        it.doInput = true
+        if (!headers.containsKey("content-type")) {
+          it.setRequestProperty("content-type", "application/json")
+        }
+        headers.forEach { header -> it.setRequestProperty(header.key, header.value) }
+        if (headers.getOrDefault("content-type", "") == "application/x-www-form-urlencoded") {
+          requestBody?.let { body ->
+            it.doOutput = true
+            val builder = Uri.Builder()
+            body.forEach { param -> builder.appendQueryParameter(param.key, param.value as String) }
+            builder.build().encodedQuery?.let { encodedQuery ->
+              it.outputStream.write(encodedQuery.toByteArray())
+            }
+          }
+        } else {
+          requestBody?.let { body ->
+            it.doOutput = true
+            it.outputStream.write(JSONObject(body).toString().toByteArray())
           }
         }
-      } else {
-        requestBody?.let { body ->
-          it.doOutput = true
-          it.outputStream.write(JSONObject(body).toString().toByteArray())
-        }
       }
+    } catch (e: Exception) {
+      throw NetworkException("999", "unknown network error")
     }
   }
 }

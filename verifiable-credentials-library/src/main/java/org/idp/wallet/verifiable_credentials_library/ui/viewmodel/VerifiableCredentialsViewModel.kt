@@ -84,7 +84,7 @@ class VerifiableCredentialsViewModel(
       _loading.value = true
       VerifiableCredentialsClient.handleAuthorizationCode(context, subject(), issuer, format)
     } catch (e: Exception) {
-        // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
+      // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
     } finally {
       _loading.value = false
     }

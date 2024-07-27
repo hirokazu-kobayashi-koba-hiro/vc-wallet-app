@@ -3,6 +3,8 @@ package org.idp.wallet.verifiable_credentials_library
 import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.DpopJwtCreator
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsAuthorizationRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
@@ -77,21 +79,21 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     val oidcMetadata =
         service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
 
-    val vcAuthorizationRequest =
-        VerifiableCredentialsAuthorizationRequest(
-            issuer = issuer,
-            clientId = service.clientId,
-            scope = oidcMetadata.scopesSupportedAsString(),
-            redirectUri = "",
-        )
+    val authenticationRequestUri = createAuthenticationRequestUri(oidcMetadata)
     val authenticationResponse =
         OpenIdConnectApi.request(
-            context = context,
-            authenticationRequestUri =
-                "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}")
+            context = context, authenticationRequestUri = authenticationRequestUri)
+    val dpopJwt =
+        oidcMetadata.dpopSigningAlgValuesSupported?.let {
+          return@let DpopJwtCreator.create(
+              privateKey = service.getWalletPrivateKey(),
+              method = "POST",
+              path = oidcMetadata.tokenEndpoint)
+        }
     val tokenResponse =
         service.requestTokenWithAuthorizedCode(
             url = oidcMetadata.tokenEndpoint,
+            dpopJwt = dpopJwt,
             authorizationCode = authenticationResponse.code(),
         )
 
@@ -108,6 +110,42 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
           service.transform(issuer = issuer, format = format, type = "", it, jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
+  }
+
+  private suspend fun createAuthenticationRequestUri(oidcMetadata: OidcMetadata): String {
+    oidcMetadata.pushedAuthorizationRequestEndpoint?.let { endpoint ->
+      val dpopJwt =
+          oidcMetadata.dpopSigningAlgValuesSupported?.let {
+            return@let DpopJwtCreator.create(
+                privateKey = service.getWalletPrivateKey(), method = "POST", path = endpoint)
+          }
+
+      val pushAuthenticationResponse =
+          OpenIdConnectApi.pushAuthenticationRequest(
+              url = endpoint,
+              dpopJwt = dpopJwt,
+              body =
+                  mapOf(
+                      "issuer" to oidcMetadata.issuer,
+                      "client_id" to service.clientId,
+                      "scope" to oidcMetadata.scopesSupportedAsString(),
+                  ))
+      val vcAuthorizationRequest =
+          VerifiableCredentialsAuthorizationRequest(
+              issuer = oidcMetadata.issuer,
+              requestUri = pushAuthenticationResponse.requestUri,
+          )
+      return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
+    }
+
+    val vcAuthorizationRequest =
+        VerifiableCredentialsAuthorizationRequest(
+            issuer = oidcMetadata.issuer,
+            clientId = service.clientId,
+            scope = oidcMetadata.scopesSupportedAsString(),
+            redirectUri = "",
+        )
+    return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
   }
 
   private suspend fun interact(

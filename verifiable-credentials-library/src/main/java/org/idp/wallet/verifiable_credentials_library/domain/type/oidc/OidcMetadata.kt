@@ -60,6 +60,11 @@ data class OidcMetadata(
     val authorizationSigningAlgValuesSupported: List<String>?,
     val authorizationEncryptionAlgValuesSupported: List<String>?,
     val authorizationEncryptionEncValuesSupported: List<String>?,
+
+    // PAR
+    val pushedAuthorizationRequestEndpoint: String?,
+    // Dpop
+    val dpopSigningAlgValuesSupported: List<String>?
 ) {
 
   fun scopesSupportedAsString(): String {

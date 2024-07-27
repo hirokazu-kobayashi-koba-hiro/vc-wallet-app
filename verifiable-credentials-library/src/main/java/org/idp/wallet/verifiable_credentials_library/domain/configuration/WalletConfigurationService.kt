@@ -34,4 +34,12 @@ class WalletConfigurationService(
       throw SettingInvalidException(SettingError.NOT_FOUND_WALLET_CONFIG, e)
     }
   }
+
+  fun getWalletPrivateKey(): String {
+    val key = keyStore.find(keyId)
+    key?.let {
+      return it
+    }
+    throw SettingInvalidException(SettingError.NOT_FOUND_WALLET_CONFIG)
+  }
 }
