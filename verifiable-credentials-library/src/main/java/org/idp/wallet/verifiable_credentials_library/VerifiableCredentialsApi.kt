@@ -21,7 +21,6 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
       context: Context,
       subject: String,
       url: String,
-      format: String = "vc+sd-jwt",
       interactor: VerifiableCredentialInteractor
   ) {
     val credentialOfferRequest = CredentialOfferRequest(url)
@@ -47,20 +46,22 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
             url = oidcMetadata.tokenEndpoint,
             preAuthorizationCode = preAuthorizedCodeGrant.preAuthorizedCode,
             txCode = result.second)
-    val credentialResponse =
+    val verifiableCredentialsType = credentialIssuerMetadata.getVerifiableCredentialsType(credentialOffer.credentialConfigurationIds[0])
+    val vct = credentialIssuerMetadata.findVct(credentialOffer.credentialConfigurationIds[0])
+      val credentialResponse =
         service.requestCredential(
             credentialIssuerMetadata.credentialEndpoint,
             null,
             tokenResponse.accessToken,
-            format,
-            "https://credentials.example.com/identity_credential")
+            verifiableCredentialsType,
+            vct)
     val jwtVcIssuerResponse = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
           service.transform(
               issuer = credentialOffer.credentialIssuer,
-              format = format,
+              verifiableCredentialsType = verifiableCredentialsType,
               type = credentialOffer.credentialConfigurationIds[0],
               it,
               jwks)
@@ -72,7 +73,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
       context: Context,
       subject: String,
       issuer: String,
-      format: String,
+      credentialConfigurationId: String,
   ) {
     val credentialIssuerMetadata =
         service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
@@ -80,7 +81,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
     val oidcMetadata =
         service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
 
-    val authenticationRequestUri = createAuthenticationRequestUri(oidcMetadata)
+    val authenticationRequestUri = createAuthenticationRequestUri(credentialConfigurationId, credentialIssuerMetadata, oidcMetadata)
     val authenticationResponse =
         OpenIdConnectApi.request(
             context = context, authenticationRequestUri = authenticationRequestUri)
@@ -106,23 +107,30 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
               path = credentialIssuerMetadata.credentialEndpoint,
               accessToken = tokenResponse.accessToken)
         }
+    val verifiableCredentialsType = credentialIssuerMetadata.getVerifiableCredentialsType(credentialConfigurationId)
+    val vct = credentialIssuerMetadata.findVct(credentialConfigurationId)
     val credentialResponse =
         service.requestCredential(
             credentialIssuerMetadata.credentialEndpoint,
             dpopJwtForCredential,
             tokenResponse.accessToken,
-            format,
-            "https://credentials.example.com/identity_credential")
+            verifiableCredentialsType,
+            vct)
     val jwtVcIssuerResponse = service.getJwksConfiguration("$issuer/.well-known/jwt-vc-issuer")
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          service.transform(issuer = issuer, format = format, type = "", it, jwks)
+          service.transform(issuer = issuer, verifiableCredentialsType = verifiableCredentialsType, type = credentialConfigurationId, it, jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
   }
 
-  private suspend fun createAuthenticationRequestUri(oidcMetadata: OidcMetadata): String {
+  private suspend fun createAuthenticationRequestUri(
+      credentialConfigurationId: String,
+      credentialIssuerMetadata: CredentialIssuerMetadata,
+      oidcMetadata: OidcMetadata
+  ): String {
+    val scope = credentialIssuerMetadata.getScope(credentialConfigurationId)
     oidcMetadata.pushedAuthorizationRequestEndpoint?.let { endpoint ->
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
@@ -138,7 +146,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
                   mapOf(
                       "issuer" to oidcMetadata.issuer,
                       "client_id" to service.clientId,
-                      "scope" to oidcMetadata.scopesSupportedAsString(),
+                      "scope" to scope,
                       "response_type" to "code",
                   ))
       val vcAuthorizationRequest =
@@ -154,7 +162,7 @@ class VerifiableCredentialsApi(private val service: VerifiableCredentialsService
         VerifiableCredentialsAuthorizationRequest(
             issuer = oidcMetadata.issuer,
             clientId = service.clientId,
-            scope = oidcMetadata.scopesSupportedAsString(),
+            scope = scope,
             redirectUri = "",
         )
     return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"

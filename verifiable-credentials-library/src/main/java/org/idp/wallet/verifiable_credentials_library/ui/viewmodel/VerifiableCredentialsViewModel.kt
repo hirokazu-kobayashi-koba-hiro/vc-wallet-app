@@ -63,13 +63,12 @@ class VerifiableCredentialsViewModel(
   suspend fun requestVcOnPreAuthorization(
       context: Context,
       uri: String,
-      format: String,
       interactor: VerifiableCredentialInteractor
   ) {
     try {
       _loading.value = true
       VerifiableCredentialsClient.handlePreAuthorization(
-          context, subject(), uri, format, interactor)
+          context, subject(), uri, interactor)
     } finally {
       _loading.value = false
     }
@@ -78,11 +77,11 @@ class VerifiableCredentialsViewModel(
   suspend fun requestVcOnAuthorizationCode(
       context: Context,
       issuer: String,
-      format: String,
+      credentialConfigurationId: String,
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handleAuthorizationCode(context, subject(), issuer, format)
+      VerifiableCredentialsClient.handleAuthorizationCode(context, subject(), issuer, credentialConfigurationId)
     } catch (e: Exception) {
       // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
     } finally {

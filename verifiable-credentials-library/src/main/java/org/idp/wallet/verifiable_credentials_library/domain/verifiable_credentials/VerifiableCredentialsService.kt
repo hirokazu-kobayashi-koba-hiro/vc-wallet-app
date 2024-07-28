@@ -7,6 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetada
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.JwtVcConfiguration
+import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsType
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
@@ -21,26 +22,26 @@ class VerifiableCredentialsService(
 
   suspend fun transform(
       issuer: String,
-      format: String,
+      verifiableCredentialsType: VerifiableCredentialsType,
       type: String,
       rawVc: String,
       jwks: String
   ): VerifiableCredentialsRecord {
-    return when (format) {
-      "vc+sd-jwt" -> {
+    return when (verifiableCredentialsType) {
+      VerifiableCredentialsType.SD_JWT -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
         return VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, format, rawVc, claims)
+            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, claims)
       }
-      "jwt_vc_json" -> {
+      VerifiableCredentialsType.JWT_VC_JSON -> {
         val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
         val payload = jwt.payload()
         VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, format, rawVc, payload)
+            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, payload)
       }
-      "mso_mdoc" -> {
+      VerifiableCredentialsType.MSO_MDOC -> {
         VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, format, rawVc, mapOf())
+            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, mapOf())
       }
       else -> {
         throw RuntimeException("unsupported format")
@@ -116,11 +117,14 @@ class VerifiableCredentialsService(
       url: String,
       dpopJwt: String?,
       accessToken: String,
-      format: String,
-      vc: String
+      verifiableCredentialType: VerifiableCredentialsType,
+      vct: String?
   ): CredentialResponse {
-    val credentialRequest = mapOf(Pair("format", format), Pair("doctype", "org.iso.18013.5.1.mDL"))
-    val credentialRequestHeader =
+    val credentialRequest = mutableMapOf(Pair("format", verifiableCredentialType.format), Pair("doctype", verifiableCredentialType.doctype))
+    vct?.let {
+        credentialRequest.put("vct", it)
+    }
+      val credentialRequestHeader =
         dpopJwt?.let {
           return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
         } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))

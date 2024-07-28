@@ -122,6 +122,7 @@ fun DefaultVcPreview() {
                           CredentialConfiguration(
                               "",
                               "",
+                              "",
                               null,
                               null,
                               listOf(

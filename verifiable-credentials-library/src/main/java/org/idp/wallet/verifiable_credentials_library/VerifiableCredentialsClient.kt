@@ -57,19 +57,18 @@ object VerifiableCredentialsClient {
       context: Context,
       subject: String,
       url: String,
-      format: String = "vc+sd-jwt",
       interactor: VerifiableCredentialInteractor
   ) {
-    verifiableCredentialsApi.handlePreAuthorization(context, subject, url, format, interactor)
+    verifiableCredentialsApi.handlePreAuthorization(context, subject, url, interactor)
   }
 
   suspend fun handleAuthorizationCode(
       context: Context,
       subject: String,
       url: String,
-      format: String,
+      credentialConfigurationId: String,
   ) {
-    verifiableCredentialsApi.handleAuthorizationCode(context, subject, url, format)
+    verifiableCredentialsApi.handleAuthorizationCode(context, subject, url, credentialConfigurationId)
   }
 
   suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
