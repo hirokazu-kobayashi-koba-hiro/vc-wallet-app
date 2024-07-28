@@ -119,11 +119,12 @@ class VerifiableCredentialsService(
       format: String,
       vc: String
   ): CredentialResponse {
-    val credentialRequest = mapOf(Pair("format", format), Pair("vct", vc))
+    val credentialRequest = mapOf(Pair("format", format), Pair("doctype", "org.iso.18013.5.1.mDL"))
     val credentialRequestHeader =
         dpopJwt?.let {
-          return@let mapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
-        } ?: mapOf(Pair("Authorization", "Bearer $accessToken"))
+          return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
+        } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))
+    credentialRequestHeader.put("content-type", "application/json")
     val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
