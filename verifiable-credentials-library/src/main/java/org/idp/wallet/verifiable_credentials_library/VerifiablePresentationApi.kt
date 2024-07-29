@@ -15,11 +15,19 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentat
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluator
 
-class VerifiablePresentationApi(
-    val repository: VerifiableCredentialRecordRepository,
-    private val verifiablePresentationRequestContextService:
-        VerifiablePresentationRequestContextService
-) {
+object VerifiablePresentationApi {
+
+  lateinit var repository: VerifiableCredentialRecordRepository
+  lateinit var verifiablePresentationRequestContextService:
+      VerifiablePresentationRequestContextService
+
+  fun initalize(
+      repository: VerifiableCredentialRecordRepository,
+      verifiablePresentationRequestContextService: VerifiablePresentationRequestContextService
+  ) {
+    this.repository = repository
+    this.verifiablePresentationRequestContextService = verifiablePresentationRequestContextService
+  }
 
   suspend fun handleRequest(
       context: Context,

@@ -19,10 +19,6 @@ import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 
 object VerifiableCredentialsClient {
 
-  private lateinit var verifiableCredentialsApi: VerifiableCredentialsApi
-  private lateinit var verifiablePresentationApi: VerifiablePresentationApi
-  private lateinit var walletConfigurationService: WalletConfigurationService
-
   fun initialize(context: Context, clientId: String) {
     val keyStore = KeyStore(context)
     val assetsReader = AssetsReader(context)
@@ -34,18 +30,16 @@ object VerifiableCredentialsClient {
             )
             .build()
     val repository = VerifiableCredentialRecordDataSource(database)
-    walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
+    val walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
     walletConfigurationService.initialize()
     val verifiableCredentialsService =
         VerifiableCredentialsService(walletConfigurationService, repository, clientId)
-    verifiableCredentialsApi = VerifiableCredentialsApi(verifiableCredentialsService)
+    VerifiableCredentialsApi.initialize(verifiableCredentialsService)
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()
     }
-    verifiablePresentationApi =
-        VerifiablePresentationApi(
-            repository,
-            VerifiablePresentationRequestContextService(walletConfigurationService, mock))
+    VerifiablePresentationApi.initalize(
+        repository, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
   }
 
   fun start(context: Context, request: OpenIdConnectRequest, forceLogin: Boolean = false) {
@@ -59,7 +53,7 @@ object VerifiableCredentialsClient {
       url: String,
       interactor: VerifiableCredentialInteractor
   ) {
-    verifiableCredentialsApi.handlePreAuthorization(context, subject, url, interactor)
+    VerifiableCredentialsApi.handlePreAuthorization(context, subject, url, interactor)
   }
 
   suspend fun handleAuthorizationCode(
@@ -68,11 +62,12 @@ object VerifiableCredentialsClient {
       url: String,
       credentialConfigurationId: String,
   ) {
-    verifiableCredentialsApi.handleAuthorizationCode(context, subject, url, credentialConfigurationId)
+    VerifiableCredentialsApi.handleAuthorizationCode(
+        context, subject, url, credentialConfigurationId)
   }
 
   suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
-    return verifiableCredentialsApi.getAllCredentials(subject)
+    return VerifiableCredentialsApi.getAllCredentials(subject)
   }
 
   suspend fun handleVpRequest(
@@ -81,6 +76,6 @@ object VerifiableCredentialsClient {
       url: String,
       interactor: VerifiablePresentationInteractor
   ): Result<Any> {
-    return verifiablePresentationApi.handleRequest(context, subject, url, interactor)
+    return VerifiablePresentationApi.handleRequest(context, subject, url, interactor)
   }
 }

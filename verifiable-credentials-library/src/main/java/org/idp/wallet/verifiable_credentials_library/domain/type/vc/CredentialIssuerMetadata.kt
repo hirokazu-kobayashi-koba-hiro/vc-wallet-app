@@ -27,18 +27,23 @@ data class CredentialIssuerMetadata(
     return "$credentialIssuer/.well-known/openid-configuration"
   }
 
-    fun getVerifiableCredentialsType(credentialConfigurationId: String): VerifiableCredentialsType {
-       val format = credentialConfigurationsSupported[credentialConfigurationId]?.format ?: throw RuntimeException(String.format("not found credential configuration (%s)", credentialConfigurationId))
-        return VerifiableCredentialsType.of(format)
-    }
+  fun getVerifiableCredentialsType(credentialConfigurationId: String): VerifiableCredentialsType {
+    val format =
+        credentialConfigurationsSupported[credentialConfigurationId]?.format
+            ?: throw RuntimeException(
+                String.format("not found credential configuration (%s)", credentialConfigurationId))
+    return VerifiableCredentialsType.of(format)
+  }
 
-    fun findVct(credentialConfigurationId: String): String? {
-        return credentialConfigurationsSupported[credentialConfigurationId]?.vct
-    }
+  fun findVct(credentialConfigurationId: String): String? {
+    return credentialConfigurationsSupported[credentialConfigurationId]?.vct
+  }
 
-    fun getScope(credentialConfigurationId: String): String {
-        return credentialConfigurationsSupported[credentialConfigurationId]?.scope ?: throw RuntimeException(String.format("not found scope configuration, (%s)", credentialConfigurationId))
-    }
+  fun getScope(credentialConfigurationId: String): String {
+    return credentialConfigurationsSupported[credentialConfigurationId]?.scope
+        ?: throw RuntimeException(
+            String.format("not found scope configuration, (%s)", credentialConfigurationId))
+  }
 }
 
 data class CredentialResponseEncryption(
@@ -70,7 +75,7 @@ data class CredentialConfiguration(
     val display: List<Display>?,
 ) {
 
-    fun getFirstDisplay(): Display? {
+  fun getFirstDisplay(): Display? {
     return display?.get(0)
   }
 

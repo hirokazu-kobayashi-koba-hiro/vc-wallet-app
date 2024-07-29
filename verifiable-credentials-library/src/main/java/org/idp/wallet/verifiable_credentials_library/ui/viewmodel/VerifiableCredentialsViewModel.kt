@@ -67,8 +67,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handlePreAuthorization(
-          context, subject(), uri, interactor)
+      VerifiableCredentialsClient.handlePreAuthorization(context, subject(), uri, interactor)
     } finally {
       _loading.value = false
     }
@@ -81,7 +80,8 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handleAuthorizationCode(context, subject(), issuer, credentialConfigurationId)
+      VerifiableCredentialsClient.handleAuthorizationCode(
+          context, subject(), issuer, credentialConfigurationId)
     } catch (e: Exception) {
       // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
     } finally {

@@ -126,7 +126,8 @@ fun VerifiableCredentialsMainScreen(
                                 Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
                               })
                       scope.launch(errorHandler) {
-                        viewModel.requestVcOnAuthorizationCode(context = context, it, "org.iso.18013.5.1.mDL")
+                        viewModel.requestVcOnAuthorizationCode(
+                            context = context, it, "org.iso.18013.5.1.mDL")
                       }
                     })
             AppDestinations.VP -> VpScreen(viewModel = viewModel, resolveQrCode = resolveQrCode)

@@ -31,17 +31,32 @@ class VerifiableCredentialsService(
       VerifiableCredentialsType.SD_JWT -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
         return VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, claims)
+            UUID.randomUUID().toString(),
+            issuer,
+            type,
+            verifiableCredentialsType.format,
+            rawVc,
+            claims)
       }
       VerifiableCredentialsType.JWT_VC_JSON -> {
         val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
         val payload = jwt.payload()
         VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, payload)
+            UUID.randomUUID().toString(),
+            issuer,
+            type,
+            verifiableCredentialsType.format,
+            rawVc,
+            payload)
       }
       VerifiableCredentialsType.MSO_MDOC -> {
         VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(), issuer, type, verifiableCredentialsType.format, rawVc, mapOf())
+            UUID.randomUUID().toString(),
+            issuer,
+            type,
+            verifiableCredentialsType.format,
+            rawVc,
+            mapOf())
       }
       else -> {
         throw RuntimeException("unsupported format")
@@ -120,11 +135,12 @@ class VerifiableCredentialsService(
       verifiableCredentialType: VerifiableCredentialsType,
       vct: String?
   ): CredentialResponse {
-    val credentialRequest = mutableMapOf(Pair("format", verifiableCredentialType.format), Pair("doctype", verifiableCredentialType.doctype))
-    vct?.let {
-        credentialRequest.put("vct", it)
-    }
-      val credentialRequestHeader =
+    val credentialRequest =
+        mutableMapOf(
+            Pair("format", verifiableCredentialType.format),
+            Pair("doctype", verifiableCredentialType.doctype))
+    vct?.let { credentialRequest.put("vct", it) }
+    val credentialRequestHeader =
         dpopJwt?.let {
           return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
         } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))
