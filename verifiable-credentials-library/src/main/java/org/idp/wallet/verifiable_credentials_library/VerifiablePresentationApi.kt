@@ -21,7 +21,7 @@ object VerifiablePresentationApi {
   lateinit var verifiablePresentationRequestContextService:
       VerifiablePresentationRequestContextService
 
-  fun initalize(
+  fun initialize(
       repository: VerifiableCredentialRecordRepository,
       verifiablePresentationRequestContextService: VerifiablePresentationRequestContextService
   ) {

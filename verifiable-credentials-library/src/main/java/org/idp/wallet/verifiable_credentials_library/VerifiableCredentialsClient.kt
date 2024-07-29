@@ -38,7 +38,7 @@ object VerifiableCredentialsClient {
     val mock = ClientConfigurationRepository {
       return@ClientConfigurationRepository ClientConfiguration()
     }
-    VerifiablePresentationApi.initalize(
+    VerifiablePresentationApi.initialize(
         repository, VerifiablePresentationRequestContextService(walletConfigurationService, mock))
   }
 
