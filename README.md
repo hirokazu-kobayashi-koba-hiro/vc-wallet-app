@@ -31,10 +31,10 @@ The library provides the following functionality:
    - [x] separate with namespace
 - OpenID for Verifiable Credential Issuance
    - protocol
-      - [ ] Authorization Code Flow
+      - [x] Authorization Code Flow
       - [x] Pre-authorization Code Flow
       - [ ] Support for deferred issuing
-      - [ ] Dynamic registration of clients
+      - [x] Dynamic registration of clients
    - use-case
       - [ ] same device
       - [x] cross device
