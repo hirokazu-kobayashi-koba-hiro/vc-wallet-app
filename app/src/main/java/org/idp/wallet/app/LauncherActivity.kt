@@ -30,7 +30,7 @@ class LauncherActivity : FragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent { LauncherView(viewModel = viewModel, onClick = { login() }) }
-    VerifiableCredentialsClient.initialize(this, "218232426")
+    VerifiableCredentialsClient.initialize(this)
     login()
   }
 

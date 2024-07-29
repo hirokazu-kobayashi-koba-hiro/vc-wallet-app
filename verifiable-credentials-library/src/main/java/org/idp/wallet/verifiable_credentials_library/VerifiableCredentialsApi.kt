@@ -3,6 +3,7 @@ package org.idp.wallet.verifiable_credentials_library
 import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.DpopJwtCreator
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -43,6 +44,7 @@ object VerifiableCredentialsApi {
         service.getCredentialIssuerMetadata(credentialOffer.credentialIssuerMetadataEndpoint())
     val oidcMetadata =
         service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
+    val clientConfiguration = service.getClientConfiguration(oidcMetadata)
     val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
     if (!result.first) {
       throw RuntimeException("user canceled")
@@ -50,6 +52,7 @@ object VerifiableCredentialsApi {
     val tokenResponse =
         service.requestTokenWithPreAuthorizedCode(
             url = oidcMetadata.tokenEndpoint,
+            clientId = clientConfiguration.clientId,
             preAuthorizationCode = preAuthorizedCodeGrant.preAuthorizedCode,
             txCode = result.second)
     val verifiableCredentialsType =
@@ -89,9 +92,10 @@ object VerifiableCredentialsApi {
     val oidcMetadata =
         service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
 
+    val clientConfiguration = service.getClientConfiguration(oidcMetadata)
     val authenticationRequestUri =
         createAuthenticationRequestUri(
-            credentialConfigurationId, credentialIssuerMetadata, oidcMetadata)
+            credentialConfigurationId, credentialIssuerMetadata, oidcMetadata, clientConfiguration)
     val authenticationResponse =
         OpenIdConnectApi.request(
             context = context, authenticationRequestUri = authenticationRequestUri)
@@ -105,6 +109,7 @@ object VerifiableCredentialsApi {
     val tokenResponse =
         service.requestTokenWithAuthorizedCode(
             url = oidcMetadata.tokenEndpoint,
+            clientId = clientConfiguration.clientId,
             dpopJwt = dpopJwt,
             authorizationCode = authenticationResponse.code(),
         )
@@ -144,7 +149,8 @@ object VerifiableCredentialsApi {
   private suspend fun createAuthenticationRequestUri(
       credentialConfigurationId: String,
       credentialIssuerMetadata: CredentialIssuerMetadata,
-      oidcMetadata: OidcMetadata
+      oidcMetadata: OidcMetadata,
+      clientConfiguration: ClientConfiguration
   ): String {
     val scope = credentialIssuerMetadata.getScope(credentialConfigurationId)
     oidcMetadata.pushedAuthorizationRequestEndpoint?.let { endpoint ->
@@ -161,14 +167,14 @@ object VerifiableCredentialsApi {
               body =
                   mapOf(
                       "issuer" to oidcMetadata.issuer,
-                      "client_id" to service.clientId,
+                      "client_id" to clientConfiguration.clientId,
                       "scope" to scope,
                       "response_type" to "code",
                   ))
       val vcAuthorizationRequest =
           VerifiableCredentialsAuthorizationRequest(
               issuer = oidcMetadata.issuer,
-              clientId = service.clientId,
+              clientId = clientConfiguration.clientId,
               requestUri = pushAuthenticationResponse.requestUri,
           )
       return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
@@ -177,7 +183,7 @@ object VerifiableCredentialsApi {
     val vcAuthorizationRequest =
         VerifiableCredentialsAuthorizationRequest(
             issuer = oidcMetadata.issuer,
-            clientId = service.clientId,
+            clientId = clientConfiguration.clientId,
             scope = scope,
             redirectUri = "",
         )

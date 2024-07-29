@@ -1,6 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
+import android.util.Log
 import java.util.UUID
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
@@ -15,9 +17,9 @@ import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
-    val walletConfigurationService: WalletConfigurationService,
-    val repository: VerifiableCredentialRecordRepository,
-    val clientId: String
+    private val walletConfigurationService: WalletConfigurationService,
+    private val verifiableCredentialRecordRepository: VerifiableCredentialRecordRepository,
+    private val walletClientConfigurationRepository: WalletClientConfigurationRepository,
 ) {
 
   suspend fun transform(
@@ -65,7 +67,7 @@ class VerifiableCredentialsService(
   }
 
   suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
-    return repository.getAll(subject)
+    return verifiableCredentialRecordRepository.getAll(subject)
   }
 
   suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
@@ -95,6 +97,7 @@ class VerifiableCredentialsService(
 
   suspend fun requestTokenWithPreAuthorizedCode(
       url: String,
+      clientId: String,
       preAuthorizationCode: String,
       txCode: String?
   ): TokenResponse {
@@ -111,6 +114,7 @@ class VerifiableCredentialsService(
 
   suspend fun requestTokenWithAuthorizedCode(
       url: String,
+      clientId: String,
       dpopJwt: String? = null,
       authorizationCode: String,
       redirectUri: String? = null,
@@ -153,7 +157,7 @@ class VerifiableCredentialsService(
       subject: String,
       verifiableCredentialsRecord: VerifiableCredentialsRecord
   ) {
-    repository.save(subject, verifiableCredentialsRecord)
+    verifiableCredentialRecordRepository.save(subject, verifiableCredentialsRecord)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {
@@ -168,5 +172,56 @@ class VerifiableCredentialsService(
 
   fun getWalletPrivateKey(): String {
     return walletConfigurationService.getWalletPrivateKey()
+  }
+
+  suspend fun getClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
+    val walletClientConfiguration = walletClientConfigurationRepository.find(oidcMetadata.issuer)
+    walletClientConfiguration?.let {
+      return it
+    }
+    val clientConfiguration = registerClientConfiguration(oidcMetadata)
+    walletClientConfigurationRepository.register(oidcMetadata.issuer, clientConfiguration)
+    return clientConfiguration
+  }
+
+  suspend fun registerClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
+    try {
+      // FIXME dynamic configuration
+      val redirectUris =
+          listOf(
+              "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
+      val grantTypes = oidcMetadata.grantTypesSupported ?: listOf()
+      val responseTypes: List<String> = ArrayList()
+      val clientName = "verifiable_credentials_library"
+      val scope: String = oidcMetadata.scopesSupportedAsString()
+      val requestBody =
+          mapOf(
+              "redirect_uris" to redirectUris,
+              "grant_types" to grantTypes,
+              "response_types" to responseTypes,
+              "client_Uri" to clientName,
+              "scope" to scope,
+          )
+      val registrationEndpoint =
+          oidcMetadata.registrationEndpoint
+              ?: throw RuntimeException(
+                  String.format("not configure registration endpoint (%s)", oidcMetadata.issuer))
+
+      val response = HttpClient.post(registrationEndpoint, requestBody = requestBody)
+      return ClientConfiguration(
+          clientId = response.getString("client_id"),
+          clientSecret = response.getString("client_secret"),
+          redirectUris = redirectUris,
+          grantTypes = grantTypes,
+          responseTypes = responseTypes,
+          clientUri = clientName,
+          scope = scope)
+    } catch (e: Exception) {
+      // FIXME
+      Log.e("VcWalletLibrary", e.message ?: "registerClientConfiguration failed")
+      return ClientConfiguration(
+          clientId = "218232426",
+      )
+    }
   }
 }

@@ -1,7 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation
 
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
-import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.ClientIdScheme
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
@@ -10,7 +9,7 @@ import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class VerifiablePresentationRequestContextService(
     private val walletConfigurationService: WalletConfigurationService,
-    private val clientConfigurationRepository: ClientConfigurationRepository
+    private val verifierConfigurationRepository: VerifierConfigurationRepository
 ) {
 
   suspend fun create(url: String): VerifiablePresentationRequestContext {
@@ -39,7 +38,7 @@ class VerifiablePresentationRequestContextService(
       }
       // pre-registered
       else -> {
-        clientConfigurationRepository.get(parameters.getClientId())
+        verifierConfigurationRepository.get(parameters.getClientId())
       }
     }
   }

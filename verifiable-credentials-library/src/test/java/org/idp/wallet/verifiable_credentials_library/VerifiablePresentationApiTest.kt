@@ -6,13 +6,13 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
-import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifierConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
 import org.idp.wallet.verifiable_credentials_library.mock.MockAssetsReader
 import org.idp.wallet.verifiable_credentials_library.repository.AppDatabase
@@ -41,8 +41,8 @@ class VerifiablePresentationApiTest {
     val oauthRequestHandler =
         VerifiablePresentationRequestContextService(
             walletConfigurationService,
-            ClientConfigurationRepository { it ->
-              return@ClientConfigurationRepository ClientConfiguration()
+            VerifierConfigurationRepository { it ->
+              return@VerifierConfigurationRepository ClientConfiguration()
             })
     service = VerifiablePresentationApi(repository, oauthRequestHandler)
   }
