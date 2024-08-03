@@ -28,7 +28,6 @@ import org.robolectric.RobolectricTestRunner
 class VerifiablePresentationApiTest {
 
   private lateinit var context: Context
-  private lateinit var service: VerifiablePresentationApi
 
   @Before
   fun setup() {
@@ -44,7 +43,7 @@ class VerifiablePresentationApiTest {
             VerifierConfigurationRepository { it ->
               return@VerifierConfigurationRepository ClientConfiguration()
             })
-    service = VerifiablePresentationApi(repository, oauthRequestHandler)
+    VerifiablePresentationApi.initialize(repository, oauthRequestHandler)
   }
 
   @Test
@@ -111,7 +110,7 @@ class VerifiablePresentationApiTest {
               .appendQueryParameter("presentation_definition", presentationDefinition)
               .appendQueryParameter("client_metadata", clientMetadata)
               .build()
-      val registry = service.repository
+      val registry = VerifiablePresentationApi.repository
       val header = mapOf("type" to "JWT")
       val payloadValue =
           """
@@ -173,7 +172,7 @@ class VerifiablePresentationApiTest {
               callback.accept()
             }
           }
-      val result = service.handleRequest(context, "1", uri.toString(), interactor = interactor)
+      val result = VerifiablePresentationApi.handleRequest(context, "1", uri.toString(), interactor = interactor)
       result.onSuccess { print("success") }
       result.onFailure { print("failure") }
     }
@@ -182,7 +181,7 @@ class VerifiablePresentationApiTest {
   @Test
   fun to_handle_vp_request_with_request_object() {
     runBlocking {
-      val registry = service.repository
+      val registry = VerifiablePresentationApi.repository
       val header = mapOf("type" to "JWT")
       val payloadValue =
           """
@@ -354,7 +353,7 @@ class VerifiablePresentationApiTest {
               callback.accept()
             }
           }
-      val response = service.handleRequest(context, "1", url, interactor = interactor)
+      val response = VerifiablePresentationApi.handleRequest(context, "1", url, interactor = interactor)
 
     }
   }

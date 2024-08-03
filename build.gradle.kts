@@ -5,6 +5,7 @@ plugins {
     id("com.android.library") version "8.4.2" apply false
     id("com.diffplug.spotless") version "6.25.0" apply true
     id("com.google.devtools.ksp") version "1.9.23-1.0.20" apply false
+    kotlin("plugin.serialization") version "1.8.22"
 }
 
 spotless {
