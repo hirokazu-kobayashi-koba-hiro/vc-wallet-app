@@ -20,6 +20,7 @@ class VerifiableCredentialsService(
     private val walletConfigurationService: WalletConfigurationService,
     private val verifiableCredentialRecordRepository: VerifiableCredentialRecordRepository,
     private val walletClientConfigurationRepository: WalletClientConfigurationRepository,
+    private val credentialIssuanceResultRepository: CredentialIssuanceResultRepository,
 ) {
 
   suspend fun transform(
@@ -158,6 +159,26 @@ class VerifiableCredentialsService(
       verifiableCredentialsRecord: VerifiableCredentialsRecord
   ) {
     verifiableCredentialRecordRepository.save(subject, verifiableCredentialsRecord)
+  }
+
+  suspend fun registerCredentialIssuanceResult(
+      issuer: String,
+      credentialResponse: CredentialResponse
+  ) {
+    val id = UUID.randomUUID().toString()
+    val credentialIssuanceResult =
+        CredentialIssuanceResult(
+            id = id,
+            issuer = issuer,
+            credential = credentialResponse.credential,
+            transactionId = credentialResponse.transactionId,
+            cNonce = credentialResponse.cNonce,
+            cNonceExpiresIn = credentialResponse.cNonceExpiresIn,
+            notificationId = credentialResponse.notificationId,
+            status =
+                credentialResponse.credential?.let { CredentialIssuanceResultStatus.SUCCESS }
+                    ?: CredentialIssuanceResultStatus.PENDING)
+    credentialIssuanceResultRepository.register(credentialIssuanceResult = credentialIssuanceResult)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {

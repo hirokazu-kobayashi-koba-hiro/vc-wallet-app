@@ -78,6 +78,8 @@ object VerifiableCredentialsApi {
               jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
+    service.registerCredentialIssuanceResult(
+        issuer = credentialOffer.credentialIssuer, credentialResponse)
   }
 
   suspend fun handleAuthorizationCode(
@@ -144,6 +146,7 @@ object VerifiableCredentialsApi {
               jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
+    service.registerCredentialIssuanceResult(issuer = issuer, credentialResponse)
   }
 
   private suspend fun createAuthenticationRequestUri(
