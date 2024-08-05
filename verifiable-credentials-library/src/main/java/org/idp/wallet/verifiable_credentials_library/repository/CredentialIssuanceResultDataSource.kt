@@ -17,11 +17,15 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
 
   val dao = db.credentialIssuanceResultDao()
 
-  override suspend fun register(credentialIssuanceResult: CredentialIssuanceResult) =
+  override suspend fun register(
+      subject: String,
+      credentialIssuanceResult: CredentialIssuanceResult
+  ) =
       withContext(Dispatchers.IO) {
         val entity =
             CredentialIssuanceResultEntity(
                 id = credentialIssuanceResult.id,
+                subject = subject,
                 issuer = credentialIssuanceResult.issuer,
                 credential = credentialIssuanceResult.credential,
                 transactionId = credentialIssuanceResult.transactionId,
@@ -32,17 +36,18 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
         dao.insert(entity)
       }
 
-  override suspend fun findAll(): List<CredentialIssuanceResult> =
+  override suspend fun findAll(subject: String): List<CredentialIssuanceResult> =
       withContext(Dispatchers.IO) {
-        val entity = dao.selectAll()
+        val entity = dao.selectAll(subject)
         return@withContext entity.map { it.toResult() }
       }
 
-  override suspend fun update(credentialIssuanceResult: CredentialIssuanceResult) =
+  override suspend fun update(subject: String, credentialIssuanceResult: CredentialIssuanceResult) =
       withContext(Dispatchers.IO) {
         val entity =
             CredentialIssuanceResultEntity(
                 id = credentialIssuanceResult.id,
+                subject = subject,
                 issuer = credentialIssuanceResult.issuer,
                 credential = credentialIssuanceResult.credential,
                 transactionId = credentialIssuanceResult.transactionId,
@@ -53,24 +58,27 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
         dao.update(entity)
       }
 
-  override suspend fun delete(id: String) = withContext(Dispatchers.IO) { dao.delete(id) }
+  override suspend fun delete(subject: String, id: String) =
+      withContext(Dispatchers.IO) { dao.delete(subject, id) }
 }
 
 @Dao
 interface CredentialIssuanceResultDao {
   @Insert fun insert(entity: CredentialIssuanceResultEntity)
 
-  @Query("SELECT * FROM credential_issuance_result")
-  fun selectAll(): List<CredentialIssuanceResultEntity>
+  @Query("SELECT * FROM credential_issuance_result WHERE subject = :subject")
+  fun selectAll(subject: String): List<CredentialIssuanceResultEntity>
 
   @Update fun update(entity: CredentialIssuanceResultEntity)
 
-  @Query("DELETE FROM credential_issuance_result WHERE id = :id") fun delete(id: String)
+  @Query("DELETE FROM credential_issuance_result WHERE id = :id AND subject = :subject")
+  fun delete(subject: String, id: String)
 }
 
 @Entity(tableName = "credential_issuance_result")
 data class CredentialIssuanceResultEntity(
     @PrimaryKey val id: String,
+    @ColumnInfo("subject") val subject: String,
     @ColumnInfo("issuer") val issuer: String,
     @ColumnInfo("credential") val credential: String?,
     @ColumnInfo("transaction_id") val transactionId: String?,

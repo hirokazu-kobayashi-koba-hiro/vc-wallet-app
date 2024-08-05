@@ -1,11 +1,11 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
 interface CredentialIssuanceResultRepository {
-  suspend fun register(credentialIssuanceResult: CredentialIssuanceResult)
+  suspend fun register(subject: String, credentialIssuanceResult: CredentialIssuanceResult)
 
-  suspend fun findAll(): List<CredentialIssuanceResult>
+  suspend fun findAll(subject: String): List<CredentialIssuanceResult>
 
-  suspend fun update(credentialIssuanceResult: CredentialIssuanceResult)
+  suspend fun update(subject: String, credentialIssuanceResult: CredentialIssuanceResult)
 
-  suspend fun delete(id: String)
+  suspend fun delete(subject: String, id: String)
 }

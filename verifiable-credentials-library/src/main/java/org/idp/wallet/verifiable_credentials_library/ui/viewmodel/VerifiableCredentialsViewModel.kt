@@ -9,6 +9,7 @@ import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialIssuanceResult
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
@@ -25,10 +26,12 @@ class VerifiableCredentialsViewModel(
   private var _systemDialogState = MutableStateFlow(SystemDialogState())
   private var _loginState =
       MutableStateFlow(OpenIdConnectResponse(TokenResponse("", "", "", 0, "", "")))
+  private var _vciResults = MutableStateFlow(listOf<CredentialIssuanceResult>())
   val vciState = _vcContent.asStateFlow()
   val loadingState = _loading.asStateFlow()
   val systemDialogState = _systemDialogState.asStateFlow()
   val loginState = _loginState.asStateFlow()
+  val vciResultsState = _vciResults.asStateFlow()
 
   suspend fun login(
       context: Context,
@@ -97,6 +100,12 @@ class VerifiableCredentialsViewModel(
     } finally {
       _loading.value = false
     }
+  }
+
+  suspend fun findAllCredentialIssuanceResults() {
+    val credentialIssuanceResults =
+        VerifiableCredentialsClient.findAllCredentialIssuanceResults(subject())
+    _vciResults.value = credentialIssuanceResults
   }
 
   suspend fun handleVpRequest(

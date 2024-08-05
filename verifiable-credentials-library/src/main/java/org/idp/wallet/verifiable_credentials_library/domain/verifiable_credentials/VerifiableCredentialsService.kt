@@ -162,6 +162,7 @@ class VerifiableCredentialsService(
   }
 
   suspend fun registerCredentialIssuanceResult(
+      subject: String,
       issuer: String,
       credentialResponse: CredentialResponse
   ) {
@@ -178,7 +179,12 @@ class VerifiableCredentialsService(
             status =
                 credentialResponse.credential?.let { CredentialIssuanceResultStatus.SUCCESS }
                     ?: CredentialIssuanceResultStatus.PENDING)
-    credentialIssuanceResultRepository.register(credentialIssuanceResult = credentialIssuanceResult)
+    credentialIssuanceResultRepository.register(
+        subject = subject, credentialIssuanceResult = credentialIssuanceResult)
+  }
+
+  suspend fun findAllCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
+    return credentialIssuanceResultRepository.findAll(subject)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {

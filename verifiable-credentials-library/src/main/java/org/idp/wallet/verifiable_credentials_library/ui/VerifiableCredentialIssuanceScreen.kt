@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +37,9 @@ fun VcScreen(
 ) {
   var format by remember { mutableStateOf("vc+sd-jwt") }
   var issuer by remember { mutableStateOf("https://trial.authlete.net") }
-  val vciState = viewModel.vciState.collectAsState()
+  val vciResultsState = viewModel.vciResultsState.collectAsState()
+
+  LaunchedEffect(Unit) { viewModel.findAllCredentialIssuanceResults() }
 
   if (viewModel.loadingState.collectAsState().value) {
     LoadingScreen()
@@ -52,30 +58,35 @@ fun VcScreen(
       },
       content = { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxWidth().padding(paddingValues),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Column(
-                  modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
-                  horizontalAlignment = Alignment.CenterHorizontally,
-                  verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
-              ) {
-                Column {
-                  Text(text = "pre-authorization")
-                  Button(
-                      modifier = Modifier.padding(top = Dp(16.0F)),
-                      onClick = { resolveQrCode(format) }) {
-                        Text(text = "scan QR")
-                      }
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = Dp(16.0F),
+                        end = Dp(16.0F)),
+            verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
+            horizontalAlignment = Alignment.Start) {
+              Column(verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
+                Text(text = "pre-authorization")
+                Button(onClick = { resolveQrCode(format) }) { Text(text = "scan QR") }
+              }
+              Column(verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
+                Text(text = "authorization-code")
+                OutlinedTextField(value = issuer, onValueChange = { issuer = it })
+                Button(onClick = { issueVcWhenAuthorizationCodeFlow(issuer) }) {
+                  Text(text = "request vc")
                 }
-                Column {
-                  Text(text = "authorization-code")
-                  OutlinedTextField(value = issuer, onValueChange = { issuer = it })
-                  Button(
-                      modifier = Modifier.padding(top = Dp(16.0F)),
-                      onClick = { issueVcWhenAuthorizationCodeFlow(issuer) }) {
-                        Text(text = "request vc")
-                      }
+              }
+              Divider()
+              Column {
+                Text(text = "issuance result")
+                LazyColumn {
+                  items(vciResultsState.value) { vciResult ->
+                    Text(text = vciResult.id)
+                    Text(text = vciResult.issuer)
+                    Text(text = vciResult.transactionId ?: "")
+                    Text(text = vciResult.status.name)
+                  }
                 }
               }
             }

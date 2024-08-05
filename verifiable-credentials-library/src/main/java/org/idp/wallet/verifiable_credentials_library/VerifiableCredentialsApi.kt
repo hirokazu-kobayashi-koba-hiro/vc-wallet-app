@@ -8,6 +8,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.DpopJ
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsAuthorizationRequest
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialIssuanceResult
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequestValidator
@@ -79,7 +80,7 @@ object VerifiableCredentialsApi {
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
     service.registerCredentialIssuanceResult(
-        issuer = credentialOffer.credentialIssuer, credentialResponse)
+        subject = subject, issuer = credentialOffer.credentialIssuer, credentialResponse)
   }
 
   suspend fun handleAuthorizationCode(
@@ -146,7 +147,7 @@ object VerifiableCredentialsApi {
               jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
-    service.registerCredentialIssuanceResult(issuer = issuer, credentialResponse)
+    service.registerCredentialIssuanceResult(subject = subject, issuer = issuer, credentialResponse)
   }
 
   private suspend fun createAuthenticationRequestUri(
@@ -159,7 +160,7 @@ object VerifiableCredentialsApi {
     oidcMetadata.pushedAuthorizationRequestEndpoint?.let { endpoint ->
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
-            return@let DpopJwtCreator.create(
+            DpopJwtCreator.create(
                 privateKey = service.getWalletPrivateKey(), method = "POST", path = endpoint)
           }
 
@@ -214,5 +215,9 @@ object VerifiableCredentialsApi {
 
   suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
     return service.getAllCredentials(subject)
+  }
+
+  suspend fun findAllCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
+    return service.findAllCredentialIssuanceResults(subject)
   }
 }

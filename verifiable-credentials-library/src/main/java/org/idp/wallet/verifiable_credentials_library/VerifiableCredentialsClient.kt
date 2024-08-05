@@ -6,6 +6,7 @@ import org.idp.wallet.verifiable_credentials_library.activity.VerifiableCredenti
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialIssuanceResult
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
@@ -86,5 +87,9 @@ object VerifiableCredentialsClient {
       interactor: VerifiablePresentationInteractor
   ): Result<Any> {
     return VerifiablePresentationApi.handleRequest(context, subject, url, interactor)
+  }
+
+  suspend fun findAllCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
+    return VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject)
   }
 }
