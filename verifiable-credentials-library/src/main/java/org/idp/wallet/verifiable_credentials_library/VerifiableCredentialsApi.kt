@@ -9,6 +9,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetada
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsAuthorizationRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialIssuanceResult
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialIssuanceResultStatus
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequestValidator
@@ -80,7 +81,11 @@ object VerifiableCredentialsApi {
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
     service.registerCredentialIssuanceResult(
-        subject = subject, issuer = credentialOffer.credentialIssuer, credentialResponse)
+        subject = subject,
+        issuer = credentialOffer.credentialIssuer,
+        credentialConfigurationId = credentialOffer.credentialConfigurationIds[0],
+        credentialResponse = credentialResponse,
+    )
   }
 
   suspend fun handleAuthorizationCode(
@@ -147,7 +152,89 @@ object VerifiableCredentialsApi {
               jwks)
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
-    service.registerCredentialIssuanceResult(subject = subject, issuer = issuer, credentialResponse)
+    service.registerCredentialIssuanceResult(
+        subject = subject,
+        issuer = issuer,
+        credentialConfigurationId = credentialConfigurationId,
+        credentialResponse = credentialResponse)
+  }
+
+  suspend fun handleDeferredCredential(
+      context: Context,
+      subject: String,
+      credentialIssuanceResultId: String
+  ) {
+    val credentialIssuanceResult =
+        service.getCredentialIssuanceResult(subject, credentialIssuanceResultId)
+    val transactionId =
+        credentialIssuanceResult.transactionId ?: throw RuntimeException("not found transactionId")
+    val credentialIssuerMetadata =
+        service.getCredentialIssuerMetadata(credentialIssuanceResult.issuer)
+    val deferredCredentialEndpoint =
+        credentialIssuerMetadata.deferredCredentialEndpoint
+            ?: throw RuntimeException(
+                String.format(
+                    "unsupported deferredCredential (%s)", credentialIssuanceResult.issuer))
+
+    val oidcMetadata =
+        service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
+    val clientConfiguration = service.getClientConfiguration(oidcMetadata)
+    val authenticationRequestUri =
+        createAuthenticationRequestUri(
+            credentialIssuanceResult.credentialConfigurationId,
+            credentialIssuerMetadata,
+            oidcMetadata,
+            clientConfiguration)
+    val authenticationResponse =
+        OpenIdConnectApi.request(
+            context = context, authenticationRequestUri = authenticationRequestUri)
+    val dpopJwt =
+        oidcMetadata.dpopSigningAlgValuesSupported?.let {
+          return@let DpopJwtCreator.create(
+              privateKey = service.getWalletPrivateKey(),
+              method = "POST",
+              path = oidcMetadata.tokenEndpoint)
+        }
+    val tokenResponse =
+        service.requestTokenWithAuthorizedCode(
+            url = oidcMetadata.tokenEndpoint,
+            clientId = clientConfiguration.clientId,
+            dpopJwt = dpopJwt,
+            authorizationCode = authenticationResponse.code(),
+        )
+
+    val dpopJwtForCredential =
+        oidcMetadata.dpopSigningAlgValuesSupported?.let {
+          return@let DpopJwtCreator.create(
+              privateKey = service.getWalletPrivateKey(),
+              method = "POST",
+              path = credentialIssuerMetadata.credentialEndpoint,
+              accessToken = tokenResponse.accessToken)
+        }
+    val deferredCredentialResponse =
+        service.requestDeferredCredential(
+            url = deferredCredentialEndpoint,
+            dpopJwt = dpopJwtForCredential,
+            accessToken = tokenResponse.accessToken,
+            transactionId = transactionId)
+    val verifiableCredentialsType =
+        credentialIssuerMetadata.getVerifiableCredentialsType(
+            credentialIssuanceResult.credentialConfigurationId)
+    val jwks = service.getJwks(credentialIssuerMetadata.credentialEndpoint)
+    deferredCredentialResponse.credential?.let {
+      val verifiableCredentialsRecord =
+          service.transform(
+              issuer = credentialIssuanceResult.issuer,
+              verifiableCredentialsType = verifiableCredentialsType,
+              type = credentialIssuanceResult.credentialConfigurationId,
+              it,
+              jwks)
+      service.registerCredential(subject, verifiableCredentialsRecord)
+      val updatedCredentialIssuanceResult =
+          credentialIssuanceResult.copy(status = CredentialIssuanceResultStatus.SUCCESS)
+      service.updateCredentialIssuanceResult(
+          subject = subject, credentialIssuanceResult = updatedCredentialIssuanceResult)
+    }
   }
 
   private suspend fun createAuthenticationRequestUri(

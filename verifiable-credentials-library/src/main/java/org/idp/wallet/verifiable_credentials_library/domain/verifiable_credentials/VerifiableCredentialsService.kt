@@ -154,6 +154,22 @@ class VerifiableCredentialsService(
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
+  suspend fun requestDeferredCredential(
+      url: String,
+      dpopJwt: String?,
+      accessToken: String,
+      transactionId: String
+  ): CredentialResponse {
+    val credentialRequest = mutableMapOf(Pair("transaction_id", transactionId))
+    val credentialRequestHeader =
+        dpopJwt?.let {
+          return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
+        } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))
+    credentialRequestHeader.put("content-type", "application/json")
+    val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
+    return JsonUtils.read(response.toString(), CredentialResponse::class.java)
+  }
+
   suspend fun registerCredential(
       subject: String,
       verifiableCredentialsRecord: VerifiableCredentialsRecord
@@ -164,13 +180,15 @@ class VerifiableCredentialsService(
   suspend fun registerCredentialIssuanceResult(
       subject: String,
       issuer: String,
-      credentialResponse: CredentialResponse
+      credentialConfigurationId: String,
+      credentialResponse: CredentialResponse,
   ) {
     val id = UUID.randomUUID().toString()
     val credentialIssuanceResult =
         CredentialIssuanceResult(
             id = id,
             issuer = issuer,
+            credentialConfigurationId = credentialConfigurationId,
             credential = credentialResponse.credential,
             transactionId = credentialResponse.transactionId,
             cNonce = credentialResponse.cNonce,
@@ -185,6 +203,18 @@ class VerifiableCredentialsService(
 
   suspend fun findAllCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
     return credentialIssuanceResultRepository.findAll(subject)
+  }
+
+  suspend fun getCredentialIssuanceResult(subject: String, id: String): CredentialIssuanceResult {
+    return credentialIssuanceResultRepository.get(subject, id)
+  }
+
+  suspend fun updateCredentialIssuanceResult(
+      subject: String,
+      credentialIssuanceResult: CredentialIssuanceResult
+  ) {
+    credentialIssuanceResultRepository.update(
+        subject = subject, credentialIssuanceResult = credentialIssuanceResult)
   }
 
   suspend fun getJwks(jwksEndpoint: String): String {

@@ -27,6 +27,7 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
                 id = credentialIssuanceResult.id,
                 subject = subject,
                 issuer = credentialIssuanceResult.issuer,
+                credentialConfigurationId = credentialIssuanceResult.credentialConfigurationId,
                 credential = credentialIssuanceResult.credential,
                 transactionId = credentialIssuanceResult.transactionId,
                 cNonce = credentialIssuanceResult.cNonce,
@@ -42,6 +43,12 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
         return@withContext entity.map { it.toResult() }
       }
 
+  override suspend fun get(subject: String, id: String): CredentialIssuanceResult =
+      withContext(Dispatchers.IO) {
+        val entity = dao.selectBy(subject, id)
+        return@withContext entity.toResult()
+      }
+
   override suspend fun update(subject: String, credentialIssuanceResult: CredentialIssuanceResult) =
       withContext(Dispatchers.IO) {
         val entity =
@@ -49,6 +56,7 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
                 id = credentialIssuanceResult.id,
                 subject = subject,
                 issuer = credentialIssuanceResult.issuer,
+                credentialConfigurationId = credentialIssuanceResult.credentialConfigurationId,
                 credential = credentialIssuanceResult.credential,
                 transactionId = credentialIssuanceResult.transactionId,
                 cNonce = credentialIssuanceResult.cNonce,
@@ -69,6 +77,9 @@ interface CredentialIssuanceResultDao {
   @Query("SELECT * FROM credential_issuance_result WHERE subject = :subject")
   fun selectAll(subject: String): List<CredentialIssuanceResultEntity>
 
+  @Query("SELECT * FROM credential_issuance_result WHERE subject = :subject AND id = :id")
+  fun selectBy(subject: String, id: String): CredentialIssuanceResultEntity
+
   @Update fun update(entity: CredentialIssuanceResultEntity)
 
   @Query("DELETE FROM credential_issuance_result WHERE id = :id AND subject = :subject")
@@ -80,6 +91,7 @@ data class CredentialIssuanceResultEntity(
     @PrimaryKey val id: String,
     @ColumnInfo("subject") val subject: String,
     @ColumnInfo("issuer") val issuer: String,
+    @ColumnInfo("credential_configuration_id") val credentialConfigurationId: String,
     @ColumnInfo("credential") val credential: String?,
     @ColumnInfo("transaction_id") val transactionId: String?,
     @ColumnInfo("c_nonce") val cNonce: String?,
@@ -91,6 +103,7 @@ data class CredentialIssuanceResultEntity(
     return CredentialIssuanceResult(
         id = id,
         issuer = issuer,
+        credentialConfigurationId = credentialConfigurationId,
         credential = credential,
         transactionId = transactionId,
         cNonce = cNonce,
