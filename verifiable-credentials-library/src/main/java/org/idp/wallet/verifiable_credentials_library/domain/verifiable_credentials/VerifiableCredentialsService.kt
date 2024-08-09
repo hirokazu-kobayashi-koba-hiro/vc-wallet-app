@@ -258,6 +258,8 @@ class VerifiableCredentialsService(
               "response_types" to responseTypes,
               "client_Uri" to clientName,
               "scope" to scope,
+              "application_type" to "native",
+              "token_endpoint_auth_method" to "none",
           )
       val registrationEndpoint =
           oidcMetadata.registrationEndpoint
@@ -267,7 +269,7 @@ class VerifiableCredentialsService(
       val response = HttpClient.post(registrationEndpoint, requestBody = requestBody)
       return ClientConfiguration(
           clientId = response.getString("client_id"),
-          clientSecret = response.getString("client_secret"),
+          clientSecret = response.optString("client_secret", ""),
           redirectUris = redirectUris,
           grantTypes = grantTypes,
           responseTypes = responseTypes,
