@@ -1,10 +1,12 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
@@ -24,7 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import org.idp.wallet.verifiable_credentials_library.R
+import org.idp.wallet.verifiable_credentials_library.ui.component.CardComponent
 import org.idp.wallet.verifiable_credentials_library.ui.component.LoadingScreen
 import org.idp.wallet.verifiable_credentials_library.ui.viewmodel.VerifiableCredentialsViewModel
 
@@ -59,11 +64,13 @@ fun VcScreen(
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.fillMaxWidth()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = Dp(16.0F),
-                        end = Dp(16.0F)),
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = Dp(16.0F),
+                    end = Dp(16.0F)
+                ),
             verticalArrangement = Arrangement.spacedBy(Dp(16.0F)),
             horizontalAlignment = Alignment.Start) {
               Column(verticalArrangement = Arrangement.spacedBy(Dp(8.0F))) {
@@ -82,10 +89,25 @@ fun VcScreen(
                 Text(text = "issuance result")
                 LazyColumn {
                   items(vciResultsState.value) { vciResult ->
-                    Text(text = vciResult.id)
-                    Text(text = vciResult.issuer)
-                    Text(text = vciResult.transactionId ?: "")
-                    Text(text = vciResult.status.name)
+                      CardComponent(
+                          title = vciResult.credentialConfigurationId,
+                          icon = {
+                              Image(
+                                  painter = painterResource(id = R.drawable.proof),
+                                  contentDescription = "contentDescription",
+                                  modifier = Modifier.size(Dp(50.0F)))
+                          },
+                          detailContent = {
+                              Column(modifier = Modifier.fillMaxWidth().padding(Dp(16.0F)),
+                                  verticalArrangement = Arrangement.spacedBy(Dp(8.0F))
+                                  ) {
+                                  Text(text = vciResult.id)
+                                  Text(text = vciResult.issuer)
+                                  Text(text = vciResult.transactionId ?: "")
+                                  Text(text = vciResult.status.name)
+                              }
+                          }
+                      )
                   }
                 }
               }
