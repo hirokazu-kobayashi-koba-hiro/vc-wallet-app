@@ -122,6 +122,14 @@ class VerifiableCredentialsViewModel(
     }
   }
 
+  suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {
+      try {
+          VerifiableCredentialsClient.handleDeferredCredential(context, subject(), credentialIssuanceResultId)
+      } catch (e: Exception) {
+          // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
+      }
+  }
+
   fun showDialog(
       title: String,
       message: String,
