@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import java.io.File
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.R
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
@@ -96,7 +98,7 @@ fun VerifiableCredentialsMainScreen(
 ) {
   var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
   val context = LocalContext.current
-  val scope = rememberCoroutineScope()
+  val scope = CoroutineScope(Dispatchers.Main)
   VcWalletTheme {
     NavigationSuiteScaffold(
         navigationSuiteItems = {

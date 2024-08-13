@@ -1,5 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.idp.wallet.verifiable_credentials_library.R
 import org.idp.wallet.verifiable_credentials_library.ui.component.CardComponent
@@ -50,7 +53,7 @@ fun VcScreen(
   var format by remember { mutableStateOf("vc+sd-jwt") }
   var issuer by remember { mutableStateOf("https://trial.authlete.net") }
   val vciResultsState = viewModel.vciResultsState.collectAsState()
-  val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = CoroutineScope(Dispatchers.Main)
   val context = LocalContext.current
 
   LaunchedEffect(Unit) { viewModel.findAllCredentialIssuanceResults() }
@@ -116,7 +119,10 @@ fun VcScreen(
                                           contentColor = Color.Transparent
                                       ),
                                       onClick = {
-                                          coroutineScope.launch {
+                                          val errorHandler = CoroutineExceptionHandler { _, error ->
+                                              Toast.makeText(context, error.message ?: "unexpected error", Toast.LENGTH_LONG).show()
+                                          }
+                                          coroutineScope.launch(errorHandler) {
                                               viewModel.handleDeferredCredential(
                                                   context = context,
                                                   credentialIssuanceResultId = vciResult.id
@@ -133,10 +139,10 @@ fun VcScreen(
                                   .padding(Dp(16.0F)),
                                   verticalArrangement = Arrangement.spacedBy(Dp(8.0F))
                                   ) {
-                                  rowContent(label = "id", value = vciResult.id)
-                                  rowContent(label = "issuer", value = vciResult.issuer)
-                                  rowContent(label = "transactionId", value = vciResult.transactionId ?: "")
-                                  rowContent(label = "status", value = vciResult.status.name)
+                                  RowContent(label = "id", value = vciResult.id)
+                                  RowContent(label = "issuer", value = vciResult.issuer)
+                                  RowContent(label = "transactionId", value = vciResult.transactionId ?: "")
+                                  RowContent(label = "status", value = vciResult.status.name)
                               }
                           }
                       )
@@ -148,7 +154,7 @@ fun VcScreen(
 }
 
 @Composable
-private fun rowContent(label: String, value: String) {
+private fun RowContent(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween) {

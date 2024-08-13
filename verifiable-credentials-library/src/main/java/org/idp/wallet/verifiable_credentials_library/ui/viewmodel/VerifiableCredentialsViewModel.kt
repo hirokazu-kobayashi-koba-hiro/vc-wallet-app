@@ -85,8 +85,6 @@ class VerifiableCredentialsViewModel(
       _loading.value = true
       VerifiableCredentialsClient.handleAuthorizationCode(
           context, subject(), issuer, credentialConfigurationId)
-    } catch (e: Exception) {
-      // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
     } finally {
       _loading.value = false
     }
@@ -123,11 +121,7 @@ class VerifiableCredentialsViewModel(
   }
 
   suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {
-      try {
-          VerifiableCredentialsClient.handleDeferredCredential(context, subject(), credentialIssuanceResultId)
-      } catch (e: Exception) {
-          // FIXME Catching error with CoroutineExceptionHandler to hang and can not operate app.
-      }
+      VerifiableCredentialsClient.handleDeferredCredential(context, subject(), credentialIssuanceResultId)
   }
 
   fun showDialog(
