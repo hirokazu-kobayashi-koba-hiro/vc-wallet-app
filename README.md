@@ -2,6 +2,8 @@
 
 ## app
 
+### run
+
 ### demo with authlete trial
 You can issue verifiable-credentials of vc+sd-jwt format with authlete trial service.
 
