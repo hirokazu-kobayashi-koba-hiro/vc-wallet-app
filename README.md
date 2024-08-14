@@ -35,7 +35,7 @@ The library provides the following functionality:
    - protocol
       - [x] Authorization Code Flow
       - [x] Pre-authorization Code Flow
-      - [ ] Support for deferred issuing
+      - [x] Support for deferred issuing
       - [x] Dynamic registration of clients
    - use-case
       - [ ] same device

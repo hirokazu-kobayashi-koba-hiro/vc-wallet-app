@@ -121,7 +121,8 @@ class VerifiableCredentialsViewModel(
   }
 
   suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {
-      VerifiableCredentialsClient.handleDeferredCredential(context, subject(), credentialIssuanceResultId)
+    VerifiableCredentialsClient.handleDeferredCredential(
+        context, subject(), credentialIssuanceResultId)
   }
 
   fun showDialog(
