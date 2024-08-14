@@ -93,7 +93,14 @@ object VerifiableCredentialsClient {
     return VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject)
   }
 
-    suspend fun handleDeferredCredential(context: Context, subject: String, credentialIssuanceResultId: String) {
-        VerifiableCredentialsApi.handleDeferredCredential(context = context, subject = subject, credentialIssuanceResultId = credentialIssuanceResultId)
-    }
+  suspend fun handleDeferredCredential(
+      context: Context,
+      subject: String,
+      credentialIssuanceResultId: String
+  ) {
+    VerifiableCredentialsApi.handleDeferredCredential(
+        context = context,
+        subject = subject,
+        credentialIssuanceResultId = credentialIssuanceResultId)
+  }
 }

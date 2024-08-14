@@ -4,6 +4,8 @@ import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
+import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.DpopJwtCreator
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -39,7 +41,8 @@ object VerifiableCredentialsApi {
 
     val preAuthorizedCodeGrant = credentialOffer.preAuthorizedCodeGrant
     if (preAuthorizedCodeGrant == null) {
-      throw RuntimeException(
+      throw VerifiableCredentialsException(
+          VcError.NOT_FOUND_REQUIRED_PARAMS,
           "PreAuthorizedCode in credential offer response is empty. It is required on pre-authorization-code flow")
     }
     val credentialIssuerMetadata =
@@ -49,7 +52,7 @@ object VerifiableCredentialsApi {
     val clientConfiguration = service.getClientConfiguration(oidcMetadata)
     val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
     if (!result.first) {
-      throw RuntimeException("user canceled")
+      throw VerifiableCredentialsException(VcError.NOT_AUTHENTICATED, "user canceled")
     }
     val tokenResponse =
         service.requestTokenWithPreAuthorizedCode(
@@ -167,12 +170,15 @@ object VerifiableCredentialsApi {
     val credentialIssuanceResult =
         service.getCredentialIssuanceResult(subject, credentialIssuanceResultId)
     val transactionId =
-        credentialIssuanceResult.transactionId ?: throw RuntimeException("not found transactionId")
+        credentialIssuanceResult.transactionId
+            ?: throw VerifiableCredentialsException(
+                VcError.NOT_FOUND_REQUIRED_PARAMS, "not found transactionId")
     val credentialIssuerMetadata =
         service.getCredentialIssuerMetadata(credentialIssuanceResult.issuer)
     val deferredCredentialEndpoint =
         credentialIssuerMetadata.deferredCredentialEndpoint
-            ?: throw RuntimeException(
+            ?: throw VerifiableCredentialsException(
+                VcError.UNSUPPORTED_DEFERRED_CREDENTIAL,
                 String.format(
                     "unsupported deferredCredential (%s)", credentialIssuanceResult.issuer))
 
