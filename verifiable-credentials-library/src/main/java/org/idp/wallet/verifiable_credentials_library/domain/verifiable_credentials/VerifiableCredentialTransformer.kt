@@ -16,36 +16,20 @@ class VerifiableCredentialTransformer(
 ) {
 
   suspend fun transform(): VerifiableCredentialsRecord {
+    val uuid = UUID.randomUUID().toString()
+    val format = verifiableCredentialsType.format
     return when (verifiableCredentialsType) {
       VerifiableCredentialsType.SD_JWT -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
-         VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            claims)
+        VerifiableCredentialsRecord(uuid, issuer, type, format, rawVc, claims)
       }
       VerifiableCredentialsType.JWT_VC_JSON -> {
         val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
         val payload = jwt.payload()
-        VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            payload)
+        VerifiableCredentialsRecord(uuid, issuer, type, format, rawVc, payload)
       }
       VerifiableCredentialsType.MSO_MDOC -> {
-        VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            mapOf())
+        VerifiableCredentialsRecord(uuid, issuer, type, format, rawVc, mapOf())
       }
       else -> {
         throw VerifiableCredentialsException(
