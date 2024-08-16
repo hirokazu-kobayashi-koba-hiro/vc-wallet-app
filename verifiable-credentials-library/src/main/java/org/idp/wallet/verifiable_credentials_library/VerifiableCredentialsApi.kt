@@ -76,12 +76,13 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          VerifiableCredentialTransformer.transform(
-              issuer = credentialOffer.credentialIssuer,
-              verifiableCredentialsType = verifiableCredentialsType,
-              type = credentialOffer.credentialConfigurationIds[0],
-              it,
-              jwks)
+          VerifiableCredentialTransformer(
+                  issuer = credentialOffer.credentialIssuer,
+                  verifiableCredentialsType = verifiableCredentialsType,
+                  type = credentialOffer.credentialConfigurationIds[0],
+                  it,
+                  jwks)
+              .transform()
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
     service.registerCredentialIssuanceResult(
@@ -148,12 +149,13 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          VerifiableCredentialTransformer.transform(
-              issuer = issuer,
-              verifiableCredentialsType = verifiableCredentialsType,
-              type = credentialConfigurationId,
-              it,
-              jwks)
+          VerifiableCredentialTransformer(
+                  issuer = issuer,
+                  verifiableCredentialsType = verifiableCredentialsType,
+                  type = credentialConfigurationId,
+                  it,
+                  jwks)
+              .transform()
       service.registerCredential(subject, verifiableCredentialsRecord)
     }
     service.registerCredentialIssuanceResult(
@@ -230,12 +232,13 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(credentialIssuerMetadata.credentialEndpoint)
     deferredCredentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          VerifiableCredentialTransformer.transform(
-              issuer = credentialIssuanceResult.issuer,
-              verifiableCredentialsType = verifiableCredentialsType,
-              type = credentialIssuanceResult.credentialConfigurationId,
-              it,
-              jwks)
+          VerifiableCredentialTransformer(
+                  issuer = credentialIssuanceResult.issuer,
+                  verifiableCredentialsType = verifiableCredentialsType,
+                  type = credentialIssuanceResult.credentialConfigurationId,
+                  it,
+                  jwks)
+              .transform()
       service.registerCredential(subject, verifiableCredentialsRecord)
       val updatedCredentialIssuanceResult =
           credentialIssuanceResult.copy(status = CredentialIssuanceResultStatus.SUCCESS)

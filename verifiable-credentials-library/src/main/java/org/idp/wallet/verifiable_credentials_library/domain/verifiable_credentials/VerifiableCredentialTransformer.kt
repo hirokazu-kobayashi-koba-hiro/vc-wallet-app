@@ -7,15 +7,15 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCr
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 
-object VerifiableCredentialTransformer {
+class VerifiableCredentialTransformer(
+    private val issuer: String,
+    private val verifiableCredentialsType: VerifiableCredentialsType,
+    private val type: String,
+    private val rawVc: String,
+    private val jwks: String
+) {
 
-  suspend fun transform(
-      issuer: String,
-      verifiableCredentialsType: VerifiableCredentialsType,
-      type: String,
-      rawVc: String,
-      jwks: String
-  ): VerifiableCredentialsRecord {
+  suspend fun transform(): VerifiableCredentialsRecord {
     return when (verifiableCredentialsType) {
       VerifiableCredentialsType.SD_JWT -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
