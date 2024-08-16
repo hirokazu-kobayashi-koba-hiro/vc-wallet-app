@@ -11,9 +11,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialRe
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.JwtVcConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.VerifiableCredentialsType
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
-import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
-import org.idp.wallet.verifiable_credentials_library.util.sdjwt.SdJwtUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
@@ -22,50 +20,6 @@ class VerifiableCredentialsService(
     private val walletClientConfigurationRepository: WalletClientConfigurationRepository,
     private val credentialIssuanceResultRepository: CredentialIssuanceResultRepository,
 ) {
-
-  suspend fun transform(
-      issuer: String,
-      verifiableCredentialsType: VerifiableCredentialsType,
-      type: String,
-      rawVc: String,
-      jwks: String
-  ): VerifiableCredentialsRecord {
-    return when (verifiableCredentialsType) {
-      VerifiableCredentialsType.SD_JWT -> {
-        val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
-        return VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            claims)
-      }
-      VerifiableCredentialsType.JWT_VC_JSON -> {
-        val jwt = JoseUtils.parseAndVerifySignature(rawVc, jwks)
-        val payload = jwt.payload()
-        VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            payload)
-      }
-      VerifiableCredentialsType.MSO_MDOC -> {
-        VerifiableCredentialsRecord(
-            UUID.randomUUID().toString(),
-            issuer,
-            type,
-            verifiableCredentialsType.format,
-            rawVc,
-            mapOf())
-      }
-      else -> {
-        throw RuntimeException("unsupported format")
-      }
-    }
-  }
 
   suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
     return verifiableCredentialRecordRepository.getAll(subject)
