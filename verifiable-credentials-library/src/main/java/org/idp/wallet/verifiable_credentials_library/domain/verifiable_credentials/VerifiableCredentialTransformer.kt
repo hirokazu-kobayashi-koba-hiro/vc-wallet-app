@@ -19,7 +19,7 @@ class VerifiableCredentialTransformer(
     return when (verifiableCredentialsType) {
       VerifiableCredentialsType.SD_JWT -> {
         val claims = SdJwtUtils.parseAndVerifySignature(rawVc, jwks)
-        return VerifiableCredentialsRecord(
+         VerifiableCredentialsRecord(
             UUID.randomUUID().toString(),
             issuer,
             type,
