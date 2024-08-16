@@ -17,6 +17,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequestValidator
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractorCallback
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialTransformer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
 
@@ -75,7 +76,7 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          service.transform(
+          VerifiableCredentialTransformer.transform(
               issuer = credentialOffer.credentialIssuer,
               verifiableCredentialsType = verifiableCredentialsType,
               type = credentialOffer.credentialConfigurationIds[0],
@@ -147,7 +148,7 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
     credentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          service.transform(
+          VerifiableCredentialTransformer.transform(
               issuer = issuer,
               verifiableCredentialsType = verifiableCredentialsType,
               type = credentialConfigurationId,
@@ -229,7 +230,7 @@ object VerifiableCredentialsApi {
     val jwks = service.getJwks(credentialIssuerMetadata.credentialEndpoint)
     deferredCredentialResponse.credential?.let {
       val verifiableCredentialsRecord =
-          service.transform(
+          VerifiableCredentialTransformer.transform(
               issuer = credentialIssuanceResult.issuer,
               verifiableCredentialsType = verifiableCredentialsType,
               type = credentialIssuanceResult.credentialConfigurationId,
