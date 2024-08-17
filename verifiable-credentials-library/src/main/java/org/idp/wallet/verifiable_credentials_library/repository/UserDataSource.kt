@@ -3,6 +3,7 @@ package org.idp.wallet.verifiable_credentials_library.repository
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Insert
@@ -12,6 +13,7 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.Address
 import org.idp.wallet.verifiable_credentials_library.domain.user.User
 import org.idp.wallet.verifiable_credentials_library.domain.user.UserRepository
 
@@ -96,6 +98,14 @@ class UserDataSource(db: AppDatabase) : UserRepository {
                     locale = user.locale,
                     phoneNumber = user.phoneNumber,
                     phoneNumberVerified = user.phoneNumberVerified,
+                    address =
+                        AddressEntity(
+                            formatted = user.address?.formatted,
+                            streetAddress = user.address?.streetAddress,
+                            locality = user.address?.locality,
+                            region = user.address?.region,
+                            postalCode = user.address?.postalCode,
+                            country = user.address?.country),
                     updatedAt = user.updatedAt))
         val currentUserEntity = CurrentUserEntity(userId = user.id)
         currentUserDao.insert(entity = currentUserEntity)
@@ -145,6 +155,7 @@ class UserEntity(
     @ColumnInfo("locale") val locale: String? = null,
     @ColumnInfo("phone_number") val phoneNumber: String? = null,
     @ColumnInfo("phone_number_verified") val phoneNumberVerified: Boolean? = null,
+    @Embedded val address: AddressEntity? = null,
     @ColumnInfo("updated_at") val updatedAt: String? = null
 ) {
   fun toUser(): User {
@@ -167,8 +178,27 @@ class UserEntity(
         locale = locale,
         phoneNumber = phoneNumber,
         phoneNumberVerified = phoneNumberVerified,
-        address = null,
+        address = address?.toAddress(),
         updatedAt = updatedAt)
+  }
+}
+
+data class AddressEntity(
+    val formatted: String? = null,
+    @ColumnInfo("street_address") val streetAddress: String? = null,
+    val locality: String? = null,
+    val region: String? = null,
+    @ColumnInfo("postal_code") val postalCode: String? = null,
+    val country: String? = null
+) {
+  fun toAddress(): Address {
+    return Address(
+        formatted = formatted,
+        streetAddress = streetAddress,
+        locality = locality,
+        region = region,
+        postalCode = postalCode,
+    )
   }
 }
 
