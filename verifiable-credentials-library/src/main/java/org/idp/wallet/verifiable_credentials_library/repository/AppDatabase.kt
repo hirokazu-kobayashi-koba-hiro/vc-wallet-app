@@ -8,7 +8,10 @@ import androidx.room.RoomDatabase
         [
             VerifiableCredentialRecordEntity::class,
             WalletClientConfigurationEntity::class,
-            CredentialIssuanceResultEntity::class],
+            CredentialIssuanceResultEntity::class,
+            UserEntity::class,
+            CurrentUserEntity::class,
+        ],
     version = 1)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun verifiableCredentialRecordDao(): VerifiableCredentialRecordDao
@@ -16,4 +19,8 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun walletClientConfigurationDao(): WalletClientConfigurationDao
 
   abstract fun credentialIssuanceResultDao(): CredentialIssuanceResultDao
+
+  abstract fun userDao(): UserDao
+
+  abstract fun currentUserDao(): CurrentUserDao
 }

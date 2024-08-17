@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.widget.AppCompatEditText
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -25,12 +26,19 @@ import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetada
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.PushAuthenticationResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.UserinfoResponse
+import org.idp.wallet.verifiable_credentials_library.domain.user.User
+import org.idp.wallet.verifiable_credentials_library.domain.user.UserRepository
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 object OpenIdConnectApi {
 
   private val tokenRegistry = TokenRegistry()
+  private lateinit var userRepository: UserRepository
+
+  fun initialize(userRepository: UserRepository) {
+    this.userRepository = userRepository
+  }
 
   suspend fun login(
       context: Context,
@@ -41,6 +49,33 @@ object OpenIdConnectApi {
     val tokenDirector = TokenDirector(force, tokenRecord)
     val direction = tokenDirector.direct()
     val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
+    val response =
+        getOpenIdConnectResponse(context, request, force, direction, tokenRecord, oidcMetadata)
+    val foundUser = userRepository.find(response.sub())
+    foundUser?.let {
+      val user = response.toUser(it.id)
+      userRepository.update(user)
+    }
+        ?: run {
+          val userId = UUID.randomUUID().toString()
+          val user = response.toUser(userId)
+          userRepository.register(user)
+        }
+    return response
+  }
+
+  suspend fun getCurrentUser(): User {
+    return userRepository.getCurrentUser()
+  }
+
+  private suspend fun getOpenIdConnectResponse(
+      context: Context,
+      request: OpenIdConnectRequest,
+      force: Boolean,
+      direction: TokenDirection,
+      tokenRecord: TokenRecord?,
+      oidcMetadata: OidcMetadata
+  ): OpenIdConnectResponse {
     when (direction) {
       TokenDirection.CACHE -> {
         tokenRecord?.let {

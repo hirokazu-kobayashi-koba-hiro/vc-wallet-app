@@ -113,6 +113,7 @@ dependencies {
 
     //sql
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.activity:activity:1.9.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     // To use Kotlin Symbol Processing (KSP)
     ksp("androidx.room:room-compiler:2.6.1")

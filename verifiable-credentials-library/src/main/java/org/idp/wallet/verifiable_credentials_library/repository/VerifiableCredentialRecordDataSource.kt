@@ -76,9 +76,9 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
         return@withContext VerifiableCredentialsRecords(records)
       }
 
-  override suspend fun find(sub: String, issuer: String): VerifiableCredentialsRecords? =
+  override suspend fun find(sub: String, credentialIssuer: String): VerifiableCredentialsRecords? =
       withContext(Dispatchers.IO) {
-        val entity = dao.selectByIssuer(sub, issuer) ?: return@withContext null
+        val entity = dao.selectByIssuer(sub, credentialIssuer) ?: return@withContext null
         val record =
             VerifiableCredentialsRecord(
                 id = entity.id,

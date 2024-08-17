@@ -29,7 +29,7 @@ object VerifiablePresentationApi {
     this.verifiablePresentationRequestContextService = verifiablePresentationRequestContextService
   }
 
-  suspend fun handleRequest(
+  suspend fun handleVpRequest(
       context: Context,
       subject: String,
       url: String,

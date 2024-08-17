@@ -173,7 +173,7 @@ class VerifiablePresentationApiTest {
             }
           }
       val result =
-          VerifiablePresentationApi.handleRequest(
+          VerifiablePresentationApi.handleVpRequest(
               context, "1", uri.toString(), interactor = interactor)
       result.onSuccess { print("success") }
       result.onFailure { print("failure") }
@@ -356,7 +356,7 @@ class VerifiablePresentationApiTest {
             }
           }
       val response =
-          VerifiablePresentationApi.handleRequest(context, "1", url, interactor = interactor)
+          VerifiablePresentationApi.handleVpRequest(context, "1", url, interactor = interactor)
 
     }
   }
