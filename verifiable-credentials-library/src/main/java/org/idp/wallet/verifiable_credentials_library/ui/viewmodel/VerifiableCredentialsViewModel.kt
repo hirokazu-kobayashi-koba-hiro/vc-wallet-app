@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.OpenIdConnectApi
-import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsApi
+import org.idp.wallet.verifiable_credentials_library.VerifiablePresentationApi
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
@@ -70,7 +71,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handlePreAuthorization(context, subject(), uri, interactor)
+      VerifiableCredentialsApi.handlePreAuthorization(context, subject(), uri, interactor)
     } finally {
       _loading.value = false
     }
@@ -83,7 +84,7 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsClient.handleAuthorizationCode(
+      VerifiableCredentialsApi.handleAuthorizationCode(
           context, subject(), issuer, credentialConfigurationId)
     } finally {
       _loading.value = false
@@ -93,7 +94,7 @@ class VerifiableCredentialsViewModel(
   suspend fun getAllCredentials() {
     try {
       _loading.value = true
-      val allCredentials = VerifiableCredentialsClient.getAllCredentials(subject())
+      val allCredentials = VerifiableCredentialsApi.getAllCredentials(subject())
       _vcContent.value = allCredentials
     } finally {
       _loading.value = false
@@ -102,8 +103,13 @@ class VerifiableCredentialsViewModel(
 
   suspend fun findAllCredentialIssuanceResults() {
     val credentialIssuanceResults =
-        VerifiableCredentialsClient.findAllCredentialIssuanceResults(subject())
+        VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject())
     _vciResults.value = credentialIssuanceResults
+  }
+
+  suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {
+    VerifiableCredentialsApi.handleDeferredCredential(
+        context, subject(), credentialIssuanceResultId)
   }
 
   suspend fun handleVpRequest(
@@ -113,16 +119,11 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      val result = VerifiableCredentialsClient.handleVpRequest(context, subject(), url, interactor)
+      val result = VerifiablePresentationApi.handleVpRequest(context, subject(), url, interactor)
       println(result)
     } finally {
       _loading.value = false
     }
-  }
-
-  suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {
-    VerifiableCredentialsClient.handleDeferredCredential(
-        context, subject(), credentialIssuanceResultId)
   }
 
   fun showDialog(
