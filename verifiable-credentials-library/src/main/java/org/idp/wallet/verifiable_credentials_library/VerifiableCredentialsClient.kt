@@ -11,7 +11,6 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentat
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifierConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.repository.AppDatabase
 import org.idp.wallet.verifiable_credentials_library.repository.CredentialIssuanceResultDataSource
-import org.idp.wallet.verifiable_credentials_library.repository.MIGRATION_1_2
 import org.idp.wallet.verifiable_credentials_library.repository.UserDataSource
 import org.idp.wallet.verifiable_credentials_library.repository.VerifiableCredentialRecordDataSource
 import org.idp.wallet.verifiable_credentials_library.repository.WalletClientConfigurationDataSource
@@ -29,7 +28,6 @@ object VerifiableCredentialsClient {
                 AppDatabase::class.java,
                 "verifiable_credential",
             )
-            .addMigrations(MIGRATION_1_2)
             .build()
     val verifiableCredentialRecordDataSource = VerifiableCredentialRecordDataSource(database)
     val walletClientConfigurationDataSource = WalletClientConfigurationDataSource(database)
