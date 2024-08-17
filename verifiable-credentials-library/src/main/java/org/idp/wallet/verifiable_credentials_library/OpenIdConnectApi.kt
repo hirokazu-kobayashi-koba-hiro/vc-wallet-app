@@ -51,20 +51,21 @@ object OpenIdConnectApi {
     val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
     val response =
         getOpenIdConnectResponse(context, request, force, direction, tokenRecord, oidcMetadata)
-    val findedUser = userRepository.find(response.sub())
-    if (findedUser == null) {
-      val userId = UUID.randomUUID().toString()
-      val user = response.toUser(userId)
-      userRepository.register(user)
-    } else {
-      val user = response.toUser(findedUser.id)
+    val foundUser = userRepository.find(response.sub())
+    foundUser?.let {
+      val user = response.toUser(it.id)
       userRepository.update(user)
     }
+        ?: run {
+          val userId = UUID.randomUUID().toString()
+          val user = response.toUser(userId)
+          userRepository.register(user)
+        }
     return response
   }
 
   suspend fun getCurrentUser(): User {
-      return userRepository.getCurrentUsr()
+    return userRepository.getCurrentUser()
   }
 
   private suspend fun getOpenIdConnectResponse(

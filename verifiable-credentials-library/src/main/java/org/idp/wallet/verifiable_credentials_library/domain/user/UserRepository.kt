@@ -4,11 +4,11 @@ interface UserRepository {
 
   suspend fun register(user: User)
 
-  suspend fun getCurrentUsr(): User
+  suspend fun getCurrentUser(): User
 
   suspend fun get(id: String): User
 
-  suspend fun findALl(): List<User>
+  suspend fun findAll(): List<User>
 
   suspend fun find(sub: String): User?
 

@@ -6,12 +6,12 @@ import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.Address
 import org.idp.wallet.verifiable_credentials_library.domain.user.User
 import org.idp.wallet.verifiable_credentials_library.domain.user.UserRepository
 
@@ -44,11 +44,10 @@ class UserDataSource(db: AppDatabase) : UserRepository {
                     phoneNumberVerified = user.phoneNumberVerified,
                     updatedAt = user.updatedAt))
         val currentUserEntity = CurrentUserEntity(userId = user.id)
-        currentUserDao.delete(entity = currentUserEntity)
         currentUserDao.insert(entity = currentUserEntity)
       }
 
-  override suspend fun getCurrentUsr(): User =
+  override suspend fun getCurrentUser(): User =
       withContext(Dispatchers.IO) {
         val entity = userDao.selectByCurrent()
         return@withContext entity.toUser()
@@ -57,10 +56,11 @@ class UserDataSource(db: AppDatabase) : UserRepository {
   override suspend fun get(id: String): User =
       withContext(Dispatchers.IO) {
         val entity = userDao.selectBy(id)
+        entity ?: throw RuntimeException(String.format("not found user (%s)"))
         return@withContext entity.toUser()
       }
 
-  override suspend fun findALl(): List<User> =
+  override suspend fun findAll(): List<User> =
       withContext(Dispatchers.IO) {
         val entityList = userDao.selectAll()
         return@withContext entityList.map { it.toUser() }.toList()
@@ -69,6 +69,7 @@ class UserDataSource(db: AppDatabase) : UserRepository {
   override suspend fun find(sub: String): User? =
       withContext(Dispatchers.IO) {
         val entity = userDao.selectBy(sub)
+        entity ?: return@withContext null
         return@withContext entity.toUser()
       }
 
@@ -97,7 +98,6 @@ class UserDataSource(db: AppDatabase) : UserRepository {
                     phoneNumberVerified = user.phoneNumberVerified,
                     updatedAt = user.updatedAt))
         val currentUserEntity = CurrentUserEntity(userId = user.id)
-        currentUserDao.delete(entity = currentUserEntity)
         currentUserDao.insert(entity = currentUserEntity)
       }
 }
@@ -108,7 +108,7 @@ interface UserDao {
 
   @Update fun update(entity: UserEntity)
 
-  @Query("SELECT * FROM user_entity WHERE id = :id") fun selectBy(id: String): UserEntity
+  @Query("SELECT * FROM user_entity WHERE id = :id") fun selectBy(id: String): UserEntity?
 
   @Query(
       "SELECT * FROM user_entity JOIN current_user_entity ON user_entity.id = current_user_entity.user_id")
@@ -119,7 +119,7 @@ interface UserDao {
 
 @Dao
 interface CurrentUserDao {
-  @Insert fun insert(entity: CurrentUserEntity)
+  @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(entity: CurrentUserEntity)
 
   @Delete fun delete(entity: CurrentUserEntity)
 }
@@ -127,7 +127,7 @@ interface CurrentUserDao {
 @Entity("user_entity")
 class UserEntity(
     @PrimaryKey val id: String,
-    @ColumnInfo("sub") val sub: String,
+    @ColumnInfo(name = "sub", index = true) val sub: String,
     @ColumnInfo("name") val name: String? = null,
     @ColumnInfo("given_name") val givenName: String? = null,
     @ColumnInfo("family_name") val familyName: String? = null,
