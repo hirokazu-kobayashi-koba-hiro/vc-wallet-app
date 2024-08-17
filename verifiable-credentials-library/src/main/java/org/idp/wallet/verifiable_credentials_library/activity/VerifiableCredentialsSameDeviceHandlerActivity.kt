@@ -8,7 +8,7 @@ import org.idp.wallet.verifiable_credentials_library.OpenIdConnectApi
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsApi
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 
-class VerifiableCredentialsSameDeviceHandringActivity : ComponentActivity() {
+class VerifiableCredentialsSameDeviceHandlerActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -16,7 +16,7 @@ class VerifiableCredentialsSameDeviceHandringActivity : ComponentActivity() {
     lifecycleScope.launch {
       val user = OpenIdConnectApi.getCurrentUser()
       VerifiableCredentialsApi.handlePreAuthorization(
-          context = this@VerifiableCredentialsSameDeviceHandringActivity,
+          context = this@VerifiableCredentialsSameDeviceHandlerActivity,
           url = queries,
           subject = user.sub,
           interactor = DefaultVerifiableCredentialInteractor())

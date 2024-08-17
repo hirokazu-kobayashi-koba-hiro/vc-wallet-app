@@ -11,7 +11,6 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.Address
 import org.idp.wallet.verifiable_credentials_library.domain.user.User
 import org.idp.wallet.verifiable_credentials_library.domain.user.UserRepository
 
