@@ -11,6 +11,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentat
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifierConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.repository.AppDatabase
 import org.idp.wallet.verifiable_credentials_library.repository.CredentialIssuanceResultDataSource
+import org.idp.wallet.verifiable_credentials_library.repository.UserDataSource
 import org.idp.wallet.verifiable_credentials_library.repository.VerifiableCredentialRecordDataSource
 import org.idp.wallet.verifiable_credentials_library.repository.WalletClientConfigurationDataSource
 import org.idp.wallet.verifiable_credentials_library.util.resource.AssetsReader
@@ -31,6 +32,7 @@ object VerifiableCredentialsClient {
     val verifiableCredentialRecordDataSource = VerifiableCredentialRecordDataSource(database)
     val walletClientConfigurationDataSource = WalletClientConfigurationDataSource(database)
     val credentialIssuanceResultDataSource = CredentialIssuanceResultDataSource(database)
+    val userDataSource = UserDataSource(database)
     val walletConfigurationService = WalletConfigurationService(keyStore, assetsReader)
     walletConfigurationService.initialize()
     val verifiableCredentialsService =
@@ -40,6 +42,7 @@ object VerifiableCredentialsClient {
             walletClientConfigurationDataSource,
             credentialIssuanceResultDataSource)
     VerifiableCredentialsApi.initialize(verifiableCredentialsService)
+    OpenIdConnectApi.initialize(userDataSource)
     val mock = VerifierConfigurationRepository {
       return@VerifierConfigurationRepository ClientConfiguration()
     }
