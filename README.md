@@ -38,7 +38,7 @@ The library provides the following functionality:
       - [x] Support for deferred issuing
       - [x] Dynamic registration of clients
    - use-case
-      - [ ] same device
+      - [x] same device
       - [x] cross device
    - format
       - [ ] mso_mdoc
