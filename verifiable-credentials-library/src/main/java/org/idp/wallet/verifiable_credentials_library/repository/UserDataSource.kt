@@ -198,8 +198,7 @@ data class AddressEntity(
         locality = locality,
         region = region,
         postalCode = postalCode,
-        country = country
-    )
+        country = country)
   }
 }
 
