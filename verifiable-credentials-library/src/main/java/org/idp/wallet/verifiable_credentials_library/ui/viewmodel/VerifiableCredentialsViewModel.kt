@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.idp.wallet.verifiable_credentials_library.OpenIdConnectApi
+import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialResult
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsApi
 import org.idp.wallet.verifiable_credentials_library.VerifiablePresentationApi
 import org.idp.wallet.verifiable_credentials_library.domain.openid_connect.OpenIdConnectResponse
@@ -94,17 +95,26 @@ class VerifiableCredentialsViewModel(
   suspend fun getAllCredentials() {
     try {
       _loading.value = true
-      val allCredentials = VerifiableCredentialsApi.getAllCredentials(subject())
-      _vcContent.value = allCredentials
+      val result = VerifiableCredentialsApi.getAllCredentials(subject())
+      when (result) {
+        is VerifiableCredentialResult.Success -> {
+          _vcContent.value = result.data
+        }
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+      }
     } finally {
       _loading.value = false
     }
   }
 
   suspend fun findAllCredentialIssuanceResults() {
-    val credentialIssuanceResults =
-        VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject())
-    _vciResults.value = credentialIssuanceResults
+    val result = VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject())
+    when (result) {
+      is VerifiableCredentialResult.Success -> {
+        _vciResults.value = result.data
+      }
+      is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+    }
   }
 
   suspend fun handleDeferredCredential(context: Context, credentialIssuanceResultId: String) {

@@ -7,3 +7,13 @@ interface VerifiableCredentialsError {
 
   fun cause(): Throwable?
 }
+
+fun Exception.toVerifiableCredentialsError(): VerifiableCredentialsError {
+  return when (this) {
+    is VerifiableCredentialsException, -> this
+    is NetworkException -> this
+    is OAuthBadRequestException -> this
+    is SettingInvalidException -> this
+    else -> VerifiableCredentialsException(VcError.UNSUPPORTED_CREDENTIAL_FORMAT, cause = this)
+  }
+}
