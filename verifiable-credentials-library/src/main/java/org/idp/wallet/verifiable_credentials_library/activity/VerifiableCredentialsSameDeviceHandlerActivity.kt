@@ -22,6 +22,7 @@ class VerifiableCredentialsSameDeviceHandlerActivity : ComponentActivity() {
     val queries = intent.data.toString()
     val errorHandler = CoroutineExceptionHandler { _, throwable ->
       Toast.makeText(this, throwable.message ?: "unexpected error", Toast.LENGTH_LONG).show()
+      finish()
     }
     lifecycleScope.launch(errorHandler) {
       val user = OpenIdConnectApi.getCurrentUser()

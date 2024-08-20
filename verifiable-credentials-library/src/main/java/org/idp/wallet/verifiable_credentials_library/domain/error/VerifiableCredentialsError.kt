@@ -10,7 +10,7 @@ interface VerifiableCredentialsError {
 
 fun Exception.toVerifiableCredentialsError(): VerifiableCredentialsError {
   return when (this) {
-    is VerifiableCredentialsException, -> this
+    is VerifiableCredentialsException -> this
     is NetworkException -> this
     is OAuthBadRequestException -> this
     is SettingInvalidException -> this

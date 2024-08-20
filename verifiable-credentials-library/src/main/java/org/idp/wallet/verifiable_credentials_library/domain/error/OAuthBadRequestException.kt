@@ -5,8 +5,8 @@ import java.lang.RuntimeException
 class OAuthBadRequestException(
     private val error: OAuthError,
     private val additionalDescription: String? = null,
-    cause: Throwable? = null
-) : VerifiableCredentialsError, RuntimeException(error.description, cause) {
+    initialCause: Throwable? = null
+) : VerifiableCredentialsError, RuntimeException(error.description, initialCause) {
 
   fun error(): String {
     return error.error
