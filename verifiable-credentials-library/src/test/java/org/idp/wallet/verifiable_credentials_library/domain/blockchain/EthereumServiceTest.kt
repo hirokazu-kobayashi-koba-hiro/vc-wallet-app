@@ -1,5 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.domain.blockchain
 
+import org.idp.wallet.verifiable_credentials_library.domain.cert.blockchain.EthereumService
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

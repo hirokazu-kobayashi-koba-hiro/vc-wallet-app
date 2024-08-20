@@ -2,8 +2,8 @@ package org.idp.wallet.verifiable_credentials_library.domain.error
 
 import java.lang.RuntimeException
 
-class SettingInvalidException(val error: SettingError, cause: Throwable? = null) :
-    VerifiableCredentialsError, RuntimeException(error.description, cause) {
+class SettingInvalidException(val error: SettingError, initialCause: Throwable? = null) :
+    VerifiableCredentialsError, RuntimeException(error.description, initialCause) {
   override fun code(): String {
     return error.code
   }

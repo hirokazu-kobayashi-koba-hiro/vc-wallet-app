@@ -1,4 +1,4 @@
-package org.idp.wallet.verifiable_credentials_library.domain.blockchain
+package org.idp.wallet.verifiable_credentials_library.domain.cert.blockchain
 
 import android.util.Log
 import java.math.BigInteger

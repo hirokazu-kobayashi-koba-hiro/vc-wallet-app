@@ -2,8 +2,8 @@ package org.idp.wallet.verifiable_credentials_library.domain.error
 
 import java.lang.RuntimeException
 
-class OAuthBadRequestException(
-    private val error: OAuthError,
+class SystemException(
+    private val error: VcError,
     private val additionalDescription: String? = null,
     initialCause: Throwable? = null
 ) : VerifiableCredentialsError, RuntimeException(error.description, initialCause) {
