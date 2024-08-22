@@ -13,7 +13,7 @@ class CredentialRequestProofCreator(
   fun create(): Map<String, Any> {
     val header = mapOf("" to "")
     val payload =
-        mutableMapOf("iss" to clientId, "iss" to issuer, "iat" to DateUtils.nowAsEpochSecond())
+        mutableMapOf("iss" to clientId, "aud" to issuer, "iat" to DateUtils.nowAsEpochSecond())
     cNonce?.let { payload.put("nonce", it) }
     val jwt = JoseUtils.sign(additionalHeaders = header, payload = payload, privateKey = privateKey)
     return mapOf("proof_type" to "jwt", "proof" to jwt)
