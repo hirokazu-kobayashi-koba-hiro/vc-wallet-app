@@ -92,13 +92,15 @@ class VerifiableCredentialsService(
       dpopJwt: String?,
       accessToken: String,
       verifiableCredentialType: VerifiableCredentialsType,
-      vct: String?
+      vct: String? = null,
+      proof: Map<String, Any>? = null,
   ): CredentialResponse {
     val credentialRequest =
-        mutableMapOf(
+        mutableMapOf<String, Any>(
             Pair("format", verifiableCredentialType.format),
             Pair("doctype", verifiableCredentialType.doctype))
     vct?.let { credentialRequest.put("vct", it) }
+    proof?.let { credentialRequest["proof"] = it }
     val credentialRequestHeader =
         dpopJwt?.let {
           return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
@@ -185,7 +187,7 @@ class VerifiableCredentialsService(
     return walletConfigurationService.getWalletPrivateKey()
   }
 
-  suspend fun getClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
+  suspend fun getOrRegisterClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
     val walletClientConfiguration = walletClientConfigurationRepository.find(oidcMetadata.issuer)
     walletClientConfiguration?.let {
       return it
@@ -195,7 +197,7 @@ class VerifiableCredentialsService(
     return clientConfiguration
   }
 
-  suspend fun registerClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
+  private suspend fun registerClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
     try {
       // FIXME dynamic configuration
       val redirectUris =

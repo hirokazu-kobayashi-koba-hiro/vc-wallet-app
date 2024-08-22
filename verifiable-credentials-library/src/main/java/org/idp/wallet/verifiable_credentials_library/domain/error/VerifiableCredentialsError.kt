@@ -14,6 +14,7 @@ fun Exception.toVerifiableCredentialsError(): VerifiableCredentialsError {
     is NetworkException -> this
     is OAuthBadRequestException -> this
     is SettingInvalidException -> this
-    else -> VerifiableCredentialsException(VcError.UNSUPPORTED_CREDENTIAL_FORMAT, cause = this)
+    else ->
+        VerifiableCredentialsException(VcError.UNSUPPORTED_CREDENTIAL_FORMAT, initialCause = this)
   }
 }

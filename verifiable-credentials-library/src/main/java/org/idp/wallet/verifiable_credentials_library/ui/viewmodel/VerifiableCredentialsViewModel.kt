@@ -72,7 +72,12 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsApi.handlePreAuthorization(context, subject(), uri, interactor)
+      val result =
+          VerifiableCredentialsApi.handlePreAuthorization(context, subject(), uri, interactor)
+      when (result) {
+        is VerifiableCredentialResult.Success -> {}
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+      }
     } finally {
       _loading.value = false
     }
@@ -85,8 +90,13 @@ class VerifiableCredentialsViewModel(
   ) {
     try {
       _loading.value = true
-      VerifiableCredentialsApi.handleAuthorizationCode(
-          context, subject(), issuer, credentialConfigurationId)
+      val result =
+          VerifiableCredentialsApi.handleAuthorizationCode(
+              context, subject(), issuer, credentialConfigurationId)
+      when (result) {
+        is VerifiableCredentialResult.Success -> {}
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+      }
     } finally {
       _loading.value = false
     }

@@ -1,9 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.domain.openid_connect
 
 import com.nimbusds.jose.jwk.JWK
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.UUID
+import org.idp.wallet.verifiable_credentials_library.util.date.DateUtils
 import org.idp.wallet.verifiable_credentials_library.util.hash.calculateHashWithSha256
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 
@@ -22,7 +21,7 @@ object DpopJwtCreator {
             "jti" to UUID.randomUUID().toString(),
             "htm" to method,
             "htu" to path,
-            "iat" to LocalDateTime.now().minusHours(9L).toEpochSecond(ZoneOffset.UTC),
+            "iat" to DateUtils.nowAsEpochSecond(),
         )
     accessToken?.let { payload.put("ath", calculateHashWithSha256(accessToken)) }
     return JoseUtils.sign(additionalHeaders = headers, payload = payload, privateKey = privateKey)
