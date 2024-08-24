@@ -2,9 +2,10 @@ package org.idp.wallet.verifiable_credentials_library.domain.type.oauth
 
 data class TokenResponse(
     val accessToken: String,
-    val refreshToken: String?,
-    val idToken: String?,
+    val refreshToken: String? = null,
+    val idToken: String? = null,
     val expiresIn: Long,
-    val scope: String?,
-    val cNonce: String?
+    val scope: String? = null,
+    val cNonce: String? = null,
+    val cNonceExpiresIn: Int? = null
 )

@@ -17,6 +17,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOffer
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialOfferRequestValidator
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.CredentialRequestProofCreator
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialInteractorCallback
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialTransformer
@@ -53,7 +54,7 @@ object VerifiableCredentialsApi {
           service.getCredentialIssuerMetadata(credentialOffer.credentialIssuerMetadataEndpoint())
       val oidcMetadata =
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
-      val clientConfiguration = service.getClientConfiguration(oidcMetadata)
+      val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
       val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
       if (!result.first) {
         throw VerifiableCredentialsException(VcError.NOT_AUTHENTICATED, "user canceled")
@@ -68,13 +69,21 @@ object VerifiableCredentialsApi {
           credentialIssuerMetadata.getVerifiableCredentialsType(
               credentialOffer.credentialConfigurationIds[0])
       val vct = credentialIssuerMetadata.findVct(credentialOffer.credentialConfigurationIds[0])
+      val proof =
+          CredentialRequestProofCreator(
+                  cNonce = tokenResponse.cNonce,
+                  clientId = clientConfiguration.clientId,
+                  issuer = credentialOffer.credentialIssuer,
+                  privateKey = service.getWalletPrivateKey())
+              .create()
       val credentialResponse =
           service.requestCredential(
               credentialIssuerMetadata.credentialEndpoint,
               null,
               tokenResponse.accessToken,
               verifiableCredentialsType,
-              vct)
+              vct,
+              proof)
       val jwtVcIssuerResponse = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
       val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
       credentialResponse.credential?.let {
@@ -114,7 +123,7 @@ object VerifiableCredentialsApi {
       val oidcMetadata =
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
 
-      val clientConfiguration = service.getClientConfiguration(oidcMetadata)
+      val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
       val authenticationRequestUri =
           createAuthenticationRequestUri(
               credentialConfigurationId,
@@ -205,7 +214,7 @@ object VerifiableCredentialsApi {
 
       val oidcMetadata =
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
-      val clientConfiguration = service.getClientConfiguration(oidcMetadata)
+      val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
       val authenticationRequestUri =
           createAuthenticationRequestUri(
               credentialIssuanceResult.credentialConfigurationId,
