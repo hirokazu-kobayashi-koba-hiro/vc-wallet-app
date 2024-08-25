@@ -35,7 +35,7 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
       }
 
   @SuppressLint("SuspiciousIndentation")
-  override suspend fun getAll(sub: String): Map<String, VerifiableCredentialsRecords> =
+  override suspend fun find(sub: String): Map<String, VerifiableCredentialsRecords> =
       withContext(Dispatchers.IO) {
         val entities = dao.getAll(sub)
         if (entities.isEmpty()) return@withContext mapOf()

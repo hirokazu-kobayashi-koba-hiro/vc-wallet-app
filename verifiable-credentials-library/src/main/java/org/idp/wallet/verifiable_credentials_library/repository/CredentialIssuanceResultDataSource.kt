@@ -37,9 +37,9 @@ class CredentialIssuanceResultDataSource(db: AppDatabase) : CredentialIssuanceRe
         dao.insert(entity)
       }
 
-  override suspend fun findAll(subject: String): List<CredentialIssuanceResult> =
+  override suspend fun find(subject: String): List<CredentialIssuanceResult> =
       withContext(Dispatchers.IO) {
-        val entity = dao.selectAll(subject)
+        val entity = dao.selectBy(subject)
         return@withContext entity.map { it.toResult() }
       }
 
@@ -75,7 +75,7 @@ interface CredentialIssuanceResultDao {
   @Insert fun insert(entity: CredentialIssuanceResultEntity)
 
   @Query("SELECT * FROM credential_issuance_result WHERE subject = :subject")
-  fun selectAll(subject: String): List<CredentialIssuanceResultEntity>
+  fun selectBy(subject: String): List<CredentialIssuanceResultEntity>
 
   @Query("SELECT * FROM credential_issuance_result WHERE subject = :subject AND id = :id")
   fun selectBy(subject: String, id: String): CredentialIssuanceResultEntity

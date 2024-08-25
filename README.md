@@ -138,4 +138,14 @@ class MainActivity : FragmentActivity() {
 
 ### custom activity
 
+This way is to enable custom activity of verifiable credential with VerifiableCredentialsApi.
+
+VerifiableCredentialsApi provides following function.
+
+1. handlePreAuthorization
+2. handleAuthorizationCode
+3. handleDeferredCredential
+4. findCredentials
+5. findCredentialIssuanceResults
+
 

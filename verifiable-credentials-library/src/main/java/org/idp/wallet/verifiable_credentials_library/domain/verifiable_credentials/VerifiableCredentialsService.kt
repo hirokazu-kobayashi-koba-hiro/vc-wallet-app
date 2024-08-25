@@ -21,8 +21,8 @@ class VerifiableCredentialsService(
     private val credentialIssuanceResultRepository: CredentialIssuanceResultRepository,
 ) {
 
-  suspend fun getAllCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
-    return verifiableCredentialRecordRepository.getAll(subject)
+  suspend fun findCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
+    return verifiableCredentialRecordRepository.find(subject)
   }
 
   suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
@@ -157,8 +157,8 @@ class VerifiableCredentialsService(
         subject = subject, credentialIssuanceResult = credentialIssuanceResult)
   }
 
-  suspend fun findAllCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
-    return credentialIssuanceResultRepository.findAll(subject)
+  suspend fun findCredentialIssuanceResults(subject: String): List<CredentialIssuanceResult> {
+    return credentialIssuanceResultRepository.find(subject)
   }
 
   suspend fun getCredentialIssuanceResult(subject: String, id: String): CredentialIssuanceResult {

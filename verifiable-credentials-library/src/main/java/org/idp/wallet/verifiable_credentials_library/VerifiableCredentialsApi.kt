@@ -342,12 +342,12 @@ object VerifiableCredentialsApi {
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
   }
 
-  suspend fun getAllCredentials(
+  suspend fun findCredentials(
       subject: String
   ): VerifiableCredentialResult<
       Map<String, VerifiableCredentialsRecords>, VerifiableCredentialsError> {
     try {
-      val allCredentials = service.getAllCredentials(subject)
+      val allCredentials = service.findCredentials(subject)
       return VerifiableCredentialResult.Success(allCredentials)
     } catch (e: Exception) {
       val error = e.toVerifiableCredentialsError()
@@ -355,11 +355,11 @@ object VerifiableCredentialsApi {
     }
   }
 
-  suspend fun findAllCredentialIssuanceResults(
+  suspend fun findCredentialIssuanceResults(
       subject: String
   ): VerifiableCredentialResult<List<CredentialIssuanceResult>, VerifiableCredentialsError> {
     try {
-      val credentialIssuanceResults = service.findAllCredentialIssuanceResults(subject)
+      val credentialIssuanceResults = service.findCredentialIssuanceResults(subject)
       return VerifiableCredentialResult.Success(credentialIssuanceResults)
     } catch (e: Exception) {
       val error = e.toVerifiableCredentialsError()
