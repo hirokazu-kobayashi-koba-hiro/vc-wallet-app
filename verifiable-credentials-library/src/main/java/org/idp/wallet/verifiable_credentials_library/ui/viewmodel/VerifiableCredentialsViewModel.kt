@@ -76,7 +76,7 @@ class VerifiableCredentialsViewModel(
           VerifiableCredentialsApi.handlePreAuthorization(context, subject(), uri, interactor)
       when (result) {
         is VerifiableCredentialResult.Success -> {}
-        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.description())
       }
     } finally {
       _loading.value = false
@@ -95,7 +95,7 @@ class VerifiableCredentialsViewModel(
               context, subject(), issuer, credentialConfigurationId)
       when (result) {
         is VerifiableCredentialResult.Success -> {}
-        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.description())
       }
     } finally {
       _loading.value = false
@@ -110,7 +110,7 @@ class VerifiableCredentialsViewModel(
         is VerifiableCredentialResult.Success -> {
           _vcContent.value = result.data
         }
-        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+        is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.description())
       }
     } finally {
       _loading.value = false
@@ -123,7 +123,7 @@ class VerifiableCredentialsViewModel(
       is VerifiableCredentialResult.Success -> {
         _vciResults.value = result.data
       }
-      is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.cause())
+      is VerifiableCredentialResult.Failure -> throw RuntimeException(result.error.description())
     }
   }
 
