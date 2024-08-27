@@ -112,6 +112,7 @@ object VerifiableCredentialsApi {
       )
       return VerifiableCredentialResult.Success(Unit)
     } catch (e: Exception) {
+
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
     }
@@ -124,6 +125,7 @@ object VerifiableCredentialsApi {
       credentialConfigurationId: String,
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+
       val credentialIssuerMetadata =
           service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
       val oidcMetadata =
@@ -199,6 +201,7 @@ object VerifiableCredentialsApi {
 
       return VerifiableCredentialResult.Success(Unit)
     } catch (e: Exception) {
+
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
     }
@@ -210,6 +213,7 @@ object VerifiableCredentialsApi {
       credentialIssuanceResultId: String
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+
       val credentialIssuanceResult =
           service.getCredentialIssuanceResult(subject, credentialIssuanceResultId)
       val transactionId =
@@ -308,6 +312,7 @@ object VerifiableCredentialsApi {
       oidcMetadata: OidcMetadata,
       clientConfiguration: ClientConfiguration
   ): String {
+
     val scope = credentialIssuerMetadata.getScope(credentialConfigurationId)
     oidcMetadata.pushedAuthorizationRequestEndpoint?.let { endpoint ->
       val dpopJwt =
@@ -352,6 +357,7 @@ object VerifiableCredentialsApi {
       credentialOffer: CredentialOffer,
       interactor: VerifiableCredentialInteractor
   ): Pair<Boolean, String?> = suspendCoroutine { continuation ->
+
     val callback =
         object : VerifiableCredentialInteractorCallback {
           override fun accept(txCode: String) {
@@ -370,9 +376,11 @@ object VerifiableCredentialsApi {
   ): VerifiableCredentialResult<
       Map<String, VerifiableCredentialsRecords>, VerifiableCredentialsError> {
     try {
+
       val allCredentials = service.findCredentials(subject)
       return VerifiableCredentialResult.Success(allCredentials)
     } catch (e: Exception) {
+
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
     }
@@ -385,6 +393,7 @@ object VerifiableCredentialsApi {
       val credentialIssuanceResults = service.findCredentialIssuanceResults(subject)
       return VerifiableCredentialResult.Success(credentialIssuanceResults)
     } catch (e: Exception) {
+
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
     }
