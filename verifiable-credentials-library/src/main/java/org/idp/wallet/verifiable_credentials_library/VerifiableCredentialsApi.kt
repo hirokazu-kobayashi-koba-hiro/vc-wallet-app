@@ -357,7 +357,6 @@ object VerifiableCredentialsApi {
       credentialOffer: CredentialOffer,
       interactor: VerifiableCredentialInteractor
   ): Pair<Boolean, String?> = suspendCoroutine { continuation ->
-
     val callback =
         object : VerifiableCredentialInteractorCallback {
           override fun accept(txCode: String) {
