@@ -105,7 +105,7 @@ class VerifiableCredentialsViewModel(
   suspend fun getAllCredentials() {
     try {
       _loading.value = true
-      val result = VerifiableCredentialsApi.getAllCredentials(subject())
+      val result = VerifiableCredentialsApi.findCredentials(subject())
       when (result) {
         is VerifiableCredentialResult.Success -> {
           _vcContent.value = result.data
@@ -118,7 +118,7 @@ class VerifiableCredentialsViewModel(
   }
 
   suspend fun findAllCredentialIssuanceResults() {
-    val result = VerifiableCredentialsApi.findAllCredentialIssuanceResults(subject())
+    val result = VerifiableCredentialsApi.findCredentialIssuanceResults(subject())
     when (result) {
       is VerifiableCredentialResult.Success -> {
         _vciResults.value = result.data
