@@ -39,11 +39,12 @@ object VerifiableCredentialsApi {
       interactor: VerifiableCredentialInteractor
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+
       val credentialOfferRequest = CredentialOfferRequest(url)
       val credentialOfferRequestValidator = CredentialOfferRequestValidator(credentialOfferRequest)
       credentialOfferRequestValidator.validate()
-      val credentialOffer = service.getCredentialOffer(credentialOfferRequest)
 
+      val credentialOffer = service.getCredentialOffer(credentialOfferRequest)
       val preAuthorizedCodeGrant = credentialOffer.preAuthorizedCodeGrant
       if (preAuthorizedCodeGrant == null) {
         throw VerifiableCredentialsException(
@@ -55,16 +56,19 @@ object VerifiableCredentialsApi {
       val oidcMetadata =
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
       val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
+
       val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
       if (!result.first) {
         throw VerifiableCredentialsException(VcError.NOT_AUTHENTICATED, "user canceled")
       }
+
       val tokenResponse =
           service.requestTokenWithPreAuthorizedCode(
               url = oidcMetadata.tokenEndpoint,
               clientId = clientConfiguration.clientId,
               preAuthorizationCode = preAuthorizedCodeGrant.preAuthorizedCode,
               txCode = result.second)
+
       val verifiableCredentialsType =
           credentialIssuerMetadata.getVerifiableCredentialsType(
               credentialOffer.credentialConfigurationIds[0])
@@ -84,6 +88,7 @@ object VerifiableCredentialsApi {
               verifiableCredentialsType,
               vct,
               proof)
+
       val jwtVcIssuerResponse = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
       val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
       credentialResponse.credential?.let {
@@ -95,8 +100,10 @@ object VerifiableCredentialsApi {
                     it,
                     jwks)
                 .transform()
+
         service.registerCredential(subject, verifiableCredentialsRecord)
       }
+
       service.registerCredentialIssuanceResult(
           subject = subject,
           issuer = credentialOffer.credentialIssuer,
@@ -119,20 +126,22 @@ object VerifiableCredentialsApi {
     try {
       val credentialIssuerMetadata =
           service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
-
       val oidcMetadata =
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
 
       val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
+
       val authenticationRequestUri =
           createAuthenticationRequestUri(
               credentialConfigurationId,
               credentialIssuerMetadata,
               oidcMetadata,
               clientConfiguration)
+
       val authenticationResponse =
           OpenIdConnectApi.request(
               context = context, authenticationRequestUri = authenticationRequestUri)
+
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
@@ -166,6 +175,7 @@ object VerifiableCredentialsApi {
               tokenResponse.accessToken,
               verifiableCredentialsType,
               vct)
+
       val jwtVcIssuerResponse = service.getJwksConfiguration("$issuer/.well-known/jwt-vc-issuer")
       val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
       credentialResponse.credential?.let {
@@ -177,13 +187,16 @@ object VerifiableCredentialsApi {
                     it,
                     jwks)
                 .transform()
+
         service.registerCredential(subject, verifiableCredentialsRecord)
       }
+
       service.registerCredentialIssuanceResult(
           subject = subject,
           issuer = issuer,
           credentialConfigurationId = credentialConfigurationId,
           credentialResponse = credentialResponse)
+
       return VerifiableCredentialResult.Success(Unit)
     } catch (e: Exception) {
       val error = e.toVerifiableCredentialsError()
@@ -203,8 +216,10 @@ object VerifiableCredentialsApi {
           credentialIssuanceResult.transactionId
               ?: throw VerifiableCredentialsException(
                   VcError.NOT_FOUND_REQUIRED_PARAMS, "not found transactionId")
+
       val credentialIssuerMetadata =
           service.getCredentialIssuerMetadata(credentialIssuanceResult.issuer)
+
       val deferredCredentialEndpoint =
           credentialIssuerMetadata.deferredCredentialEndpoint
               ?: throw VerifiableCredentialsException(
@@ -224,6 +239,7 @@ object VerifiableCredentialsApi {
       val authenticationResponse =
           OpenIdConnectApi.request(
               context = context, authenticationRequestUri = authenticationRequestUri)
+
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
@@ -231,6 +247,7 @@ object VerifiableCredentialsApi {
                 method = "POST",
                 path = oidcMetadata.tokenEndpoint)
           }
+
       val tokenResponse =
           service.requestTokenWithAuthorizedCode(
               url = oidcMetadata.tokenEndpoint,
@@ -253,6 +270,7 @@ object VerifiableCredentialsApi {
               dpopJwt = dpopJwtForCredential,
               accessToken = tokenResponse.accessToken,
               transactionId = transactionId)
+
       val verifiableCredentialsType =
           credentialIssuerMetadata.getVerifiableCredentialsType(
               credentialIssuanceResult.credentialConfigurationId)
@@ -266,14 +284,19 @@ object VerifiableCredentialsApi {
                     it,
                     jwks)
                 .transform()
+
         service.registerCredential(subject, verifiableCredentialsRecord)
+
         val updatedCredentialIssuanceResult =
             credentialIssuanceResult.copy(status = CredentialIssuanceResultStatus.SUCCESS)
+
         service.updateCredentialIssuanceResult(
             subject = subject, credentialIssuanceResult = updatedCredentialIssuanceResult)
       }
+
       return VerifiableCredentialResult.Success(Unit)
     } catch (e: Exception) {
+
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
     }
