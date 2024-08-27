@@ -54,7 +54,7 @@ class VerifiableCredentialsActivity : ComponentActivity() {
               return@registerForActivityResult
             }
             val errorHandler = CoroutineExceptionHandler { _, error ->
-              Toast.makeText(this, error.message ?: "unexpected error", Toast.LENGTH_LONG).show()
+              viewModel.showDialog(title = "Error", message = error.message ?: "unexpected error")
             }
             lifecycleScope.launch(errorHandler) {
               if (format == "vp") {

@@ -1,7 +1,6 @@
 package org.idp.wallet.verifiable_credentials_library.ui
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -124,7 +123,8 @@ fun VerifiableCredentialsMainScreen(
                       val errorHandler =
                           CoroutineExceptionHandler(
                               handler = { _, error ->
-                                Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                viewModel.showDialog(
+                                    title = "Error", message = error.message ?: "unexpected error")
                               })
                       scope.launch(errorHandler) {
                         viewModel.requestVcOnAuthorizationCode(
