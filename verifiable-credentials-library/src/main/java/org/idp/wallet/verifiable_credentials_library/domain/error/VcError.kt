@@ -7,5 +7,6 @@ enum class VcError(val error: String, val code: String, val description: String)
       "invalid_request", "3001", "Authorization request must not contain duplicate value."),
   NOT_AUTHENTICATED("user_action", "3002", "User does not authenticate"),
   UNSUPPORTED_DEFERRED_CREDENTIAL("unsupported_error", "3003", "Unsupported deferred credential"),
-  UNSUPPORTED_CREDENTIAL_FORMAT("unsupported_error", "3004", "Unsupported format of credential")
+  UNSUPPORTED_CREDENTIAL_FORMAT("unsupported_error", "3004", "Unsupported format of credential"),
+  INVALID_VC_ISSUER_METADATA("invalid_metadata", "3005", "invalid vc issuer metadata")
 }

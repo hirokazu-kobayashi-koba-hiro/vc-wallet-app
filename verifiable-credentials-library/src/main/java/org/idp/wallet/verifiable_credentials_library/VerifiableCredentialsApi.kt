@@ -89,8 +89,8 @@ object VerifiableCredentialsApi {
               vct,
               proof)
 
-      val jwtVcIssuerResponse = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
-      val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
+      val jwtVcIssuerMetadata = service.getJwksConfiguration(credentialOffer.jwtVcIssuerEndpoint())
+      val jwks = service.getJwks(jwtVcIssuerMetadata)
       credentialResponse.credential?.let {
         val verifiableCredentialsRecord =
             VerifiableCredentialTransformer(
@@ -178,8 +178,8 @@ object VerifiableCredentialsApi {
               verifiableCredentialsType,
               vct)
 
-      val jwtVcIssuerResponse = service.getJwksConfiguration("$issuer/.well-known/jwt-vc-issuer")
-      val jwks = service.getJwks(jwtVcIssuerResponse.jwksUri)
+      val jwtVcIssuerMetadata = service.getJwksConfiguration("$issuer/.well-known/jwt-vc-issuer")
+      val jwks = service.getJwks(jwtVcIssuerMetadata)
       credentialResponse.credential?.let {
         val verifiableCredentialsRecord =
             VerifiableCredentialTransformer(
@@ -278,7 +278,9 @@ object VerifiableCredentialsApi {
       val verifiableCredentialsType =
           credentialIssuerMetadata.getVerifiableCredentialsType(
               credentialIssuanceResult.credentialConfigurationId)
-      val jwks = service.getJwks(credentialIssuerMetadata.credentialEndpoint)
+      val jwtVcIssuerMetadata =
+          service.getJwksConfiguration(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
+      val jwks = service.getJwks(jwtVcIssuerMetadata)
       deferredCredentialResponse.credential?.let {
         val verifiableCredentialsRecord =
             VerifiableCredentialTransformer(
