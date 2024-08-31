@@ -25,6 +25,11 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
 
+/**
+ * This singleton object provides an API to interact with verifiable credentials. It offers
+ * functions to handle pre-authorization, authorization code flow, deferred credentials, and to find
+ * credentials and credential issuance results.
+ */
 object VerifiableCredentialsApi {
 
   private lateinit var configuration: WalletConfiguration
@@ -44,6 +49,15 @@ object VerifiableCredentialsApi {
     this.service = service
   }
 
+  /**
+   * Handles the pre-authorization flow for verifiable credentials.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param url the URL to be used in the pre-authorization flow
+   * @param interactor the interactor to handle user interaction during the flow
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handlePreAuthorization(
       context: Context,
       subject: String,
@@ -131,6 +145,15 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Handles the authorization code flow for obtaining verifiable credentials.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param issuer the issuer of the credentials
+   * @param credentialConfigurationId the identifier of the credential configuration
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handleAuthorizationCode(
       context: Context,
       subject: String,
@@ -221,6 +244,14 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Handles the deferred credential issuance flow.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param credentialIssuanceResultId the identifier of the credential issuance result
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handleDeferredCredential(
       context: Context,
       subject: String,
@@ -323,6 +354,15 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Creates an authentication request URI for the verifiable credentials authorization request.
+   *
+   * @param credentialConfigurationId the identifier of the credential configuration
+   * @param credentialIssuerMetadata the metadata of the credential issuer
+   * @param oidcMetadata the OIDC metadata
+   * @param clientConfiguration the client configuration for the request
+   * @return the URI for the authentication request
+   */
   private suspend fun createAuthenticationRequestUri(
       credentialConfigurationId: String,
       credentialIssuerMetadata: CredentialIssuerMetadata,
@@ -368,6 +408,16 @@ object VerifiableCredentialsApi {
     return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
   }
 
+  /**
+   * Interacts with the user to confirm or reject the credential offer.
+   *
+   * @param context the context of the application
+   * @param credentialIssuerMetadata the metadata of the credential issuer
+   * @param credentialOffer the offer details for the credential
+   * @param interactor the interactor handling the user interaction
+   * @return a pair containing a boolean indicating acceptance or rejection, and a transaction code
+   *   if accepted
+   */
   private suspend fun interact(
       context: Context,
       credentialIssuerMetadata: CredentialIssuerMetadata,
@@ -387,6 +437,12 @@ object VerifiableCredentialsApi {
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
   }
 
+  /**
+   * Finds all verifiable credentials associated with the given subject.
+   *
+   * @param subject the subject identifier to search credentials for
+   * @return a result containing a map of credentials or an error if the operation fails
+   */
   suspend fun findCredentials(
       subject: String
   ): VerifiableCredentialResult<
@@ -403,6 +459,13 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Finds all credential issuance results associated with the given subject.
+   *
+   * @param subject the subject identifier to search credential issuance results for
+   * @return a result containing a list of credential issuance results or an error if the operation
+   *   fails
+   */
   suspend fun findCredentialIssuanceResults(
       subject: String
   ): VerifiableCredentialResult<List<CredentialIssuanceResult>, VerifiableCredentialsError> {
@@ -418,6 +481,10 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Verifies if the API has been properly initialized with configuration and service. Throws an
+   * exception if not initialized.
+   */
   private fun verifyInitialized() {
     if (!this::configuration.isInitialized || !this::service.isInitialized) {
       throw VerifiableCredentialsException(
