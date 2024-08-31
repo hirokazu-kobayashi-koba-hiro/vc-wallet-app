@@ -30,7 +30,16 @@ object VerifiableCredentialsApi {
   private lateinit var configuration: WalletConfiguration
   private lateinit var service: VerifiableCredentialsService
 
-  fun initialize(configuration: WalletConfiguration, service: VerifiableCredentialsService) {
+  /**
+   * Initializes the VerifiableCredentialsApi with the necessary configuration and service.
+   *
+   * @param configuration the wallet configuration containing necessary keys and settings
+   * @param service the verifiable credentials service instance
+   */
+  internal fun initialize(
+      configuration: WalletConfiguration,
+      service: VerifiableCredentialsService
+  ) {
     this.configuration = configuration
     this.service = service
   }
@@ -42,6 +51,7 @@ object VerifiableCredentialsApi {
       interactor: VerifiableCredentialInteractor
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialOfferRequest = CredentialOfferRequest(url)
       val credentialOfferRequestValidator = CredentialOfferRequestValidator(credentialOfferRequest)
@@ -128,6 +138,7 @@ object VerifiableCredentialsApi {
       credentialConfigurationId: String,
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialIssuerMetadata =
           service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
@@ -216,6 +227,7 @@ object VerifiableCredentialsApi {
       credentialIssuanceResultId: String
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialIssuanceResult =
           service.getCredentialIssuanceResult(subject, credentialIssuanceResultId)
@@ -380,6 +392,7 @@ object VerifiableCredentialsApi {
   ): VerifiableCredentialResult<
       Map<String, VerifiableCredentialsRecords>, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val allCredentials = service.findCredentials(subject)
       return VerifiableCredentialResult.Success(allCredentials)
@@ -394,12 +407,22 @@ object VerifiableCredentialsApi {
       subject: String
   ): VerifiableCredentialResult<List<CredentialIssuanceResult>, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
+
       val credentialIssuanceResults = service.findCredentialIssuanceResults(subject)
       return VerifiableCredentialResult.Success(credentialIssuanceResults)
     } catch (e: Exception) {
 
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
+    }
+  }
+
+  private fun verifyInitialized() {
+    if (!this::configuration.isInitialized || !this::service.isInitialized) {
+      throw VerifiableCredentialsException(
+          VcError.NOT_INITIALIZED,
+          "not initialized, please call VerifiableCredentialsClient.initialize")
     }
   }
 }

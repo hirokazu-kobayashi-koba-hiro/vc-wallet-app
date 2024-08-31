@@ -1,12 +1,13 @@
 package org.idp.wallet.verifiable_credentials_library.domain.error
 
 enum class VcError(val error: String, val code: String, val description: String) {
+  NOT_INITIALIZED("illegal_implementation", "3000", "VerifiableCredentialsApi is not initialized"),
   NOT_FOUND_REQUIRED_PARAMS(
-      "invalid_request", "3000", "Authorization request must not contain required params."),
+      "invalid_request", "3001", "Authorization request must not contain required params."),
   DUPLICATE_KEY(
-      "invalid_request", "3001", "Authorization request must not contain duplicate value."),
-  NOT_AUTHENTICATED("user_action", "3002", "User does not authenticate"),
-  UNSUPPORTED_DEFERRED_CREDENTIAL("unsupported_error", "3003", "Unsupported deferred credential"),
-  UNSUPPORTED_CREDENTIAL_FORMAT("unsupported_error", "3004", "Unsupported format of credential"),
-  INVALID_VC_ISSUER_METADATA("invalid_metadata", "3005", "invalid vc issuer metadata")
+      "invalid_request", "3002", "Authorization request must not contain duplicate value."),
+  NOT_AUTHENTICATED("user_action", "3003", "User does not authenticate"),
+  UNSUPPORTED_DEFERRED_CREDENTIAL("unsupported_error", "3004", "Unsupported deferred credential"),
+  UNSUPPORTED_CREDENTIAL_FORMAT("unsupported_error", "3005", "Unsupported format of credential"),
+  INVALID_VC_ISSUER_METADATA("invalid_metadata", "3006", "invalid vc issuer metadata"),
 }
