@@ -4,6 +4,8 @@ import android.util.Log
 import java.util.UUID
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
+import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OidcMetadata
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -173,9 +175,16 @@ class VerifiableCredentialsService(
         subject = subject, credentialIssuanceResult = credentialIssuanceResult)
   }
 
-  suspend fun getJwks(jwksEndpoint: String): String {
-    val response = HttpClient.get(jwksEndpoint)
-    return response.toString()
+  suspend fun getJwks(jwtVcConfiguration: JwtVcConfiguration): String {
+    jwtVcConfiguration.jwks?.let {
+      return it
+    }
+    jwtVcConfiguration.jwksUri?.let {
+      val response = HttpClient.get(it)
+      return response.toString()
+    }
+    throw VerifiableCredentialsException(
+        VcError.INVALID_VC_ISSUER_METADATA, "found neither jwks nor jwksUri")
   }
 
   suspend fun getJwksConfiguration(jwtVcIssuerEndpoint: String): JwtVcConfiguration {
