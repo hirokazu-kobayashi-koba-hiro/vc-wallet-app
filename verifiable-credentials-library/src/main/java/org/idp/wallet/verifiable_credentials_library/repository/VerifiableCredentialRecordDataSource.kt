@@ -35,10 +35,10 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
       }
 
   @SuppressLint("SuspiciousIndentation")
-  override suspend fun find(sub: String): Map<String, VerifiableCredentialsRecords> =
+  override suspend fun find(sub: String): VerifiableCredentialsRecords =
       withContext(Dispatchers.IO) {
         val entities = dao.getAll(sub)
-        if (entities.isEmpty()) return@withContext mapOf()
+        if (entities.isEmpty()) return@withContext VerifiableCredentialsRecords()
         val records =
             entities
                 .map {
@@ -51,10 +51,7 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
                       payload = JsonUtils.read(it.payload, Map::class.java) as Map<String, Any>)
                 }
                 .toList()
-        return@withContext records
-            .groupBy { it.issuer }
-            .map { it.key to VerifiableCredentialsRecords(it.value) }
-            .toMap()
+        return@withContext VerifiableCredentialsRecords(records)
       }
 
   override suspend fun getAllAsCollection(sub: String): VerifiableCredentialsRecords =

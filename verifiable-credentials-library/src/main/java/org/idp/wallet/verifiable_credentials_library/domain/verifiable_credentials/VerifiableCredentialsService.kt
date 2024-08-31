@@ -21,7 +21,7 @@ class VerifiableCredentialsService(
     private val credentialIssuanceResultRepository: CredentialIssuanceResultRepository,
 ) {
 
-  suspend fun findCredentials(subject: String): Map<String, VerifiableCredentialsRecords> {
+  suspend fun findCredentials(subject: String): VerifiableCredentialsRecords {
     return verifiableCredentialRecordRepository.find(subject)
   }
 

@@ -7,7 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.http.extractQueries
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
-class VerifiablePresentationRequestContextService(
+class VerifiablePresentationService(
     private val walletConfiguration: WalletConfiguration,
     private val verifierConfigurationRepository: VerifierConfigurationRepository
 ) {

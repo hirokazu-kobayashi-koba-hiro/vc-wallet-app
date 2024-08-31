@@ -441,12 +441,11 @@ object VerifiableCredentialsApi {
    * Finds all verifiable credentials associated with the given subject.
    *
    * @param subject the subject identifier to search credentials for
-   * @return a result containing a map of credentials or an error if the operation fails
+   * @return a result containing a lis of credentials or an error if the operation fails
    */
   suspend fun findCredentials(
       subject: String
-  ): VerifiableCredentialResult<
-      Map<String, VerifiableCredentialsRecords>, VerifiableCredentialsError> {
+  ): VerifiableCredentialResult<VerifiableCredentialsRecords, VerifiableCredentialsError> {
     try {
       verifyInitialized()
 

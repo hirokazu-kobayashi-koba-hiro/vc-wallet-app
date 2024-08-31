@@ -23,7 +23,7 @@ class VerifiableCredentialsViewModel(
     private val walletCredentialsManager: WalletCredentialsManager
 ) : ViewModel() {
 
-  private var _vcContent = MutableStateFlow(mapOf<String, VerifiableCredentialsRecords>())
+  private var _vcContent = MutableStateFlow(VerifiableCredentialsRecords())
   private var _loading = MutableStateFlow(false)
   private var _systemDialogState = MutableStateFlow(SystemDialogState())
   private var _loginState =

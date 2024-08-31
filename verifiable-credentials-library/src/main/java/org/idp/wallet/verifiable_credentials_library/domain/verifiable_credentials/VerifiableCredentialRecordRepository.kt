@@ -5,7 +5,7 @@ interface VerifiableCredentialRecordRepository {
 
   suspend fun find(
       sub: String,
-  ): Map<String, VerifiableCredentialsRecords>
+  ): VerifiableCredentialsRecords
 
   suspend fun getAllAsCollection(
       sub: String,
