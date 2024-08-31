@@ -68,13 +68,7 @@ object OpenIdConnectApi {
       force: Boolean = false
   ): OpenIdConnectResponse {
 
-    val tokenRecord = tokenRegistry.find(request.scope)
-    val tokenDirector = TokenDirector(force, tokenRecord)
-    val direction = tokenDirector.direct()
-    val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
-
-    val response =
-        getOpenIdConnectResponse(context, request, force, direction, tokenRecord, oidcMetadata)
+    val response = getOpenIdConnectResponse(context, request, force)
 
     val foundUser = userRepository.find(response.sub())
     foundUser?.let {
@@ -100,17 +94,16 @@ object OpenIdConnectApi {
   }
 
   /**
-   * Retrieves the OpenID Connect response based on the token direction.
+   * Determines the appropriate action based on the token direction and executes the corresponding
+   * flow to retrieve the OpenID Connect response.
    *
-   * This method determines the flow of the authentication process based on the provided token
-   * direction and executes the corresponding steps to retrieve the OpenID Connect response.
+   * This method handles different token directions including using a cached token, issuing a new
+   * token, or refreshing an existing token. It validates responses and manages token storage and
+   * validation.
    *
    * @param context The application context.
    * @param request The OpenID Connect request containing the necessary parameters.
    * @param force Indicates whether to force the login process regardless of cached tokens.
-   * @param direction The [TokenDirection] indicating the flow of the authentication process.
-   * @param tokenRecord The optional [TokenRecord] containing cached token data.
-   * @param oidcMetadata The [OidcMetadata] object containing OpenID Connect metadata.
    * @return The [OpenIdConnectResponse] containing the result of the authentication process.
    * @throws OpenIdConnectException if an unexpected error occurs during the process.
    */
@@ -118,11 +111,11 @@ object OpenIdConnectApi {
       context: Context,
       request: OpenIdConnectRequest,
       force: Boolean,
-      direction: TokenDirection,
-      tokenRecord: TokenRecord?,
-      oidcMetadata: OidcMetadata
   ): OpenIdConnectResponse {
-
+    val tokenRecord = tokenRegistry.find(request.scope)
+    val tokenDirector = TokenDirector(force, tokenRecord)
+    val direction = tokenDirector.direct()
+    val oidcMetadata = getOidcMetadata("${request.issuer}/.well-known/openid-configuration/")
     when (direction) {
       TokenDirection.CACHE -> {
         tokenRecord?.let {
