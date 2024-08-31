@@ -17,8 +17,22 @@ import org.idp.wallet.verifiable_credentials_library.repository.WalletClientConf
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.idp.wallet.verifiable_credentials_library.util.store.KeyStore
 
+/**
+ * This singleton object serves as the client for managing verifiable credentials. It provides
+ * methods to initialize the necessary components and start activities related to verifiable
+ * credentials.
+ */
 object VerifiableCredentialsClient {
 
+  /**
+   * Initializes the VerifiableCredentialsClient with the necessary configuration and context.
+   *
+   * This method sets up the key store, database, data sources, services, and API components
+   * required for managing verifiable credentials.
+   *
+   * @param context the application context
+   * @param configuration the wallet configuration containing necessary keys and settings
+   */
   fun initialize(context: Context, configuration: WalletConfiguration) {
     val keyStore = KeyStore(context)
     val database =
@@ -48,11 +62,32 @@ object VerifiableCredentialsClient {
         VerifiablePresentationRequestContextService(configuration, mock))
   }
 
+  /**
+   * Starts the VerifiableCredentialsActivity to handle OpenID Connect requests.
+   *
+   * This method launches an activity that processes verifiable credential operations based on the
+   * provided OpenID Connect request.
+   *
+   * @param context the application context
+   * @param request the OpenID Connect request to be processed
+   * @param forceLogin a boolean flag indicating whether to force the login process (default is
+   *   false)
+   */
   fun start(context: Context, request: OpenIdConnectRequest, forceLogin: Boolean = false) {
     VerifiableCredentialsActivity.start(
         context = context, request = request, forceLogin = forceLogin)
   }
 
+  /**
+   * Retrieves or generates an EC key for JWT signing.
+   *
+   * This method checks if a key with the specified key ID exists in the key store. If it exists,
+   * the key is returned. Otherwise, a new EC key is generated, stored in the key store, and then
+   * returned.
+   *
+   * @param keyStore the key store where the key is stored or retrieved
+   * @return the EC key as a string
+   */
   private fun getOrGenerateEcKey(keyStore: KeyStore): String {
     val keyId = "vc_wallet_jwt_key"
     val key = keyStore.find(keyId)
