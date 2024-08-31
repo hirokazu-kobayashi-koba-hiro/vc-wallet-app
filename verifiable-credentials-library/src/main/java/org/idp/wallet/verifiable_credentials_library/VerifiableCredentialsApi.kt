@@ -4,6 +4,7 @@ import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
 import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsError
 import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
@@ -24,14 +25,39 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecords
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
 
+/**
+ * This singleton object provides an API to interact with verifiable credentials. It offers
+ * functions to handle pre-authorization, authorization code flow, deferred credentials, and to find
+ * credentials and credential issuance results.
+ */
 object VerifiableCredentialsApi {
 
-  lateinit var service: VerifiableCredentialsService
+  private lateinit var configuration: WalletConfiguration
+  private lateinit var service: VerifiableCredentialsService
 
-  fun initialize(service: VerifiableCredentialsService) {
+  /**
+   * Initializes the VerifiableCredentialsApi with the necessary configuration and service.
+   *
+   * @param configuration the wallet configuration containing necessary keys and settings
+   * @param service the verifiable credentials service instance
+   */
+  internal fun initialize(
+      configuration: WalletConfiguration,
+      service: VerifiableCredentialsService
+  ) {
+    this.configuration = configuration
     this.service = service
   }
 
+  /**
+   * Handles the pre-authorization flow for verifiable credentials.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param url the URL to be used in the pre-authorization flow
+   * @param interactor the interactor to handle user interaction during the flow
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handlePreAuthorization(
       context: Context,
       subject: String,
@@ -39,6 +65,7 @@ object VerifiableCredentialsApi {
       interactor: VerifiableCredentialInteractor
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialOfferRequest = CredentialOfferRequest(url)
       val credentialOfferRequestValidator = CredentialOfferRequestValidator(credentialOfferRequest)
@@ -78,7 +105,7 @@ object VerifiableCredentialsApi {
                   cNonce = tokenResponse.cNonce,
                   clientId = clientConfiguration.clientId,
                   issuer = credentialOffer.credentialIssuer,
-                  privateKey = service.getWalletPrivateKey())
+                  privateKey = configuration.privateKey)
               .create()
       val credentialResponse =
           service.requestCredential(
@@ -118,6 +145,15 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Handles the authorization code flow for obtaining verifiable credentials.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param issuer the issuer of the credentials
+   * @param credentialConfigurationId the identifier of the credential configuration
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handleAuthorizationCode(
       context: Context,
       subject: String,
@@ -125,6 +161,7 @@ object VerifiableCredentialsApi {
       credentialConfigurationId: String,
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialIssuerMetadata =
           service.getCredentialIssuerMetadata("$issuer/.well-known/openid-credential-issuer")
@@ -147,7 +184,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = oidcMetadata.tokenEndpoint)
           }
@@ -162,7 +199,7 @@ object VerifiableCredentialsApi {
       val dpopJwtForCredential =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = credentialIssuerMetadata.credentialEndpoint,
                 accessToken = tokenResponse.accessToken)
@@ -207,12 +244,21 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Handles the deferred credential issuance flow.
+   *
+   * @param context the context of the application
+   * @param subject the subject identifier for whom the credentials are issued
+   * @param credentialIssuanceResultId the identifier of the credential issuance result
+   * @return a result indicating success or failure of the operation
+   */
   suspend fun handleDeferredCredential(
       context: Context,
       subject: String,
       credentialIssuanceResultId: String
   ): VerifiableCredentialResult<Unit, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val credentialIssuanceResult =
           service.getCredentialIssuanceResult(subject, credentialIssuanceResultId)
@@ -247,7 +293,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = oidcMetadata.tokenEndpoint)
           }
@@ -263,7 +309,7 @@ object VerifiableCredentialsApi {
       val dpopJwtForCredential =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = credentialIssuerMetadata.credentialEndpoint,
                 accessToken = tokenResponse.accessToken)
@@ -308,6 +354,15 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Creates an authentication request URI for the verifiable credentials authorization request.
+   *
+   * @param credentialConfigurationId the identifier of the credential configuration
+   * @param credentialIssuerMetadata the metadata of the credential issuer
+   * @param oidcMetadata the OIDC metadata
+   * @param clientConfiguration the client configuration for the request
+   * @return the URI for the authentication request
+   */
   private suspend fun createAuthenticationRequestUri(
       credentialConfigurationId: String,
       credentialIssuerMetadata: CredentialIssuerMetadata,
@@ -320,7 +375,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(), method = "POST", path = endpoint)
+                privateKey = configuration.privateKey, method = "POST", path = endpoint)
           }
 
       val pushAuthenticationResponse =
@@ -353,6 +408,16 @@ object VerifiableCredentialsApi {
     return "${oidcMetadata.authorizationEndpoint}${vcAuthorizationRequest.queries()}"
   }
 
+  /**
+   * Interacts with the user to confirm or reject the credential offer.
+   *
+   * @param context the context of the application
+   * @param credentialIssuerMetadata the metadata of the credential issuer
+   * @param credentialOffer the offer details for the credential
+   * @param interactor the interactor handling the user interaction
+   * @return a pair containing a boolean indicating acceptance or rejection, and a transaction code
+   *   if accepted
+   */
   private suspend fun interact(
       context: Context,
       credentialIssuerMetadata: CredentialIssuerMetadata,
@@ -372,11 +437,18 @@ object VerifiableCredentialsApi {
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
   }
 
+  /**
+   * Finds all verifiable credentials associated with the given subject.
+   *
+   * @param subject the subject identifier to search credentials for
+   * @return a result containing a map of credentials or an error if the operation fails
+   */
   suspend fun findCredentials(
       subject: String
   ): VerifiableCredentialResult<
       Map<String, VerifiableCredentialsRecords>, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
 
       val allCredentials = service.findCredentials(subject)
       return VerifiableCredentialResult.Success(allCredentials)
@@ -387,16 +459,37 @@ object VerifiableCredentialsApi {
     }
   }
 
+  /**
+   * Finds all credential issuance results associated with the given subject.
+   *
+   * @param subject the subject identifier to search credential issuance results for
+   * @return a result containing a list of credential issuance results or an error if the operation
+   *   fails
+   */
   suspend fun findCredentialIssuanceResults(
       subject: String
   ): VerifiableCredentialResult<List<CredentialIssuanceResult>, VerifiableCredentialsError> {
     try {
+      verifyInitialized()
+
       val credentialIssuanceResults = service.findCredentialIssuanceResults(subject)
       return VerifiableCredentialResult.Success(credentialIssuanceResults)
     } catch (e: Exception) {
 
       val error = e.toVerifiableCredentialsError()
       return VerifiableCredentialResult.Failure(error)
+    }
+  }
+
+  /**
+   * Verifies if the API has been properly initialized with configuration and service. Throws an
+   * exception if not initialized.
+   */
+  private fun verifyInitialized() {
+    if (!this::configuration.isInitialized || !this::service.isInitialized) {
+      throw VerifiableCredentialsException(
+          VcError.NOT_INITIALIZED,
+          "not initialized, please call VerifiableCredentialsClient.initialize")
     }
   }
 }
