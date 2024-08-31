@@ -1,14 +1,14 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation
 
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
-import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.vp.ClientIdScheme
 import org.idp.wallet.verifiable_credentials_library.util.http.HttpClient
 import org.idp.wallet.verifiable_credentials_library.util.http.extractQueries
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class VerifiablePresentationRequestContextService(
-    private val walletConfigurationService: WalletConfigurationService,
+    private val walletConfiguration: WalletConfiguration,
     private val verifierConfigurationRepository: VerifierConfigurationRepository
 ) {
 
@@ -16,7 +16,6 @@ class VerifiablePresentationRequestContextService(
     val parameters = VerifiablePresentationRequestParameters(extractQueries(url))
     val validator = VerifiablePresentationRequestValidator(parameters)
     validator.validate()
-    val walletConfiguration = walletConfigurationService.getConfiguration()
     val clientConfiguration = getClientConfiguration(parameters)
     val authorizationRequestCreationService = AuthorizationRequestCreationService(parameters)
     val oauthRequest = authorizationRequestCreationService.create()

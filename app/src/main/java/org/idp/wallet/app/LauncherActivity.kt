@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import java.util.UUID
 import org.idp.wallet.verifiable_credentials_library.VerifiableCredentialsClient
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 
 class LauncherActivity : FragmentActivity() {
@@ -30,7 +31,7 @@ class LauncherActivity : FragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent { LauncherView(viewModel = viewModel, onClick = { login() }) }
-    VerifiableCredentialsClient.initialize(this)
+    VerifiableCredentialsClient.initialize(this, WalletConfiguration(issuer = "vc-wallet"))
     login()
   }
 

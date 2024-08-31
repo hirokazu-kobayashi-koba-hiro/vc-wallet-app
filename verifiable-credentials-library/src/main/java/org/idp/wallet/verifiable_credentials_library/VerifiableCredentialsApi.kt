@@ -4,6 +4,7 @@ import android.content.Context
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
+import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
 import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsError
 import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
@@ -26,9 +27,11 @@ import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentia
 
 object VerifiableCredentialsApi {
 
-  lateinit var service: VerifiableCredentialsService
+  private lateinit var configuration: WalletConfiguration
+  private lateinit var service: VerifiableCredentialsService
 
-  fun initialize(service: VerifiableCredentialsService) {
+  fun initialize(configuration: WalletConfiguration, service: VerifiableCredentialsService) {
+    this.configuration = configuration
     this.service = service
   }
 
@@ -78,7 +81,7 @@ object VerifiableCredentialsApi {
                   cNonce = tokenResponse.cNonce,
                   clientId = clientConfiguration.clientId,
                   issuer = credentialOffer.credentialIssuer,
-                  privateKey = service.getWalletPrivateKey())
+                  privateKey = configuration.privateKey)
               .create()
       val credentialResponse =
           service.requestCredential(
@@ -147,7 +150,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = oidcMetadata.tokenEndpoint)
           }
@@ -162,7 +165,7 @@ object VerifiableCredentialsApi {
       val dpopJwtForCredential =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = credentialIssuerMetadata.credentialEndpoint,
                 accessToken = tokenResponse.accessToken)
@@ -247,7 +250,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = oidcMetadata.tokenEndpoint)
           }
@@ -263,7 +266,7 @@ object VerifiableCredentialsApi {
       val dpopJwtForCredential =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             return@let DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(),
+                privateKey = configuration.privateKey,
                 method = "POST",
                 path = credentialIssuerMetadata.credentialEndpoint,
                 accessToken = tokenResponse.accessToken)
@@ -320,7 +323,7 @@ object VerifiableCredentialsApi {
       val dpopJwt =
           oidcMetadata.dpopSigningAlgValuesSupported?.let {
             DpopJwtCreator.create(
-                privateKey = service.getWalletPrivateKey(), method = "POST", path = endpoint)
+                privateKey = configuration.privateKey, method = "POST", path = endpoint)
           }
 
       val pushAuthenticationResponse =

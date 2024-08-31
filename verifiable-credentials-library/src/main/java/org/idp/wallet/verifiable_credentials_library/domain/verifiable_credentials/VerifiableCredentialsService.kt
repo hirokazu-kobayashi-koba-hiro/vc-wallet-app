@@ -3,7 +3,6 @@ package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credenti
 import android.util.Log
 import java.util.UUID
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
-import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfigurationService
 import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
 import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
 import org.idp.wallet.verifiable_credentials_library.domain.type.oauth.TokenResponse
@@ -17,7 +16,6 @@ import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 import org.json.JSONObject
 
 class VerifiableCredentialsService(
-    private val walletConfigurationService: WalletConfigurationService,
     private val verifiableCredentialRecordRepository: VerifiableCredentialRecordRepository,
     private val walletClientConfigurationRepository: WalletClientConfigurationRepository,
     private val credentialIssuanceResultRepository: CredentialIssuanceResultRepository,
@@ -190,10 +188,6 @@ class VerifiableCredentialsService(
   suspend fun getJwksConfiguration(jwtVcIssuerEndpoint: String): JwtVcConfiguration {
     val response = HttpClient.get(jwtVcIssuerEndpoint)
     return JsonUtils.read(response.toString(), JwtVcConfiguration::class.java)
-  }
-
-  fun getWalletPrivateKey(): String {
-    return walletConfigurationService.getWalletPrivateKey()
   }
 
   suspend fun getOrRegisterClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
