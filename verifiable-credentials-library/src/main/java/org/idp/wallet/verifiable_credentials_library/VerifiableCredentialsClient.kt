@@ -7,7 +7,7 @@ import org.idp.wallet.verifiable_credentials_library.domain.configuration.Client
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsService
-import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
+import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifierConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.repository.AppDatabase
 import org.idp.wallet.verifiable_credentials_library.repository.CredentialIssuanceResultDataSource
@@ -58,8 +58,7 @@ object VerifiableCredentialsClient {
       return@VerifierConfigurationRepository ClientConfiguration()
     }
     VerifiablePresentationApi.initialize(
-        verifiableCredentialRecordDataSource,
-        VerifiablePresentationRequestContextService(configuration, mock))
+        verifiableCredentialsService, VerifiablePresentationService(configuration, mock))
   }
 
   /**

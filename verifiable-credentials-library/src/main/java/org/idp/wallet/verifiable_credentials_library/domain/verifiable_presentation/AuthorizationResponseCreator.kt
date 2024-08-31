@@ -48,10 +48,8 @@ class AuthorizationResponseCreator(
 
   private fun createVpToken(): String {
     val records = evaluation.verifiableCredentialRecords()
-    val jwks = verifiablePresentationRequestContext.walletConfiguration.jwks
-    // FIXME
-    val keyId = "vc_wallet_jwt_key"
-    val header = mapOf<String, Any>("kid" to keyId, "type" to "JWT")
+    val privateKey = verifiablePresentationRequestContext.walletConfiguration.privateKey
+    val header = mapOf<String, Any>("type" to "JWT")
     val payload = mutableMapOf<String, Any>()
     payload.put("id", UUID.randomUUID().toString())
     payload.put("type", listOf("VerifiablePresentation"))
@@ -61,6 +59,6 @@ class AuthorizationResponseCreator(
         listOf(
             "https://www.w3.org/ns/credentials/v2",
             "https://www.w3.org/ns/credentials/examples/v2"))
-    return JoseUtils.sign(header = header, payload = payload, jwks = jwks, keyId = keyId)
+    return JoseUtils.sign(additionalHeaders = header, payload = payload, privateKey = privateKey)
   }
 }

@@ -183,9 +183,7 @@ fun HomeScreen(
           }
           val cardList = mutableListOf<Pair<String, VerifiableCredentialsRecord>>()
           val vc = vciState.value
-          vc.values.forEach { records ->
-            records.forEach { record -> cardList.add(Pair(record.type, record)) }
-          }
+          vc.forEach { record -> cardList.add(Pair(record.type, record)) }
           LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(cardList) { (type, record) ->
               CardComponent(

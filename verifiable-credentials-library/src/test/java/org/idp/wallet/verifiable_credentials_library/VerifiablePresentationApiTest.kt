@@ -2,26 +2,21 @@ package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import android.net.Uri
-import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
-import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.VerifiableCredentialsRecord
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationInteractorCallback
-import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationRequestContextService
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifiablePresentationViewData
-import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.VerifierConfigurationRepository
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.vp.PresentationDefinitionEvaluation
-import org.idp.wallet.verifiable_credentials_library.repository.AppDatabase
-import org.idp.wallet.verifiable_credentials_library.repository.VerifiableCredentialRecordDataSource
 import org.idp.wallet.verifiable_credentials_library.util.jose.JoseUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+// FIXME add expected result
 @RunWith(RobolectricTestRunner::class)
 class VerifiablePresentationApiTest {
 
@@ -30,32 +25,7 @@ class VerifiablePresentationApiTest {
   @Before
   fun setup() {
     context = InstrumentationRegistry.getInstrumentation().getContext()
-    val database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-    val repository = VerifiableCredentialRecordDataSource(database)
-    val configuration =
-        WalletConfiguration(
-            issuer = "http://localhost:8080/123",
-            privateKey =
-                """
-        {
-            "kty": "EC",
-            "d": "yIWDrlhnCy3yL9xLuqZGOBFFq4PWGsCeM7Sc_lfeaQQ",
-            "use": "sig",
-            "crv": "P-256",
-            "kid": "access_token",
-            "x": "iWJINqt0ySv3kVEvlHbvNkPKY2pPSf1cG1PSx3tRfw0",
-            "y": "rW1FdfXK5AQcv-Go6Xho0CR5AbLai7Gp9IdLTIXTSIQ",
-            "alg": "ES256"
-        }
-        """
-                    .trimIndent())
-    val oauthRequestHandler =
-        VerifiablePresentationRequestContextService(
-            configuration,
-            VerifierConfigurationRepository { it ->
-              return@VerifierConfigurationRepository ClientConfiguration()
-            })
-    VerifiablePresentationApi.initialize(repository, oauthRequestHandler)
+    VerifiableCredentialsClient.initialize(context, WalletConfiguration("vc-test"))
   }
 
   @Test
@@ -122,7 +92,6 @@ class VerifiablePresentationApiTest {
               .appendQueryParameter("presentation_definition", presentationDefinition)
               .appendQueryParameter("client_metadata", clientMetadata)
               .build()
-      val registry = VerifiablePresentationApi.repository
       val header = mapOf("type" to "JWT")
       val payloadValue =
           """
@@ -171,7 +140,7 @@ class VerifiablePresentationApiTest {
       val payload = JoseUtils.parse(signedValue).payload()
       val record =
           VerifiableCredentialsRecord("1", "test", "type", "jwt_vc_json", signedValue, payload)
-      registry.save("1", record)
+
       println(uri.toString())
       val interactor =
           object : VerifiablePresentationInteractor {
@@ -187,15 +156,13 @@ class VerifiablePresentationApiTest {
       val result =
           VerifiablePresentationApi.handleVpRequest(
               context, "1", uri.toString(), interactor = interactor)
-      result.onSuccess { print("success") }
-      result.onFailure { print("failure") }
+
     }
   }
 
   @Test
   fun to_handle_vp_request_with_request_object() {
     runBlocking {
-      val registry = VerifiablePresentationApi.repository
       val header = mapOf("type" to "JWT")
       val payloadValue =
           """
@@ -248,7 +215,7 @@ class VerifiablePresentationApiTest {
       val payload = JoseUtils.parse(signedValue).payload()
       val record =
           VerifiableCredentialsRecord("1", "test", "type", "jwt_vc_json", signedValue, payload)
-      registry.save("1", record)
+
       val vpPayload =
           """
             {
