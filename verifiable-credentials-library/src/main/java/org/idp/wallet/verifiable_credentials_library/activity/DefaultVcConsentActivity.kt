@@ -1,5 +1,7 @@
 package org.idp.wallet.verifiable_credentials_library.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -45,6 +47,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import org.idp.wallet.verifiable_credentials_library.R
+import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.BackgroundImage
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.type.vc.CredentialIssuerMetadata
@@ -56,22 +60,32 @@ import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVcConsentActivity : ComponentActivity() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
+
     val cancelCallback = {
       VerifiableCredentialInteracotrCallbackProvider.callback.reject()
       finish()
     }
     val credentialIssuerMetadataValue =
-        intent.getStringExtra("credentialIssuerMetadata") ?: throw RuntimeException("")
+        intent.getStringExtra("credentialIssuerMetadata")
+            ?: throw VerifiableCredentialsException(
+                VcError.UNSUPPORTED_OPERATION,
+                "credentialIssuerMetadata is required for launch DefaultVcConsentActivity")
+
     val credentialIssuerMetadata =
         JsonUtils.read(
             credentialIssuerMetadataValue, CredentialIssuerMetadata::class.java, snakeCase = false)
     val credentialOfferValue =
-        intent.getStringExtra("credentialOffer") ?: throw RuntimeException("")
+        intent.getStringExtra("credentialOffer")
+            ?: throw VerifiableCredentialsException(
+                VcError.UNSUPPORTED_OPERATION,
+                "credentialOffer is required for launch DefaultVcConsentActivity")
     val credentialOffer =
         JsonUtils.read(credentialOfferValue, CredentialOffer::class.java, snakeCase = false)
+
     setContent {
       DefaultVcView(
           credentialIssuerMetadata = credentialIssuerMetadata,
@@ -85,6 +99,20 @@ class DefaultVcConsentActivity : ComponentActivity() {
     onBackPressedDispatcher.addCallback {
       cancelCallback()
       finish()
+    }
+  }
+
+  companion object {
+
+    fun start(
+        context: Context,
+        credentialIssuerMetadata: CredentialIssuerMetadata,
+        credentialOffer: CredentialOffer
+    ) {
+      val intent = Intent(context, DefaultVcConsentActivity::class.java)
+      intent.putExtra("credentialIssuerMetadata", JsonUtils.write(credentialIssuerMetadata))
+      intent.putExtra("credentialOffer", JsonUtils.write(credentialOffer))
+      context.startActivity(intent)
     }
   }
 }

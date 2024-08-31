@@ -1,5 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.domain.type.vc
 
+import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
+
 enum class VerifiableCredentialsType(val format: String, val doctype: String) {
   MSO_MDOC("mso_mdoc", "org.iso.18013.5.1.mDL"),
   SD_JWT("vc+sd-jwt", ""),
@@ -15,7 +18,8 @@ enum class VerifiableCredentialsType(val format: String, val doctype: String) {
           return type
         }
       }
-      throw RuntimeException(String.format("not found format (%s)", format))
+      throw VerifiableCredentialsException(
+          VcError.UNSUPPORTED_CREDENTIAL_FORMAT, String.format("not found format (%s)", format))
     }
   }
 }
