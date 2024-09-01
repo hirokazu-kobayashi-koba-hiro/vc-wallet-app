@@ -22,30 +22,36 @@ class VerifiableCredentialsService(
 ) {
 
   suspend fun findCredentials(subject: String): VerifiableCredentialsRecords {
+
     return verifiableCredentialRecordRepository.find(subject)
   }
 
   suspend fun getCredentialOffer(credentialOfferRequest: CredentialOfferRequest): CredentialOffer {
+
     val credentialOfferUri = credentialOfferRequest.credentialOfferUri()
     credentialOfferUri?.let {
       val response = HttpClient.get(it)
       return CredentialOfferCreator.create(response)
     }
+
     val credentialOffer = credentialOfferRequest.credentialOffer()
     credentialOffer?.let {
       val json = JSONObject(it)
       return CredentialOfferCreator.create(json)
     }
+
     throw CredentialOfferRequestException(
         "Credential offer request must contain either credential_offer or credential_offer_uri.")
   }
 
   suspend fun getCredentialIssuerMetadata(url: String): CredentialIssuerMetadata {
+
     val response = HttpClient.get(url)
     return JsonUtils.read(response.toString(), CredentialIssuerMetadata::class.java)
   }
 
   suspend fun getOidcMetadata(url: String): OidcMetadata {
+
     val response = HttpClient.get(url)
     return JsonUtils.read(response.toString(), OidcMetadata::class.java)
   }
@@ -56,14 +62,18 @@ class VerifiableCredentialsService(
       preAuthorizationCode: String,
       txCode: String?
   ): TokenResponse {
+
     val tokenRequest =
         mutableMapOf(
             Pair("client_id", clientId),
             Pair("grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code"),
             Pair("pre-authorized_code", preAuthorizationCode))
     txCode?.let { tokenRequest.put("tx_code", it) }
+
     val tokenRequestHeaders = hashMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
+
     val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
+
     return JsonUtils.read(response.toString(), TokenResponse::class.java)
   }
 
@@ -74,16 +84,20 @@ class VerifiableCredentialsService(
       authorizationCode: String,
       redirectUri: String? = null,
   ): TokenResponse {
+
     val tokenRequest =
         mutableMapOf(
             Pair("client_id", clientId),
             Pair("grant_type", "authorization_code"),
             Pair("code", authorizationCode))
     redirectUri?.let { tokenRequest.put("redirect_uri", it) }
+
     val tokenRequestHeaders =
         mutableMapOf(Pair("content-type", "application/x-www-form-urlencoded"))
     dpopJwt?.let { tokenRequestHeaders.put("DPoP", it) }
+
     val response = HttpClient.post(url, headers = tokenRequestHeaders, requestBody = tokenRequest)
+
     return JsonUtils.read(response.toString(), TokenResponse::class.java)
   }
 
@@ -95,18 +109,22 @@ class VerifiableCredentialsService(
       vct: String? = null,
       proof: Map<String, Any>? = null,
   ): CredentialResponse {
+
     val credentialRequest =
         mutableMapOf<String, Any>(
             Pair("format", verifiableCredentialType.format),
             Pair("doctype", verifiableCredentialType.doctype))
     vct?.let { credentialRequest.put("vct", it) }
     proof?.let { credentialRequest["proof"] = it }
+
     val credentialRequestHeader =
         dpopJwt?.let {
           return@let mutableMapOf("Authorization" to "DPoP $accessToken", "DPoP" to it)
         } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))
     credentialRequestHeader.put("content-type", "application/json")
+
     val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
+
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
@@ -116,6 +134,7 @@ class VerifiableCredentialsService(
       accessToken: String,
       transactionId: String
   ): CredentialResponse {
+
     val credentialRequest = mutableMapOf(Pair("transaction_id", transactionId))
     val credentialRequestHeader =
         dpopJwt?.let {
@@ -123,6 +142,7 @@ class VerifiableCredentialsService(
         } ?: mutableMapOf(Pair("Authorization", "Bearer $accessToken"))
     credentialRequestHeader.put("content-type", "application/json")
     val response = HttpClient.post(url, credentialRequestHeader, credentialRequest)
+
     return JsonUtils.read(response.toString(), CredentialResponse::class.java)
   }
 
@@ -130,6 +150,7 @@ class VerifiableCredentialsService(
       subject: String,
       verifiableCredentialsRecord: VerifiableCredentialsRecord
   ) {
+
     verifiableCredentialRecordRepository.save(subject, verifiableCredentialsRecord)
   }
 
@@ -139,6 +160,7 @@ class VerifiableCredentialsService(
       credentialConfigurationId: String,
       credentialResponse: CredentialResponse,
   ) {
+
     val id = UUID.randomUUID().toString()
     val credentialIssuanceResult =
         CredentialIssuanceResult(
@@ -153,6 +175,7 @@ class VerifiableCredentialsService(
             status =
                 credentialResponse.credential?.let { CredentialIssuanceResultStatus.SUCCESS }
                     ?: CredentialIssuanceResultStatus.PENDING)
+
     credentialIssuanceResultRepository.register(
         subject = subject, credentialIssuanceResult = credentialIssuanceResult)
   }
@@ -222,7 +245,8 @@ class VerifiableCredentialsService(
           )
       val registrationEndpoint =
           oidcMetadata.registrationEndpoint
-              ?: throw RuntimeException(
+              ?: throw VerifiableCredentialsException(
+                  VcError.VC_ISSUER_UNSUPPORTED_DYNAMIC_CLIENT_REGISTRATION,
                   String.format("not configure registration endpoint (%s)", oidcMetadata.issuer))
 
       val response = HttpClient.post(registrationEndpoint, requestBody = requestBody)

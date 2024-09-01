@@ -1,5 +1,8 @@
 package org.idp.wallet.verifiable_credentials_library.domain.type.vc
 
+import org.idp.wallet.verifiable_credentials_library.domain.error.VcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.VerifiableCredentialsException
+
 data class CredentialIssuerMetadata(
     val credentialIssuer: String,
     val authorizationServers: List<String>?,
@@ -30,7 +33,8 @@ data class CredentialIssuerMetadata(
   fun getVerifiableCredentialsType(credentialConfigurationId: String): VerifiableCredentialsType {
     val format =
         credentialConfigurationsSupported[credentialConfigurationId]?.format
-            ?: throw RuntimeException(
+            ?: throw VerifiableCredentialsException(
+                VcError.INVALID_VC_ISSUER_METADATA,
                 String.format("not found credential configuration (%s)", credentialConfigurationId))
     return VerifiableCredentialsType.of(format)
   }
@@ -41,7 +45,8 @@ data class CredentialIssuerMetadata(
 
   fun getScope(credentialConfigurationId: String): String {
     return credentialConfigurationsSupported[credentialConfigurationId]?.scope
-        ?: throw RuntimeException(
+        ?: throw VerifiableCredentialsException(
+            VcError.INVALID_VC_ISSUER_METADATA,
             String.format("not found scope configuration, (%s)", credentialConfigurationId))
   }
 }

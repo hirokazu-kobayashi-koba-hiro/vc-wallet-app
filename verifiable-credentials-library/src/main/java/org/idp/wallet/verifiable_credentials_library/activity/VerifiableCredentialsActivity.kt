@@ -15,6 +15,8 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.idp.wallet.verifiable_credentials_library.domain.error.OidcError
+import org.idp.wallet.verifiable_credentials_library.domain.error.OpenIdConnectException
 import org.idp.wallet.verifiable_credentials_library.domain.type.oidc.OpenIdConnectRequest
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials.DefaultVerifiableCredentialInteractor
 import org.idp.wallet.verifiable_credentials_library.domain.verifiable_presentation.DefaultVerifiablePresentationInteractor
@@ -77,15 +79,19 @@ class VerifiableCredentialsActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     val openIdConnectRequestValue =
         intent.getStringExtra("openIdConnectRequest")
-            ?: RuntimeException("not found openIdConnectRequest")
+            ?: OpenIdConnectException(
+                OidcError.UNSUPPORTED_OPERATION,
+                "not found openIdConnectRequest.It is required openIdConnectRequest for launch VerifiableCredentialsActivity.")
     val openIdConnectRequest =
         JsonUtils.read(
             openIdConnectRequestValue.toString(),
             OpenIdConnectRequest::class.java,
             snakeCase = false)
     val forceLoginString = intent.getStringExtra("forceLogin") ?: "false"
+
     setContent {
       VerifiableCredentialsApp(
           context = this@VerifiableCredentialsActivity,

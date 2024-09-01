@@ -42,8 +42,10 @@ import org.idp.wallet.verifiable_credentials_library.ui.theme.VcWalletTheme
 import org.idp.wallet.verifiable_credentials_library.util.json.JsonUtils
 
 class DefaultVpConsentActivity : ComponentActivity() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     val viewDataString = intent.getStringExtra("viewData")
     val viewData =
         viewDataString?.let {
@@ -55,6 +57,7 @@ class DefaultVpConsentActivity : ComponentActivity() {
           return@let JsonUtils.read(it, PresentationDefinitionEvaluation::class.java)
         } ?: PresentationDefinitionEvaluation()
     val callback = VerifiablePresentationInteractorCallbackProvider.callback
+
     setContent {
       DefaultVpConsentView(
           viewData = viewData,
