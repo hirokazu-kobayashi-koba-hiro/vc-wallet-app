@@ -151,7 +151,7 @@ class VerifiableCredentialsService(
       verifiableCredentialsRecord: VerifiableCredentialsRecord
   ) {
 
-    verifiableCredentialRecordRepository.save(subject, verifiableCredentialsRecord)
+    verifiableCredentialRecordRepository.register(subject, verifiableCredentialsRecord)
   }
 
   suspend fun registerCredentialIssuanceResult(
@@ -214,10 +214,12 @@ class VerifiableCredentialsService(
   }
 
   suspend fun getOrRegisterClientConfiguration(oidcMetadata: OidcMetadata): ClientConfiguration {
+
     val walletClientConfiguration = walletClientConfigurationRepository.find(oidcMetadata.issuer)
     walletClientConfiguration?.let {
       return it
     }
+
     val clientConfiguration = registerClientConfiguration(oidcMetadata)
     walletClientConfigurationRepository.register(oidcMetadata.issuer, clientConfiguration)
     return clientConfiguration

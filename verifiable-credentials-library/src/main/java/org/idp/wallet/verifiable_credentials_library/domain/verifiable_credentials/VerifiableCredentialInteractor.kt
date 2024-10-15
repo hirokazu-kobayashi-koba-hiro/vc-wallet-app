@@ -26,7 +26,7 @@ interface VerifiableCredentialInteractor {
 }
 
 interface VerifiableCredentialInteractorCallback {
-  fun accept(txCode: String)
+  fun accept(txCode: String?)
 
   fun reject()
 }

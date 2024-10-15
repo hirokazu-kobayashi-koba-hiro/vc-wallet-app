@@ -38,6 +38,6 @@ class VerifiableCredentialRecordDataSourceTest {
             format = "format",
             rawVc = "rawVc",
             payload = mapOf("iss" to "iss"))
-    dataSource.save("1", record)
+    dataSource.register("1", record)
   }
 }
