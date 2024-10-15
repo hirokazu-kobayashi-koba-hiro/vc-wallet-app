@@ -13,4 +13,5 @@ enum class VcError(val error: String, val code: String, val description: String)
   VC_ISSUER_UNSUPPORTED_DYNAMIC_CLIENT_REGISTRATION(
       "issuer_unsupported_error", "3007", "issuer is unsupported dynamic client registration"),
   UNSUPPORTED_OPERATION("system_error", "3090", "Unsupported operation."),
+  UNKNOWN("system_error", "3099", "Unknown error.")
 }

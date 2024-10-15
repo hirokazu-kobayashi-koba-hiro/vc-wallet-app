@@ -20,7 +20,7 @@ class VerifiableCredentialRecordDataSource(db: AppDatabase) : VerifiableCredenti
 
   private val dao = db.verifiableCredentialRecordDao()
 
-  override suspend fun save(sub: String, record: VerifiableCredentialsRecord) =
+  override suspend fun register(sub: String, record: VerifiableCredentialsRecord) =
       withContext(Dispatchers.IO) {
         val entity =
             VerifiableCredentialRecordEntity(

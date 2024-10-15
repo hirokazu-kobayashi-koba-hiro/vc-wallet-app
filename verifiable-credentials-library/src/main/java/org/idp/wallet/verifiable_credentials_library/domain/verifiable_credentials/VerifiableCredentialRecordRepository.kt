@@ -1,7 +1,7 @@
 package org.idp.wallet.verifiable_credentials_library.domain.verifiable_credentials
 
 interface VerifiableCredentialRecordRepository {
-  suspend fun save(sub: String, record: VerifiableCredentialsRecord)
+  suspend fun register(sub: String, record: VerifiableCredentialsRecord)
 
   suspend fun find(
       sub: String,

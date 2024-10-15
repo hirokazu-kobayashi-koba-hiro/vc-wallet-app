@@ -112,6 +112,11 @@ object JoseUtils {
     val jwkSet = JWKSet(parsedJwk)
     return jwkSet.toString(false)
   }
+
+  fun transformPublicKeyAsJwk(jwk: String): JWK {
+    val parsedJwk = JWK.parse(jwk)
+    return parsedJwk.toPublicJWK()
+  }
 }
 
 class JwtObject(private val jwt: JWT) {

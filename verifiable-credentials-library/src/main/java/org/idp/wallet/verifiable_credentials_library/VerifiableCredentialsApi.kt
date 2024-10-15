@@ -2,6 +2,7 @@ package org.idp.wallet.verifiable_credentials_library
 
 import android.content.Context
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.ClientConfiguration
 import org.idp.wallet.verifiable_credentials_library.domain.configuration.WalletConfiguration
@@ -84,17 +85,14 @@ object VerifiableCredentialsApi {
           service.getOidcMetadata(credentialIssuerMetadata.getOpenIdConfigurationEndpoint())
       val clientConfiguration = service.getOrRegisterClientConfiguration(oidcMetadata)
 
-      val result = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
-      if (!result.first) {
-        throw VerifiableCredentialsException(VcError.NOT_AUTHENTICATED, "user canceled")
-      }
+      val txCode = interact(context, credentialIssuerMetadata, credentialOffer, interactor)
 
       val tokenResponse =
           service.requestTokenWithPreAuthorizedCode(
               url = oidcMetadata.tokenEndpoint,
               clientId = clientConfiguration.clientId,
               preAuthorizationCode = preAuthorizedCodeGrant.preAuthorizedCode,
-              txCode = result.second)
+              txCode = txCode)
 
       val verifiableCredentialsType =
           credentialIssuerMetadata.getVerifiableCredentialsType(
@@ -423,15 +421,16 @@ object VerifiableCredentialsApi {
       credentialIssuerMetadata: CredentialIssuerMetadata,
       credentialOffer: CredentialOffer,
       interactor: VerifiableCredentialInteractor
-  ): Pair<Boolean, String?> = suspendCoroutine { continuation ->
+  ): String? = suspendCoroutine { continuation ->
     val callback =
         object : VerifiableCredentialInteractorCallback {
-          override fun accept(txCode: String) {
-            continuation.resume(Pair(true, txCode))
+          override fun accept(txCode: String?) {
+            continuation.resume(txCode)
           }
 
           override fun reject() {
-            continuation.resume(Pair(false, null))
+            continuation.resumeWithException(
+                VerifiableCredentialsException(VcError.NOT_AUTHENTICATED, "user canceled"))
           }
         }
     interactor.confirm(context, credentialIssuerMetadata, credentialOffer, callback)
