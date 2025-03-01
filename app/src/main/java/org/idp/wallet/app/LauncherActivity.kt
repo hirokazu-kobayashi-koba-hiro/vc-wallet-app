@@ -38,13 +38,13 @@ class LauncherActivity : FragmentActivity() {
   private fun login() {
     val request =
         OpenIdConnectRequest(
-            issuer = "https://dev-l6ns7qgdx81yv2rs.us.auth0.com",
-            clientId = "sKUsWLY5BCzdXAggk78km7kOjfQP1rWR",
+            issuer = getString(R.string.com_vc_wallet_issuer),
+            clientId = getString(R.string.com_vc_wallet_client_id),
             scope = "openid profile phone email address offline_access",
             state = UUID.randomUUID().toString(),
             nonce = UUID.randomUUID().toString(),
             redirectUri =
-                "org.idp.verifiable.credentials://dev-l6ns7qgdx81yv2rs.us.auth0.com/android/org.idp.wallet.app/callback")
+            "org.idp.verifiable.credentials://${getString(R.string.com_vc_wallet_domain)}/android/org.idp.wallet.app/callback")
     VerifiableCredentialsClient.start(context = this, request = request, forceLogin = true)
   }
 }
